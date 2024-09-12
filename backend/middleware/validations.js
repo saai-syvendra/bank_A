@@ -9,10 +9,11 @@ const handleValidationErrors = async (req, res, next) => {
 };
 
 export const validateAccountRequest = [
+    body("balance").isNumeric(),
     body("customerId").isNumeric({ min: 0 }).withMessage("Invalid customer ID"),
     body("accountType")
         .isIn(["saving", "checking"])
         .withMessage("Invalid account type"),
-    body("accountBalance").isFloat({ min: 0 }),
+    body("balance").isFloat({ min: 0 }),
     handleValidationErrors,
 ];
