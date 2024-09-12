@@ -52,3 +52,5 @@ backend/build/
 frontend/build/
 
 .history/
+
+pending.txt
