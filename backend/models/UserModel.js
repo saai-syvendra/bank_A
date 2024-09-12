@@ -4,9 +4,9 @@ import { pool } from "../middleware/constants.js";
 const getUserByUsername = async (username) => {
     const [row] = await pool.query(
         `
-          SELECT User_Role.ID, User_Role.Username, User_Role.Hashed_Pwd, User_Role.Employee_ID, User_Role.Customer_ID, Roles.Role_Name
-          FROM User_Role, Roles
-          WHERE User_Role.Role_ID=Roles.ID AND Username=?;
+          SELECT *
+          FROM User_Account
+          WHERE username=?;
       `,
         [username]
     );
@@ -19,7 +19,7 @@ const getUserByUsername = async (username) => {
 const verifyUser = async (username, password) => {
     const user = await getUserByUsername(username);
 
-    const isPasswordValid = await bcrypt.compare(password, user["Hashed_Pwd"]);
+    const isPasswordValid = await bcrypt.compare(password, user["hashed_pwd"]);
     if (!isPasswordValid) throw new Error("Invalid password");
     // console.log(user);
 
@@ -27,53 +27,53 @@ const verifyUser = async (username, password) => {
 };
 
 // Verify OTP
-const verifyOtp = async (userId, otp) => {
+const verifyOtp = async (username, otp) => {
     const [row] = await pool.query(
         `
           SELECT *
           FROM Otps
-          WHERE User_ID=?;
+          WHERE username=?;
       `,
-        [userId]
+        [username]
     );
     const otpDetails = row[0];
     if (!otpDetails) throw new Error("OTP not found");
 
-    if (otpDetails["Wrong_Count"] >= 3)
+    if (otpDetails["wrong_count"] >= 3)
         throw new Error("OTP verification failed 3 times");
 
-    if (otp != otpDetails["Otp"]) {
+    if (otp != otpDetails["otp"]) {
         await pool.query(
             `
-            UPDATE Otps SET Wrong_Count = Wrong_Count+1 WHERE User_Id = ?    
+            UPDATE Otps SET wrong_count = wrong_count+1 WHERE username = ?    
         `,
-            [userId]
+            [username]
         );
         throw new Error("OTP incorrect");
     } else {
         await pool.query(
             `
-            DELETE FROM Otps WHERE User_ID = ?;    
+            DELETE FROM Otps WHERE username = ?;    
         `,
-            [userId]
+            [username]
         );
     }
 };
 
-const deleteUserOtps = async (userId) => {
+const deleteUserOtps = async (username) => {
     await pool.query(
         `
-        DELETE FROM Otps WHERE User_ID = ?`,
-        [userId]
+        DELETE FROM Otps WHERE username = ?`,
+        [username]
     );
 };
 
-const insertOtp = async (userId, otp) => {
+const insertOtp = async (username, otp) => {
     const expiresAt = await new Date(Date.now() + 5 * 60 * 1000);
     await pool.query(
-        `INSERT INTO Otps (User_Id, Otp, Expires_At) VALUES
+        `INSERT INTO Otps (username, otp, expires_at) VALUES
         (?, ?, ?)`,
-        [userId, otp, expiresAt]
+        [username, otp, expiresAt]
     );
 };
 

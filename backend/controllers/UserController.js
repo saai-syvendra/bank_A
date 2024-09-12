@@ -4,15 +4,15 @@ import crypto from "crypto";
 import { transporter } from "../middleware/constants.js";
 import UserModel from "../models/UserModel.js";
 
-const generateAndEmailOtp = async (userId, email, reason) => {
+const generateAndEmailOtp = async (username, reason) => {
     // If current user has preexisting OTP verification remove them
 
-    await UserModel.deleteUserOtps(userId);
+    await UserModel.deleteUserOtps(username);
 
     const otp = crypto.randomInt(100000, 999999).toString();
     let message = {
         from: "syvendratech@gmail.com",
-        to: email,
+        to: username,
         subject: "One Time Passowrd",
         html: `A one time password has been requested by you for the following reason: ${reason}
         <br><br> One Time Password: <b>${otp}</b>`,
@@ -21,8 +21,8 @@ const generateAndEmailOtp = async (userId, email, reason) => {
     transporter
         .sendMail(message)
         .then(async (info) => {
-            await UserModel.insertOtp(userId, otp);
-            console.log(`\nOTP for ${email} is ${otp}`);
+            await UserModel.insertOtp(username, otp);
+            console.log(`\nOTP for ${username} is ${otp}`);
         })
         .catch((error) => {
             console.log(error);
@@ -36,9 +36,9 @@ const login = async (req, res) => {
         // console.log(username, password);
         const jwtSecret = process.env.JWT_SECRET;
         const user = await UserModel.verifyUser(username, password);
-        await generateAndEmailOtp(user["ID"], username, "Login verification");
+        await generateAndEmailOtp(username, "Login verification");
         const token = jwt.sign(
-            { userId: user["ID"], username: user["Username"] },
+            { username: user["username"] },
             jwtSecret,
             {
                 expiresIn: "5m",
@@ -64,30 +64,27 @@ const loginOtp = async (req, res) => {
 
         if (!authToken) return res.sendStatus(401);
 
-        let userId;
         let username;
         jwt.verify(authToken, jwtSecret, (err, user) => {
             if (err) {
                 return res.sendStatus(403);
             }
-            userId = user.userId;
             username = user.username;
         });
 
-        await UserModal.verifyOtp(userId, otp);
+        await UserModel.verifyOtp(username, otp);
 
         const user = await UserModel.getUserByUsername(username);
         const id =
-            user["Role_Name"] === "customer"
-                ? user["Customer_Id"]
-                : user["Employee_Id"];
+            user["user_role"] === "customer"
+                ? user["customer_id"]
+                : user["emp_id"];
 
         const token = jwt.sign(
             {
-                userId: user["ID"],
-                role: user["Role_Name"],
+                role: user["user_role"],
                 id,
-                username: user["Username"],
+                username: user["username"],
             },
             jwtSecret,
             {
@@ -99,7 +96,7 @@ const loginOtp = async (req, res) => {
             maxAge: 15 * 60 * 1000, // 15 minutes
         });
         // console.log("Token: ", token);
-        return res.json({ message: "OTP Verified", role: user["Role_Name"] });
+        return res.json({ message: "OTP Verified", role: user["user_role"] });
     } catch (error) {
         console.log(error);
         return res.status(500).send({ message: error.message });
@@ -143,7 +140,7 @@ const verify = async (req, res) => {
         username = user.username;
 
         const userDetails = await UserModel.getUserByUsername(username);
-        if (!roles.includes(userDetails["Role_Name"])) {
+        if (!roles.includes(userDetails["user_role"])) {
             return res.status(403).send({ message: "Access denied" });
         }
 
