@@ -17,10 +17,6 @@ const Dashboard = () => {
         return <EmployeeDashboard />;
     } else if (role === "admin") {
         return <AdminDashboard />;
-    } else {
-        logout();
-        navigate("/login");
-        return null;
     }
 };
 

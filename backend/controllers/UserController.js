@@ -37,13 +37,9 @@ const login = async (req, res) => {
         const jwtSecret = process.env.JWT_SECRET;
         const user = await UserModel.verifyUser(username, password);
         await generateAndEmailOtp(username, "Login verification");
-        const token = jwt.sign(
-            { username: user["username"] },
-            jwtSecret,
-            {
-                expiresIn: "5m",
-            }
-        );
+        const token = jwt.sign({ username: user["username"] }, jwtSecret, {
+            expiresIn: "5m",
+        });
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 5 * 60 * 1000, // 5 minutes
@@ -88,7 +84,7 @@ const loginOtp = async (req, res) => {
             },
             jwtSecret,
             {
-                expiresIn: "15m",
+                expiresIn: "15h",
             }
         );
         res.cookie("token", token, {
@@ -123,9 +119,6 @@ const verify = async (req, res) => {
             return res.status(401).send({ message: "Not logged in" });
         }
 
-        let userId;
-        let username;
-
         // Wrapping jwt.verify in a Promise to handle it asynchronously
         const user = await new Promise((resolve, reject) => {
             jwt.verify(authToken, jwtSecret, (err, user) => {
@@ -135,16 +128,20 @@ const verify = async (req, res) => {
                 resolve(user);
             });
         });
+        const role = user.role;
 
-        userId = user.userId;
-        username = user.username;
+        if (!role) {
+            return res.status(403).send({ message: "OTP verification needed" });
+        }
 
-        const userDetails = await UserModel.getUserByUsername(username);
-        if (!roles.includes(userDetails["user_role"])) {
+        if (!roles.includes(role)) {
             return res.status(403).send({ message: "Access denied" });
         }
 
-        return res.json({ message: "Access granted" });
+        return res.json({
+            role: userDetails["user_role"],
+            message: "Access granted",
+        });
     } catch (error) {
         console.log(error);
         if (

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { toast } from "sonner";
-import { verifyRole } from "../api/UserApi";
+import { logout, verifyRole } from "../api/UserApi";
 
 const ProtectedRoute = ({ roles }) => {
     const [isAuthorized, setIsAuthorized] = useState(null);
@@ -13,6 +13,9 @@ const ProtectedRoute = ({ roles }) => {
                 await verifyRole(roles);
                 setIsAuthorized(true);
             } catch (error) {
+                if (error.message === "OTP verification needed") {
+                    await logout();
+                }
                 toast.error(error.message);
                 setIsAuthorized(false);
             } finally {
@@ -24,7 +27,7 @@ const ProtectedRoute = ({ roles }) => {
     }, [roles]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div></div>;
     }
 
     return isAuthorized ? <Outlet /> : <Navigate to="/login" replace />;
