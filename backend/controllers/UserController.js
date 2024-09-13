@@ -18,16 +18,19 @@ const generateAndEmailOtp = async (username, reason) => {
         <br><br> One Time Password: <b>${otp}</b>`,
     };
 
-    transporter
-        .sendMail(message)
-        .then(async (info) => {
-            await UserModel.insertOtp(username, otp);
-            console.log(`\nOTP for ${username} is ${otp}`);
-        })
-        .catch((error) => {
-            console.log(error);
-            throw new Error("Error in sending OTP!");
-        });
+    // transporter
+    //     .sendMail(message)
+    //     .then(async (info) => {
+    //         await UserModel.insertOtp(username, otp);
+    //         console.log(`\nOTP for ${username} is ${otp}`);
+    //     })
+    //     .catch((error) => {
+    //         console.log(error);
+    //         throw new Error("Error in sending OTP!");
+    //     });
+
+    await UserModel.insertOtp(username, otp);
+    console.log(`\nOTP for ${username} is ${otp}`);
 };
 
 const login = async (req, res) => {
