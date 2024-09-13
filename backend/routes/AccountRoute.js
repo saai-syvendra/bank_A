@@ -1,18 +1,27 @@
 import express from "express";
 import AccountController from "../controllers/AccountController.js";
-import { authenticateJWT, authorizeRole } from "../middleware/auth.js";
+import { authorizeRole } from "../middleware/auth.js";
 import { validateAccountRequest } from "../middleware/validations.js";
 
 const router = express.Router();
 
 router.post(
     "/",
-    authenticateJWT,
     authorizeRole("employee", "manager"),
     validateAccountRequest,
     AccountController.createAccount
 );
 
-router.post("/test", AccountController.getCustomerAccounts);
+router.get(
+    "/saving-plans",
+    authorizeRole("employee", "manager"),
+    AccountController.getSavingPlans
+);
+
+router.get(
+    "/",
+    authorizeRole("employee", "manager"),
+    AccountController.getAccountDetails
+);
 
 export default router;
