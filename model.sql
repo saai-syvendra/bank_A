@@ -155,20 +155,50 @@ INSERT INTO FD_Plan (plan_name, interest, months, availability) VALUES
 
 -- Create Accounts table
 CREATE TABLE Customer_Account (
-  account_id        INT AUTO_INCREMENT,
-  account_number    CHAR(12),
+  account_id        INT,
+  account_number    CHAR(12) UNIQUE,
   plan_id           INT NOT NULL,
   branch_code       INT NOT NULL,
   customer_id       INT NOT NULL,
   balance           NUMERIC(12,2),
   starting_date     DATE,
   account_type      ENUM('saving','checking'),
-  withdrawal_count INT,
+  withdrawal_count  INT DEFAULT 0,
   PRIMARY KEY (account_id),
   FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
   FOREIGN KEY (branch_code) REFERENCES Branch(branch_code),
   FOREIGN KEY (plan_id) REFERENCES saving_plan(plan_id)
 );
+
+-- Generating Account No
+DELIMITER //
+CREATE TRIGGER BeforeInsertCustomerAccount
+BEFORE INSERT ON Customer_Account
+FOR EACH ROW
+BEGIN
+    -- Declare a variable to hold the max account_id
+    DECLARE v_max_account_id INT;
+
+    -- Find the max account_id manually
+    SELECT COALESCE(MAX(account_id), 0) + 1 INTO v_max_account_id FROM Customer_Account;
+
+    -- Set the account_id manually
+    SET NEW.account_id = v_max_account_id;
+
+    -- Generate the Account_No
+    SET NEW.account_number = CONCAT(
+        LPAD(NEW.customer_id, 5, '0'),            
+        LPAD(NEW.branch_code, 2, '0'),            
+        LPAD(NEW.account_id, 4, '0'),  
+        CASE NEW.account_type 
+            WHEN 'saving' THEN '1'
+            WHEN 'checking' THEN '2'
+        END
+    );
+END //
+DELIMITER ;
+
+
 
 -- create Loan Table
 CREATE TABLE Loan (

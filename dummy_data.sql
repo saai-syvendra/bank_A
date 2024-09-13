@@ -44,16 +44,16 @@ UPDATE Branch SET manager_id = 100 WHERE branch_code = 1;
 UPDATE Branch SET manager_id = 103 WHERE branch_code = 2;
 
 -- Insert data into Customer_Account table (for savings and checking accounts)
-INSERT INTO Customer_Account (account_number, plan_id, branch_code, customer_id, balance, starting_date, account_type, withdrawal_count) VALUES
-('123456789012', 1, 1, 10000, 15000.00, '2023-09-01', 'saving', 0),
-('234567890123', 2, 2, 10001, 10000.00, '2023-09-02', 'saving', 0),
-('345678901234', 3, 1, 10002, 20000.00, '2023-09-03', 'saving', 0),
-('456789012345', 1, 1, 10003, 18000.00, '2023-09-04', 'saving', 0),
-('567890123456', 2, 1, 10004, 12000.00, '2023-09-05', 'saving', 0),
-('678901234567', 3, 2, 10005, 16000.00, '2023-09-06', 'saving', 0),
-('789012345678', 1, 2, 10006, 14000.00, '2023-09-07', 'saving', 0),
-('890123456789', 2, 2, 10007, 17000.00, '2023-09-08', 'saving', 0),
-('901234567890', 3, 1, 10008, 50000.00, '2023-09-09', 'checking', 0);
+INSERT INTO Customer_Account (plan_id, branch_code, customer_id, balance, starting_date, account_type) VALUES
+(1, 1, 10000, 15000.00, '2023-09-01', 'saving'),
+(2, 2, 10001, 10000.00, '2023-09-02', 'saving'),
+(3, 1, 10001, 20000.00, '2023-09-03', 'saving'),
+(1, 1, 10003, 18000.00, '2023-09-04', 'saving'),
+( 2, 1, 10004, 12000.00, '2023-09-05', 'saving'),
+(3, 2, 10005, 16000.00, '2023-09-06', 'saving'),
+(1, 2, 10006, 14000.00, '2023-09-07', 'saving'),
+(2, 2, 10007, 17000.00, '2023-09-08', 'saving'),
+(3, 1, 10008, 50000.00, '2023-09-09', 'checking');
 
 -- Insert data into FD table (fixed deposits)
 INSERT INTO FD (plan_id, account_id, starting_date, maturity_date) VALUES
