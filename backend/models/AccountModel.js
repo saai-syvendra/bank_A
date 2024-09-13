@@ -1,48 +1,85 @@
 import { pool } from "../middleware/constants.js";
 
 const getAccountById = async (id) => {
-    const [row] = await pool.query(
-        `
-          SELECT * 
-          FROM Customer_Account 
-          WHERE account_id = ?;
-      `,
-        [id]
-    );
-    const account = row[0];
-    if (!account) throw new Error("Invalid accountId");
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-    return account;
+        const [row] = await connection.query(
+            `
+              SELECT * 
+              FROM Customer_Account 
+              WHERE account_id = ?;
+          `,
+            [id]
+        );
+        const account = row[0];
+        if (!account) throw new Error("Invalid accountId");
+
+        await connection.commit();
+        return account;
+    } catch (error) {
+        if (connection) await connection.rollback();
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
 };
 
 const getAccountByAccountNo = async (accountNo) => {
-    const [row] = await pool.query(
-        `
-          SELECT * 
-          FROM Customer_Account 
-          WHERE account_number = ?;
-      `,
-        [accountNo]
-    );
-    const account = row[0];
-    if (!account) throw new Error("Invalid accountId");
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-    return account;
+        const [row] = await connection.query(
+            `
+              SELECT * 
+              FROM Customer_Account 
+              WHERE account_number = ?;
+          `,
+            [accountNo]
+        );
+        const account = row[0];
+        if (!account) throw new Error("Invalid accountId");
+
+        await connection.commit();
+        return account;
+    } catch (error) {
+        if (connection) await connection.rollback();
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
 };
 
 const getCustomerAccounts = async (customerId) => {
-    const [rows] = await pool.query(
-        `
-          SELECT * 
-          FROM Customer_Account 
-          WHERE customer_id = ?;
-      `,
-        [customerId]
-    );
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-    if (rows.length === 0)
-        throw new Error("No accounts found for this customer");
-    return rows;
+        const [rows] = await connection.query(
+            `
+              SELECT * 
+              FROM Customer_Account 
+              WHERE customer_id = ?;
+          `,
+            [customerId]
+        );
+
+        if (rows.length === 0)
+            throw new Error("No accounts found for this customer");
+
+        await connection.commit();
+        return rows;
+    } catch (error) {
+        if (connection) await connection.rollback();
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
 };
 
 const createAccount = async (
@@ -52,59 +89,107 @@ const createAccount = async (
     balance,
     account_type
 ) => {
-    await pool.query(
-        `
-          INSERT INTO Customer_Account (plan_id, branch_code, customer_id, balance, starting_date, account_type)
-          VALUES (?, ?, ?, ?, CURRENT_DATE(), ?);
-      `,
-        [plan_id, branch_code, customer_id, balance, account_type]
-    );
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        await connection.query(
+            `
+              INSERT INTO Customer_Account (plan_id, branch_code, customer_id, balance, starting_date, account_type)
+              VALUES (?, ?, ?, ?, CURRENT_DATE(), ?);
+          `,
+            [plan_id, branch_code, customer_id, balance, account_type]
+        );
+
+        await connection.commit();
+    } catch (error) {
+        if (connection) await connection.rollback();
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
 };
 
 const getSavingPlans = async () => {
-    const [rows] = await pool.query(
-        `
-          SELECT * 
-          FROM Saving_Plan
-          WHERE availability = "yes";
-      `
-    );
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-    return rows;
+        const [rows] = await connection.query(
+            `
+              SELECT * 
+              FROM Saving_Plan
+              WHERE availability = "yes";
+          `
+        );
+
+        await connection.commit();
+        return rows;
+    } catch (error) {
+        if (connection) await connection.rollback();
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
 };
 
 const getSavingPlan = async (planId) => {
-    const [row] = await pool.query(
-        `
-            SELECT *
-            FROM Saving_Plan
-            WHERE plan_id = ?;
-        `,
-        [planId]
-    );
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-    const plan = row[0];
-    if (!plan) throw new Error("Invalid planId");
+        const [row] = await connection.query(
+            `
+                SELECT *
+                FROM Saving_Plan
+                WHERE plan_id = ?;
+            `,
+            [planId]
+        );
 
-    if (plan["availability"] === "no") throw new Error("Plan unavailable");
+        const plan = row[0];
+        if (!plan) throw new Error("Invalid planId");
+        if (plan["availability"] === "no") throw new Error("Plan unavailable");
 
-    return plan;
+        await connection.commit();
+        return plan;
+    } catch (error) {
+        if (connection) await connection.rollback();
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
 };
 
 const getBranch = async (branchCode) => {
-    const [row] = await pool.query(
-        `
-            SELECT *
-            FROM Branch
-            WHERE branch_code = ?;
-        `,
-        [branchCode]
-    );
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-    const branch = row[0];
-    if (!branch) throw new Error("Invalid branchId");
+        const [row] = await connection.query(
+            `
+                SELECT *
+                FROM Branch
+                WHERE branch_code = ?;
+            `,
+            [branchCode]
+        );
 
-    return branch;
+        const branch = row[0];
+        if (!branch) throw new Error("Invalid branchId");
+
+        await connection.commit();
+        return branch;
+    } catch (error) {
+        if (connection) await connection.rollback();
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
 };
 
 export default {
