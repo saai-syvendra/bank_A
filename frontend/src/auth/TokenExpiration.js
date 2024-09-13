@@ -8,9 +8,11 @@ const useTokenExpiration = () => {
 
     const logoutUser = async () => {
         await logout();
+        localStorage.removeItem("role");
         navigate("/login", { replace: true });
         toast.warning("Session timedout!");
     };
+
     useEffect(() => {
         const logoutLogic = async () => {
             const { expirationTime } = await userExpiration();

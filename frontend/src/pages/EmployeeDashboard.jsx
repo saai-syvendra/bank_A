@@ -9,7 +9,14 @@ import {
 import ViewBranchTransactions from "../tabs/employee_tabs/ViewBranchTransactions";
 import CreateAccountForm from "../forms/CreateAccountForm";
 import LogoutButton from "../components/LogoutButton";
+import useAuthorization from "../auth/useAuthorization";
+
 const EmployeeDashboard = () => {
+    const loading = useAuthorization(["manager", "employee"]);
+
+    if (loading) {
+        return <div></div>;
+    }
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow-md">

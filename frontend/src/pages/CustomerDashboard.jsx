@@ -7,8 +7,15 @@ import {
 } from "../components/ui/tabs";
 import ViewTransactions from "../tabs/customer_tabs/ViewTransactions";
 import LogoutButton from "../components/LogoutButton";
+import useAuthorization from "../auth/useAuthorization";
 
 const CustomerDashboard = () => {
+    const loading = useAuthorization(["customer"]);
+
+    if (loading) {
+        return <div></div>;
+    }
+
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow-md">

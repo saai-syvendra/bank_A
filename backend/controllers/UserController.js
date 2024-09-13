@@ -84,7 +84,7 @@ const loginOtp = async (req, res) => {
             },
             jwtSecret,
             {
-                expiresIn: "15h",
+                expiresIn: "15m",
             }
         );
         res.cookie("token", token, {
@@ -139,7 +139,7 @@ const verify = async (req, res) => {
         }
 
         return res.json({
-            role: userDetails["user_role"],
+            role: role,
             message: "Access granted",
         });
     } catch (error) {
