@@ -10,6 +10,7 @@ import ViewBranchTransactions from "../tabs/employee_tabs/ViewBranchTransactions
 import CreateAccountForm from "../forms/CreateAccountForm";
 import LogoutButton from "../components/LogoutButton";
 import useAuthorization from "../auth/useAuthorization";
+import CreateCustomer from "../tabs/employee_tabs/CreateCustomer";
 
 const EmployeeDashboard = () => {
     const loading = useAuthorization(["manager", "employee"]);
@@ -50,10 +51,10 @@ const EmployeeDashboard = () => {
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="create-account">
-                        <CreateAccountForm />
+                        <CreateAccountForm triggerFetchCustomers={true} />
                     </TabsContent>
                     <TabsContent value="create-customer">
-                        Create Customer
+                        <CreateCustomer />
                     </TabsContent>
                     <TabsContent value="create-loan">Create Loan</TabsContent>
                     <TabsContent value="transactions">

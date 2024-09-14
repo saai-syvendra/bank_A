@@ -21,11 +21,11 @@ import { toast } from "sonner";
 const formSchema = z.object({
     customerId: z.coerce.number().min(10000),
     accountType: z.enum(["checking", "saving"]),
-    planId: z.coerce.number().min(1).optional(),
+    planId: z.coerce.number().min(0),
     balance: z.coerce.number().min(0),
 });
 
-const CreateAccountForm = () => {
+const CreateAccountForm = ({ triggerFetchCustomers }) => {
     const [plans, setPlans] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [minimumBalance, setMinimumBalance] = useState(null);
@@ -34,9 +34,9 @@ const CreateAccountForm = () => {
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            customerId: "",
+            customerId: 0,
             accountType: "checking",
-            planId: "",
+            planId: 0,
             balance: 0,
         },
     });
@@ -52,6 +52,7 @@ const CreateAccountForm = () => {
     };
 
     const onSave = async (data) => {
+        setIsLoading(true);
         if (data.accountType === "checking") {
             data.planId = null;
         } else {
@@ -67,18 +68,22 @@ const CreateAccountForm = () => {
             form.reset();
         } catch (error) {
             toast.error(error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchCustomers();
-    }, []);
+        if (triggerFetchCustomers) {
+            fetchCustomers();
+        }
+    }, [triggerFetchCustomers]);
 
     useEffect(() => {
         if (form.watch("accountType") === "saving") {
             fetchPlans();
         } else {
-            form.setValue("plan", undefined);
+            form.setValue("plan", 0);
             form.setValue("balance", 0);
         }
     }, [form.watch("accountType")]);

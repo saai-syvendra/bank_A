@@ -65,9 +65,6 @@ const validateIndividual = [
     body("customerDetails.dob")
         .isDate()
         .withMessage("Date of birth is required and must be a valid date"),
-    body("customerDetails.age")
-        .isNumeric({ min: 0 })
-        .withMessage("Age must be a valid number"),
     body("customerDetails.address")
         .isString()
         .withMessage("Address must be a string"),
@@ -118,6 +115,7 @@ export const validateCreateCustomer = [
         // Check for validation errors
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.log(errors.array());
             return res.status(400).json({ errors: errors.array() });
         }
 
