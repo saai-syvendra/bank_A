@@ -44,9 +44,6 @@ const updateEmployeeDetail = async (req, res) => {
             last_name: data.lastName,
             mobile: data.mobile,
             address: data.address,
-            email: data.email,
-            dob: data.dob,
-            nic: data.nic,
         };
 
         await CustomerModel.updateCustomer(
