@@ -37,7 +37,7 @@ FOREIGN KEY (manager_id) REFERENCES Employee(emp_id);
 
 -- Create Organization Table
 CREATE TABLE Organisation (
-  brc               CHAR(6) NOT NULL,
+  brc               CHAR(6) UNIQUE NOT NULL,
   org_name          VARCHAR(50) NOT NULL,
   address           VARCHAR(300),
   telephone         CHAR(10),
@@ -57,7 +57,6 @@ CREATE TABLE Person (
   dob                   DATE NOT NULL,
   age                   INT,
   address               VARCHAR(300),
-  telephone             CHAR(10),
   customer_id           INT,
   PRIMARY KEY (customer_id),
   FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
@@ -157,7 +156,7 @@ INSERT INTO FD_Plan (plan_name, interest, months, availability) VALUES
 CREATE TABLE Customer_Account (
   account_id        INT,
   account_number    CHAR(12) UNIQUE,
-  plan_id           INT NOT NULL,
+  plan_id           INT,
   branch_code       INT NOT NULL,
   customer_id       INT NOT NULL,
   balance           NUMERIC(12,2),
@@ -170,15 +169,44 @@ CREATE TABLE Customer_Account (
   FOREIGN KEY (plan_id) REFERENCES saving_plan(plan_id)
 );
 
--- Generating Account No
 DELIMITER //
-CREATE TRIGGER BeforeInsertCustomerAccount
+
+CREATE TRIGGER check_minimum_balance
 BEFORE INSERT ON Customer_Account
 FOR EACH ROW
 BEGIN
+	DECLARE min_balance DECIMAL(12,2);
+    
     -- Declare a variable to hold the max account_id
     DECLARE v_max_account_id INT;
+    
+    -- Check if account type is 'saving'
+    IF NEW.account_type = 'saving' THEN
 
+        -- Fetch the minimum balance for the selected saving plan
+        SELECT minimum_balance INTO min_balance
+        FROM Saving_Plan
+        WHERE plan_id = NEW.plan_id;
+
+        -- Check if the new balance meets the required minimum balance
+        IF NEW.balance < min_balance THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Balance is below the minimum required for this saving plan.';
+        END IF;
+
+    ELSE
+        IF NEW.balance < 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Checking account balance cannot be less than zero.';
+        END IF;
+        
+        -- Ensure plan_id is NULL for checking accounts
+        IF NEW.plan_id IS NOT NULL THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Plan ID must be null for checking accounts.';
+        END IF;
+    END IF;
+    
     -- Find the max account_id manually
     SELECT COALESCE(MAX(account_id), 0) + 1 INTO v_max_account_id FROM Customer_Account;
 
@@ -195,7 +223,8 @@ BEGIN
             WHEN 'checking' THEN '2'
         END
     );
-END //
+END//
+
 DELIMITER ;
 
 

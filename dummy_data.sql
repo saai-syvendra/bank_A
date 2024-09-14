@@ -18,15 +18,15 @@ INSERT INTO Customer (c_type) VALUES
 ('organisation');
 
 -- Insert data into Person table
-INSERT INTO Person (nic, first_name, last_name, mobile, email, dob, address, telephone, customer_id) VALUES
-('200246579845', 'John', 'Doe', '0771234567', 'john.doe@example.com', '1957-01-01', '123 Elm St, Moratuwa', '0715489758', 10000),
-('199975312546', 'Jane', 'Smith', '0778765432', 'jane.smith@example.com', '2012-02-02', '456 Oak St, Dehiwala', '0714567589', 10001),
-('200412345698', 'Alice', 'Brown', '0776543210', 'alice.brown@example.com', '1980-03-03', '789 Pine St, Rathmalana', '0714528796', 10002),
-('196745679852', 'Bob', 'White', '0777894561', 'bob.white@example.com', '2000-04-04', '321 Maple St, Colombo 06', '0778945612', 10003),
-('200589764321', 'Michael', 'Johnson', '0771597532', 'michael.johnson@example.com', '1985-05-05', '12 Birch St, Nugegoda', '0716584975', 10004),
-('199812345987', 'Emily', 'Davis', '0779517536', 'emily.davis@example.com', '1999-06-06', '34 Cedar St, Battaramulla', '0715497365', 10005),
-('200145789632', 'David', 'Miller', '0773579514', 'david.miller@example.com', '1972-07-07', '56 Palm St, Mount Lavinia', '0712584963', 10006),
-('199356987412', 'Sarah', 'Wilson', '0776549871', 'sarah.wilson@example.com', '1995-08-08', '78 Willow St, Maharagama', '0714987521',10007);
+INSERT INTO Person (nic, first_name, last_name, mobile, email, dob, address, customer_id) VALUES
+('200246579845', 'John', 'Doe', '0771234567', 'john.doe@example.com', '1957-01-01', '123 Elm St, Moratuwa', 10000),
+('199975312546', 'Jane', 'Smith', '0778765432', 'jane.smith@example.com', '2012-02-02', '456 Oak St, Dehiwala', 10001),
+('200412345698', 'Alice', 'Brown', '0776543210', 'alice.brown@example.com', '1980-03-03', '789 Pine St, Rathmalana', 10002),
+('196745679852', 'Bob', 'White', '0777894561', 'bob.white@example.com', '2000-04-04', '321 Maple St, Colombo 06', 10003),
+('200589764321', 'Michael', 'Johnson', '0771597532', 'michael.johnson@example.com', '1985-05-05', '12 Birch St, Nugegoda', 10004),
+('199812345987', 'Emily', 'Davis', '0779517536', 'emily.davis@example.com', '1999-06-06', '34 Cedar St, Battaramulla', 10005),
+('200145789632', 'David', 'Miller', '0773579514', 'david.miller@example.com', '1972-07-07', '56 Palm St, Mount Lavinia', 10006),
+('199356987412', 'Sarah', 'Wilson', '0776549871', 'sarah.wilson@example.com', '1995-08-08', '78 Willow St, Maharagama', 10007);
 
 -- Insert data into Organisation table
 INSERT INTO Organisation (brc, org_name, address, telephone, email, customer_id) VALUES
@@ -53,7 +53,7 @@ INSERT INTO Customer_Account (plan_id, branch_code, customer_id, balance, starti
 (3, 2, 10005, 16000.00, '2023-09-06', 'saving'),
 (1, 2, 10006, 14000.00, '2023-09-07', 'saving'),
 (2, 2, 10007, 17000.00, '2023-09-08', 'saving'),
-(3, 1, 10008, 50000.00, '2023-09-09', 'checking');
+(null, 1, 10008, 50000.00, '2023-09-09', 'checking');
 
 -- Insert data into FD table (fixed deposits)
 INSERT INTO FD (plan_id, account_id, starting_date, maturity_date) VALUES
