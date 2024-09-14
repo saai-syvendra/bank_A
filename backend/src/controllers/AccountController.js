@@ -15,7 +15,6 @@ const getCustomerAccounts = async (req, res) => {
 const createAccount = async (req, res) => {
     const { planId, customerId, balance, accountType } = req.body;
     const branchCode = await EmployeeModel.getEmployeeBranch(req.user.id);
-    console.log(branchCode);
     try {
         await AccountModel.createAccount(
             planId,

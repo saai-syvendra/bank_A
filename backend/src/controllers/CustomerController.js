@@ -18,7 +18,6 @@ const getCustomerNames = async (req, res) => {
         const customers = [];
 
         for (const customer of customerDetail) {
-            console.log(customer);
             const c = {};
             c["customerId"] = customer["customer_id"];
             c["customerType"] = customer["c_type"];
@@ -28,7 +27,6 @@ const getCustomerNames = async (req, res) => {
             } else if (customer["c_type"] === "organisation") {
                 c["name"] = customer["org_name"];
             }
-            console.log(c);
             customers.push(c);
         }
         return res.json({ customers });

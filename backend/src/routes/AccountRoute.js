@@ -6,7 +6,7 @@ import { validateAccountRequest } from "../middleware/validations.js";
 const router = express.Router();
 
 router.post(
-    "/",
+    "/create",
     authorizeRole("employee", "manager"),
     validateAccountRequest,
     AccountController.createAccount

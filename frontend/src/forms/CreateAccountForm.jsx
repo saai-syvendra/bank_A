@@ -13,96 +13,61 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { custom, z } from "zod";
+import { callCreateAccount, callGetSavingPlans } from "../api/AccountApi";
+import { callGetCustomerNames } from "../api/CustomerApi";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-    customer: z.string().min(1, "Customer is required"),
-    accountType: z.enum(["Checking", "Saving"]),
-    plan: z.string().optional(),
-    initialAmount: z.coerce.number().min(0),
+    customerId: z.coerce.number().min(10000),
+    accountType: z.enum(["checking", "saving"]),
+    planId: z.coerce.number().min(1).optional(),
+    balance: z.coerce.number().min(0),
 });
 
-const CreateAccountForm = ({
-    onSave,
-    isLoading,
-    // currentUser,
-    title = "Create New Account",
-    buttonText = "Submit",
-}) => {
+const CreateAccountForm = () => {
     const [plans, setPlans] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [minimumBalance, setMinimumBalance] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            customer: "",
-            accountType: "Checking",
-            plan: "",
-            initialAmount: 0,
+            customerId: "",
+            accountType: "checking",
+            planId: "",
+            balance: 0,
         },
     });
 
     const fetchPlans = async () => {
-        // try {
-        //     const response = await axios.get("/api/plans");
-        //     setPlans(response.data);
-        // } catch (error) {
-        //     console.error("Failed to fetch plans", error);
-        // }
-        const plans = [
-            {
-                plan_id: "1",
-                name: "Basic",
-                interest: 5,
-                minimum_balance: 1000,
-            },
-            {
-                plan_id: "2",
-                name: "Standard",
-                interest: 6.0,
-                minimum_balance: 5000,
-            },
-            {
-                plan_id: "3",
-                name: "Premium",
-                interest: 7.5,
-                minimum_balance: 10000,
-            },
-        ];
+        const plans = await callGetSavingPlans();
         setPlans(plans);
     };
 
     const fetchCustomers = async () => {
-        // try {
-        //     const response = await axios.get("/api/customers");
-        //     setCustomers(response.data);
-        // } catch (error) {
-        //     console.error("Failed to fetch customers", error);
-        // }
-        const customers = [
-            {
-                customer_id: "1",
-                first_name: "John",
-                last_name: "Doe",
-            },
-            {
-                customer_id: "2",
-                first_name: "Jane",
-                last_name: "Doe",
-            },
-            {
-                customer_id: "3",
-                first_name: "Alice",
-                last_name: "Smith",
-            },
-            {
-                customer_id: "4",
-                first_name: "Bob",
-                last_name: "Johnson",
-            },
-        ];
+        const customers = await callGetCustomerNames();
         setCustomers(customers);
+    };
+
+    const onSave = async (data) => {
+        if (data.accountType === "checking") {
+            data.planId = null;
+        } else {
+            if (data.planId === "") {
+                toast.error("Please select a plan");
+                return;
+            }
+        }
+        console.log(data);
+        try {
+            await callCreateAccount(data);
+            toast.success("Account created successfully");
+            form.reset();
+        } catch (error) {
+            toast.error(error.message);
+        }
     };
 
     useEffect(() => {
@@ -110,22 +75,25 @@ const CreateAccountForm = ({
     }, []);
 
     useEffect(() => {
-        if (form.watch("accountType") === "Saving") {
+        if (form.watch("accountType") === "saving") {
             fetchPlans();
+        } else {
+            form.setValue("plan", undefined);
+            form.setValue("balance", 0);
         }
     }, [form.watch("accountType")]);
 
     useEffect(() => {
         const selectedPlan = plans.find(
-            (plan) => plan.plan_id === form.watch("plan")
+            (plan) => plan.plan_id == form.watch("planId")
         );
         if (selectedPlan) {
             setMinimumBalance(selectedPlan.minimum_balance);
-            form.setValue("initialAmount", selectedPlan.minimum_balance);
+            form.setValue("balance", selectedPlan.minimum_balance);
         } else {
-            setMinimumBalance(null);
+            setMinimumBalance(0);
         }
-    }, [form.watch("plan"), plans, form]);
+    }, [form.watch("planId"), plans, form]);
 
     return (
         <Form {...form}>
@@ -134,7 +102,7 @@ const CreateAccountForm = ({
                 className="space-y-4 bg-gray-50 rounded-lg md:p-10"
             >
                 <div>
-                    <h2 className="text-2xl font-bold">{title}</h2>
+                    <h2 className="text-2xl font-bold">Create Account Form</h2>
                     <FormDescription>
                         Fill out the form to create a new account
                     </FormDescription>
@@ -144,7 +112,7 @@ const CreateAccountForm = ({
                     <div className="w-3/4">
                         <FormField
                             control={form.control}
-                            name="customer"
+                            name="customerId"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Customer</FormLabel>
@@ -158,10 +126,13 @@ const CreateAccountForm = ({
                                             </option>
                                             {customers.map((customer) => (
                                                 <option
-                                                    key={customer.customer_id}
-                                                    value={customer.customer_id}
+                                                    key={customer.customerId}
+                                                    value={customer.customerId}
                                                 >
-                                                    {customer.first_name}
+                                                    {customer.customerId}{" "}
+                                                    {" - "} {customer.name}{" "}
+                                                    {" - "}{" "}
+                                                    {customer.customerType}
                                                 </option>
                                             ))}
                                         </select>
@@ -184,10 +155,10 @@ const CreateAccountForm = ({
                                             {...field}
                                             className="bg-white border rounded p-2 w-full"
                                         >
-                                            <option value="Checking">
+                                            <option value="checking">
                                                 Checking
                                             </option>
-                                            <option value="Saving">
+                                            <option value="saving">
                                                 Saving
                                             </option>
                                         </select>
@@ -199,10 +170,10 @@ const CreateAccountForm = ({
                     </div>
                 </div>
 
-                {form.watch("accountType") === "Saving" && (
+                {form.watch("accountType") === "saving" && (
                     <FormField
                         control={form.control}
-                        name="plan"
+                        name="planId"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Plan</FormLabel>
@@ -217,8 +188,9 @@ const CreateAccountForm = ({
                                                 key={plan.plan_id}
                                                 value={plan.plan_id}
                                             >
-                                                {plan.name} - {plan.interest}%
-                                                interest, Min Balance: $
+                                                {plan.plan_name} -{" "}
+                                                {plan.interest}% interest, Min
+                                                Balance: Rs.
                                                 {plan.minimum_balance}
                                             </option>
                                         ))}
@@ -232,9 +204,9 @@ const CreateAccountForm = ({
 
                 <FormField
                     control={form.control}
-                    name="initialAmount"
+                    name="balance"
                     render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="w-1/4">
                             <FormLabel>Initial Amount</FormLabel>
                             <FormControl>
                                 <Input
@@ -255,7 +227,7 @@ const CreateAccountForm = ({
                     <LoadingButton />
                 ) : (
                     <Button type="submit" className="bg-orange-500">
-                        {buttonText}
+                        Submit
                     </Button>
                 )}
             </form>

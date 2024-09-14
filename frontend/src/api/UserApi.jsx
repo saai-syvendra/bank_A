@@ -1,9 +1,10 @@
 //read APU_URL from .env file
 const VITE_API_URL = import.meta.env.VITE_API_URL;
+const USER_API_URL = `${VITE_API_URL}/user`;
 
 export const login = async (username, password) => {
     try {
-        const response = await fetch(`${VITE_API_URL}/user/login`, {
+        const response = await fetch(`${USER_API_URL}/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -25,7 +26,7 @@ export const login = async (username, password) => {
 
 export const loginOtp = async (otp) => {
     try {
-        const response = await fetch(`${VITE_API_URL}/user/login/otp`, {
+        const response = await fetch(`${USER_API_URL}/login/otp`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -47,7 +48,7 @@ export const loginOtp = async (otp) => {
 
 export const logout = async () => {
     try {
-        const response = await fetch(`${VITE_API_URL}/user/logout`, {
+        const response = await fetch(`${USER_API_URL}/logout`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -68,7 +69,7 @@ export const logout = async () => {
 
 export const verifyRole = async (roles) => {
     try {
-        const response = await fetch(`${VITE_API_URL}/user/verify`, {
+        const response = await fetch(`${USER_API_URL}/verify`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -90,7 +91,7 @@ export const verifyRole = async (roles) => {
 
 export const authenticateUser = async () => {
     try {
-        const response = await fetch(`${VITE_API_URL}/user/auth`, {
+        const response = await fetch(`${USER_API_URL}/auth`, {
             method: "POST",
             credentials: "include",
         });
@@ -108,7 +109,7 @@ export const authenticateUser = async () => {
 
 export const userExpiration = async () => {
     try {
-        const response = await fetch(`${VITE_API_URL}/user/exp`, {
+        const response = await fetch(`${USER_API_URL}/exp`, {
             method: "POST",
             credentials: "include",
         });

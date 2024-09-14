@@ -3,18 +3,45 @@ import { body, validationResult } from "express-validator";
 const handleValidationErrors = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        console.log(errors.array());
         return res.status(400).json({ errors: errors.array() });
     }
     next();
 };
 
 export const validateAccountRequest = [
-    body("balance").isNumeric(),
     body("customerId").isNumeric({ min: 0 }).withMessage("Invalid customer ID"),
+
     body("accountType")
         .isIn(["saving", "checking"])
         .withMessage("Invalid account type"),
-    body("balance").isFloat({ min: 0 }),
+
+    body("balance")
+        .isFloat({ min: 0 })
+        .withMessage("Balance must be a positive number"),
+
+    // Custom validation for planIUd
+    body("planId").custom((value, { req }) => {
+        const accountType = req.body.accountType;
+
+        if (accountType === "checking") {
+            if (value !== null) {
+                throw new Error(
+                    "planId should be null for 'checking' accounts"
+                );
+            }
+        } else if (accountType === "saving") {
+            if (typeof value !== "number") {
+                throw new Error(
+                    "planId must be numeric and at least 1 for 'saving' accounts"
+                );
+            }
+        }
+
+        // If all conditions pass, return true to signal validation success
+        return true;
+    }),
+
     handleValidationErrors,
 ];
 
