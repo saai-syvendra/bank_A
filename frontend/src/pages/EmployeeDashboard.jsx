@@ -11,6 +11,11 @@ import CreateAccountForm from "../forms/CreateAccountForm";
 import LogoutButton from "../components/LogoutButton";
 import useAuthorization from "../auth/useAuthorization";
 import CreateCustomer from "../tabs/employee_tabs/CreateCustomer";
+import UpdateDetailForm from "../forms/UpdateDetailForm";
+import {
+    callGetEmployeeDetail,
+    callUpdateEmployeeDetail,
+} from "../api/EmployeeApi";
 
 const EmployeeDashboard = () => {
     const loading = useAuthorization(["manager", "employee"]);
@@ -62,7 +67,12 @@ const EmployeeDashboard = () => {
                     </TabsContent>
                     <TabsContent value="cash-deposit">Cash Deposit</TabsContent>
                     <TabsContent value="update-details">
-                        Update Details
+                        <UpdateDetailForm
+                            triggerUpdateDetails={true}
+                            fetchFucntion={callGetEmployeeDetail}
+                            updateFunction={callUpdateEmployeeDetail}
+                            employee={true}
+                        />
                     </TabsContent>
                 </Tabs>
             </div>

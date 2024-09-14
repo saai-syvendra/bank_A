@@ -11,6 +11,28 @@ const getCustomer = async (req, res) => {
     }
 };
 
+const getCustomerDetail = async (req, res) => {
+    const { id } = req.user;
+    try {
+        const customer = await CustomerModel.getCustomer(id);
+
+        const customerDetail = {
+            firstName: customer["first_name"],
+            lastName: customer["last_name"],
+            mobile: customer["mobile"],
+            address: customer["address"],
+            email: customer["email"],
+            dob: customer["dob"],
+            nic: customer["nic"],
+        };
+
+        return res.json(customerDetail);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({ message: error.message });
+    }
+};
+
 const getCustomerNames = async (req, res) => {
     try {
         const customerDetail = await CustomerModel.getAllCustomers();
@@ -47,4 +69,33 @@ const createCustomer = async (req, res) => {
     }
 };
 
-export default { getCustomer, getCustomerNames, createCustomer };
+const updateCustomerDetail = async (req, res) => {
+    const { id } = req.user;
+    const data = req.body;
+    try {
+        const updatedCustomer = {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            mobile: data.mobile,
+            address: data.address,
+            email: data.email,
+            dob: data.dob,
+            nic: data.nic,
+        };
+
+        await CustomerModel.updateCustomer(id, updatedCustomer);
+
+        res.status(200).json({ message: "Employee details updated" });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export default {
+    getCustomer,
+    getCustomerNames,
+    createCustomer,
+    getCustomerDetail,
+    updateCustomerDetail,
+};

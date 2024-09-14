@@ -12,6 +12,18 @@ router.get(
 );
 
 router.get(
+    "/detail",
+    authorizeRole("customer"),
+    CustomerController.getCustomerDetail
+);
+
+router.put(
+    "/update",
+    authorizeRole("customer"),
+    CustomerController.updateCustomerDetail
+);
+
+router.get(
     "/all-names",
     authorizeRole("employee", "manager"),
     CustomerController.getCustomerNames

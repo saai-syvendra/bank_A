@@ -8,6 +8,11 @@ import {
 import ViewTransactions from "../tabs/customer_tabs/ViewTransactions";
 import LogoutButton from "../components/LogoutButton";
 import useAuthorization from "../auth/useAuthorization";
+import UpdateDetailForm from "../forms/UpdateDetailForm";
+import {
+    callGetCustomerDetail,
+    callUpdateCustomerDetail,
+} from "../api/CustomerApi";
 
 const CustomerDashboard = () => {
     const loading = useAuthorization(["customer"]);
@@ -61,7 +66,12 @@ const CustomerDashboard = () => {
                         Fund Transfer
                     </TabsContent>
                     <TabsContent value="update-details">
-                        Update Details
+                        <UpdateDetailForm
+                            triggerUpdateDetails={true}
+                            fetchFucntion={callGetCustomerDetail}
+                            updateFunction={callUpdateCustomerDetail}
+                            employee={false}
+                        />
                     </TabsContent>
                     <TabsContent value="loan-payment">Loan Payment</TabsContent>
                     <TabsContent value="atm">ATM</TabsContent>

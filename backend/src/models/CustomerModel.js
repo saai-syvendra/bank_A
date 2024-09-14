@@ -130,4 +130,15 @@ const createCustomer = async (c_type, customerDetails) => {
     }
 };
 
-export default { getCustomer, getAllCustomers, createCustomer };
+const updateCustomer = async (id, data) => {
+    await pool.query(
+        `
+          UPDATE Person 
+          SET ? 
+          WHERE customer_id = ?;
+      `,
+        [data, id]
+    );
+};
+
+export default { getCustomer, getAllCustomers, createCustomer, updateCustomer };

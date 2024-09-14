@@ -60,3 +60,45 @@ export const callGetCustomer = async (customerId) => {
         throw new Error(error.message);
     }
 };
+
+export const callGetCustomerDetail = async () => {
+    try {
+        const response = await fetch(`${CUSTOMER_API_URL}/detail`, {
+            method: "GET",
+            credentials: "include",
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        return data;
+    } catch (error) {
+        console.error(error);
+        throw new Error(error.message);
+    }
+};
+
+export const callUpdateCustomerDetail = async (data) => {
+    try {
+        const response = await fetch(`${CUSTOMER_API_URL}/update`, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        const responseData = await response.json();
+        if (!response.ok) {
+            throw new Error(responseData.message);
+        }
+
+        return responseData;
+    } catch (error) {
+        console.error(error);
+        throw new Error(error.message);
+    }
+};
