@@ -1,14 +1,14 @@
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 const LOAN_API_URL = `${VITE_API_URL}/loan`;
 
-export const callCreateLoan = async (data) => {
+export const callCreateLoan = async (loan) => {
     try {
         const response = await fetch(`${LOAN_API_URL}/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(loan),
             credentials: "include",
         });
 
@@ -16,8 +16,6 @@ export const callCreateLoan = async (data) => {
         if (!response.ok) {
             throw new Error(data.message);
         }
-
-        return data;
     } catch (error) {
         throw new Error(error.message);
     }
@@ -57,7 +55,7 @@ export const callGetLoanPlans = async () => {
             throw new Error(data.message);
         }
 
-        return data.plans;
+        return data;
     } catch (error) {
         throw new Error(error.message);
     }

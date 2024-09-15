@@ -16,6 +16,7 @@ import {
     callGetEmployeeDetail,
     callUpdateEmployeeDetail,
 } from "../api/EmployeeApi";
+import CreateLoan from "../tabs/employee_tabs/CreateLoan";
 
 const EmployeeDashboard = () => {
     const loading = useAuthorization(["manager", "employee"]);
@@ -61,7 +62,9 @@ const EmployeeDashboard = () => {
                     <TabsContent value="create-customer">
                         <CreateCustomer />
                     </TabsContent>
-                    <TabsContent value="create-loan">Create Loan</TabsContent>
+                    <TabsContent value="create-loan">
+                        <CreateLoan triggerFetchCustomers={true} />
+                    </TabsContent>
                     <TabsContent value="transactions">
                         <ViewBranchTransactions />
                     </TabsContent>

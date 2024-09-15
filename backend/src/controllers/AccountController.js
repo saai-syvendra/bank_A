@@ -2,10 +2,10 @@ import AccountModel from "../models/AccountModel.js";
 import EmployeeModel from "../models/EmployeeModel.js";
 
 const getCustomerAccounts = async (req, res) => {
-    const { customerId } = req.body;
+    const { customerId } = req.params;
     try {
         const accounts = await AccountModel.getCustomerAccounts(customerId);
-        return res.json({ accounts });
+        return res.json(accounts);
     } catch (error) {
         console.log(error);
         return res.status(500).send({ message: error.message });

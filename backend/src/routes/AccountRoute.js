@@ -24,4 +24,10 @@ router.get(
     AccountController.getAccountDetails
 );
 
+router.get(
+    "/:customerId",
+    authorizeRole("employee", "manager"),
+    AccountController.getCustomerAccounts
+);
+
 export default router;

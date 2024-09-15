@@ -68,7 +68,6 @@ const getCustomerAccounts = async (customerId) => {
           `,
             [customerId]
         );
-
         if (rows.length === 0)
             throw new Error("No accounts found for this customer");
 
