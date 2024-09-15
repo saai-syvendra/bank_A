@@ -5,13 +5,16 @@ import { useNavigate } from "react-router-dom";
 import { logout } from "../api/UserApi";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import useTokenExpiration from "../auth/TokenExpiration";
 
 const LogoutButton = () => {
     const navigate = useNavigate();
+    const { cancelTimeout } = useTokenExpiration();
 
     const handleLogout = async () => {
         await logout();
         localStorage.removeItem("role");
+        cancelTimeout();
         navigate("/login");
         toast.success("Logout successful!");
     };
