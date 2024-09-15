@@ -62,17 +62,18 @@ INSERT INTO FD (plan_id, account_id, starting_date, maturity_date) VALUES
 (3, 6, '2024-07-20', '2027-07-20');
 
 -- Insert data into Loan table
-INSERT INTO Loan (plan_id, customer_id, connected_account, started_date, loan_amount, state) VALUES
-(1, 10000, 1, '2023-07-01', 750000.00, 'approved');
+INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, approved_date) VALUES
+(1, 10000, 1, '2023-07-01', 75000.00, 'approved', '2023-08-17');
 
 -- Insert data into Loan_Installment table
-INSERT INTO Loan_Installment (loan_id, installment_no, installment_amount, due_date, state) VALUES
-(1, 1, 14687.50, '2023-08-15', 'paid'),
-(1, 2, 14687.50, '2023-09-15', 'paid'),
-(1, 3, 14687.50, '2023-10-15', 'paid'),
-(1, 4, 14687.50, '2023-11-15', 'late'),
-(1, 5, 14687.50, '2023-12-15', 'paid'),
-(1, 6, 14687.50, '2024-01-15', 'paid');
+CALL CreateLoanInstallments(1);
+-- INSERT INTO Loan_Installment (loan_id, installment_no, installment_amount, due_date, state) VALUES
+-- (1, 1, 14687.50, '2023-08-15', 'paid'),
+-- (1, 2, 14687.50, '2023-09-15', 'paid'),
+-- (1, 3, 14687.50, '2023-10-15', 'paid'),
+-- (1, 4, 14687.50, '2023-11-15', 'late'),
+-- (1, 5, 14687.50, '2023-12-15', 'paid'),
+-- (1, 6, 14687.50, '2024-01-15', 'paid');
 
 -- Insert data into Account_Transaction table (handling withdrawals, deposits, and transfers)
 -- INSERT INTO Account_Transaction (from_accnt, to_accnt, amount, trans_timestamp, reason, trans_type, method) VALUES

@@ -132,7 +132,8 @@ CREATE TABLE Loan_Plan (
   PRIMARY KEY (plan_id)
 );
 
-INSERT INTO Loan_Plan (plan_name, interest, max_amount, months, availability) VALUES 
+INSERT INTO Loan_Plan (plan_name, interest, max_amount, months, availability) VALUES
+("Short Loan", 19.00, 200000, 6, 'yes'), 
 ("Housing Loan", 17.00, 10000000.00, 48, 'yes');
 
 -- Create FD plan table
@@ -235,9 +236,10 @@ CREATE TABLE Loan (
   plan_id           INT NOT NULL,
   customer_id       INT NOT NULL,
   connected_account INT NOT NULL,
-  started_date      DATE NOT NULL,
+  request_date      DATE NOT NULL,
   loan_amount       NUMERIC(10,2),
   state             ENUM('pending','approved','disapproved','online'),
+  approved_date     DATE,
   PRIMARY KEY (loan_id),
   FOREIGN KEY (plan_id) REFERENCES loan_plan(plan_id),
   FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
