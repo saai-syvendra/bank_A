@@ -15,6 +15,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { callCreateCustomer } from "../api/CustomerApi";
 import { toast } from "sonner";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const formSchema = z.object({
     nic: z.string().length(12, "NIC must be 12 characters"),
@@ -22,11 +25,13 @@ const formSchema = z.object({
     lastName: z.string().min(1, "Last name is required"),
     mobile: z.string().length(10, "Invalid mobile number"),
     email: z.string().email("Invalid email"),
-    dob: z.string().nonempty("Date of birth is required"),
+    dob: z.date({
+        required_error: "Date of birth is required",
+    }),
     address: z.string().min(1, "Address is required"),
 });
 
-const CreateIndividualForm = () => {
+export default function CreateIndividualForm() {
     const [isLoading, setIsLoading] = useState(false);
 
     const form = useForm({
@@ -37,7 +42,7 @@ const CreateIndividualForm = () => {
             lastName: "",
             mobile: "",
             email: "",
-            dob: "",
+            dob: undefined,
             address: "",
         },
     });
@@ -45,7 +50,10 @@ const CreateIndividualForm = () => {
     const onSubmit = async (data) => {
         setIsLoading(true);
         try {
-            await callCreateCustomer("individual", data);
+            await callCreateCustomer("individual", {
+                ...data,
+                dob: data.dob.toISOString().split("T")[0], // Convert Date to YYYY-MM-DD
+            });
             toast.success("Customer created successfully");
             form.reset();
         } catch (errors) {
@@ -56,138 +64,150 @@ const CreateIndividualForm = () => {
     };
 
     return (
-        <Form {...form}>
-            <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4 bg-gray-50 rounded-lg p-6"
-            >
-                <h2 className="text-2xl font-bold">Create Person</h2>
+        <Card className="w-full max-w-3xl mx-auto">
+            <CardHeader>
+                <CardTitle className="text-2xl font-bold">
+                    Create Person
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form
+                        onSubmit={form.handleSubmit(onSubmit)}
+                        className="space-y-6"
+                    >
+                        <div className="grid grid-cols-3 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="firstName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>First Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                className="bg-white"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                <div className="flex space-x-5">
-                    {/* First Name */}
-                    <FormField
-                        control={form.control}
-                        name="firstName"
-                        render={({ field }) => (
-                            <FormItem className="w-2/5">
-                                <FormLabel>First Name</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="bg-white" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
+                            <FormField
+                                control={form.control}
+                                name="lastName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Last Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                className="bg-white"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="nic"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>NIC</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                className="bg-white"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="mobile"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Mobile</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                className="bg-white"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="email"
+                                                className="bg-white"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="dob"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Date of Birth</FormLabel>
+                                        <FormControl>
+                                            <DatePicker field={field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <FormField
+                            control={form.control}
+                            name="address"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Address</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            {...field}
+                                            className="bg-white"
+                                            rows={3}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {isLoading ? (
+                            <LoadingButton />
+                        ) : (
+                            <Button type="submit" className="w-full">
+                                Submit
+                            </Button>
                         )}
-                    />
-
-                    {/* Last Name */}
-                    <FormField
-                        control={form.control}
-                        name="lastName"
-                        render={({ field }) => (
-                            <FormItem className="w-2/5">
-                                <FormLabel>Last Name</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="bg-white" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* NIC */}
-                    <FormField
-                        control={form.control}
-                        name="nic"
-                        render={({ field }) => (
-                            <FormItem className="w-1/5">
-                                <FormLabel>NIC</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="bg-white" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
-                <div className="flex space-x-5">
-                    {/* Mobile */}
-                    <FormField
-                        control={form.control}
-                        name="mobile"
-                        render={({ field }) => (
-                            <FormItem className="w-2/5">
-                                <FormLabel>Mobile</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="bg-white" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* Email */}
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem className="w-2/5">
-                                <FormLabel>Email</FormLabel>
-                                <FormControl>
-                                    <Input {...field} className="bg-white" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* Date of Birth */}
-                    <FormField
-                        control={form.control}
-                        name="dob"
-                        render={({ field }) => (
-                            <FormItem className="w-1/5">
-                                <FormLabel>Date of Birth</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        {...field}
-                                        type="date"
-                                        className="bg-white"
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
-                <div className="flex space-x-5"></div>
-
-                {/* Address */}
-                <FormField
-                    control={form.control}
-                    name="address"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Address</FormLabel>
-                            <FormControl>
-                                <Input {...field} className="bg-white" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                {isLoading ? (
-                    <LoadingButton />
-                ) : (
-                    <Button type="submit" className="bg-orange-500">
-                        Submit
-                    </Button>
-                )}
-            </form>
-        </Form>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
     );
-};
-
-export default CreateIndividualForm;
+}

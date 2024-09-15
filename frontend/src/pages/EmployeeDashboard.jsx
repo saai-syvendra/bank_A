@@ -7,7 +7,7 @@ import {
     TabsContent,
 } from "../components/ui/tabs";
 import ViewBranchTransactions from "../tabs/employee_tabs/ViewBranchTransactions";
-import CreateAccountForm from "../forms/CreateAccountForm";
+import CreateAccount from "../tabs/employee_tabs/CreateAccount";
 import LogoutButton from "../components/LogoutButton";
 import useAuthorization from "../auth/useAuthorization";
 import CreateCustomer from "../tabs/employee_tabs/CreateCustomer";
@@ -56,7 +56,7 @@ const EmployeeDashboard = () => {
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="create-account">
-                        <CreateAccountForm triggerFetchCustomers={true} />
+                        <CreateAccount triggerFetchCustomers={true} />
                     </TabsContent>
                     <TabsContent value="create-customer">
                         <CreateCustomer />
