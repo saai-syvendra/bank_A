@@ -7,6 +7,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +19,7 @@ import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
     nic: z.string().length(12, "NIC must be 12 characters"),
@@ -69,6 +71,9 @@ export default function CreateIndividualForm() {
                 <CardTitle className="text-2xl font-bold">
                     Create Person
                 </CardTitle>
+                <p className="text-gray-400 text-sm text-secondary-foreground">
+                    Fill out the form to create a new individual customer
+                </p>
             </CardHeader>
             <CardContent>
                 <Form {...form}>
@@ -76,6 +81,7 @@ export default function CreateIndividualForm() {
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-6"
                     >
+                        <Separator />
                         <div className="grid grid-cols-3 gap-4">
                             <FormField
                                 control={form.control}

@@ -9,6 +9,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -60,9 +61,9 @@ export default function CreateOrganisationForm() {
                 <CardTitle className="text-2xl font-bold">
                     Create Organisation
                 </CardTitle>
-                {/* <FormDescription>
+                <p className="text-gray-400 text-sm text-secondary-foreground">
                     Fill out the form to create a new organisation
-                </FormDescription> */}
+                </p>
             </CardHeader>
             <CardContent>
                 <Form {...form}>
@@ -70,6 +71,7 @@ export default function CreateOrganisationForm() {
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-6"
                     >
+                        <Separator />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}

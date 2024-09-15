@@ -25,6 +25,7 @@ import { callCreateAccount, callGetSavingPlans } from "../../api/AccountApi";
 import { callGetCustomerNames } from "../../api/CustomerApi";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
     customerId: z.coerce.number().min(10000, "Please select a customer"),
@@ -122,6 +123,9 @@ export default function CreateAccount({ triggerFetchCustomers = false }) {
                 <CardTitle className="text-2xl font-bold">
                     Create Account
                 </CardTitle>
+                <p className="text-gray-400 text-sm text-secondary-foreground">
+                    Fill out the form to create a new account
+                </p>
             </CardHeader>
             <CardContent>
                 <Form {...form}>
@@ -129,10 +133,7 @@ export default function CreateAccount({ triggerFetchCustomers = false }) {
                         onSubmit={form.handleSubmit(onSave)}
                         className="space-y-6"
                     >
-                        <FormDescription>
-                            Fill out the form to create a new account
-                        </FormDescription>
-
+                        <Separator />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
