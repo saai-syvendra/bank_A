@@ -125,16 +125,16 @@ CREATE TABLE Loan_Plan (
   plan_id           INT AUTO_INCREMENT,
   plan_name         VARCHAR(50) NOT NULL,
   interest          NUMERIC(4,2),
-  plan_type         ENUM('personal','bussiness'),
+  plan_type         ENUM('personal','business'),
   max_amount 		NUMERIC(10,2),
   months            INT,
   availability      ENUM('yes','no'),
   PRIMARY KEY (plan_id)
 );
 
-INSERT INTO Loan_Plan (plan_name, interest, max_amount, months, availability) VALUES
-("Short Loan", 19.00, 200000, 6, 'yes'), 
-("Housing Loan", 17.00, 10000000.00, 48, 'yes');
+INSERT INTO Loan_Plan (plan_name, interest, plan_type, max_amount, months, availability) VALUES
+("Short Loan", 19.00, 'personal', 200000, 6, 'yes'), 
+("Housing Loan", 17.00, 'business', 10000000.00, 48, 'yes');
 
 -- Create FD plan table
 CREATE TABLE FD_Plan (
@@ -172,7 +172,7 @@ CREATE TABLE Customer_Account (
 
 DELIMITER //
 
-CREATE TRIGGER check_minimum_balance
+CREATE TRIGGER MinBalanceAndAccountNumber
 BEFORE INSERT ON Customer_Account
 FOR EACH ROW
 BEGIN
@@ -228,7 +228,39 @@ END//
 
 DELIMITER ;
 
+-- Create FD table
+CREATE TABLE FD
+(
+    fd_id         INT AUTO_INCREMENT,
+    plan_id       INT NOT NULL,
+    account_id    INT NOT NULL,
+    starting_date DATE NOT NULL,
+    amount		  NUMERIC(12,2) NOT NULL,
+    maturity_date DATE,
+    PRIMARY KEY (fd_id),
+    FOREIGN KEY (account_id) REFERENCES Customer_Account (account_id),
+    FOREIGN KEY (plan_id) REFERENCES fd_plan (plan_id)
 
+);
+
+DELIMITER //
+
+CREATE TRIGGER before_insert_fd
+BEFORE INSERT ON FD
+FOR EACH ROW
+BEGIN
+    DECLARE plan_months INT;
+
+    -- Retrieve the number of months from FD_Plan based on plan_id
+    SELECT months INTO plan_months
+    FROM FD_Plan
+    WHERE plan_id = NEW.plan_id;
+
+    -- Calculate maturity_date
+    SET NEW.maturity_date = DATE_ADD(NEW.starting_date, INTERVAL plan_months MONTH);
+END //
+
+DELIMITER ;
 
 -- create Loan Table
 CREATE TABLE Loan (
@@ -239,12 +271,39 @@ CREATE TABLE Loan (
   request_date      DATE NOT NULL,
   loan_amount       NUMERIC(10,2),
   state             ENUM('pending','approved','disapproved','online'),
+  fd_id				INT,
   approved_date     DATE,
+  reason			VARCHAR(100),
   PRIMARY KEY (loan_id),
   FOREIGN KEY (plan_id) REFERENCES loan_plan(plan_id),
   FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
-  FOREIGN KEY (connected_account) REFERENCES Customer_Account(account_id)
+  FOREIGN KEY (connected_account) REFERENCES Customer_Account(account_id),
+  FOREIGN KEY (fd_id) REFERENCES FD(fd_id),
+  CHECK ( (state = 'online' AND fd_id IS NOT NULL) OR (state != 'online' AND fd_id IS NULL))
 );
+
+DELIMITER $$
+
+CREATE TRIGGER CheckLoanAmountBeforeInsert
+BEFORE INSERT ON Loan
+FOR EACH ROW
+BEGIN
+    DECLARE maxLoanAmount NUMERIC(10,2);
+
+    -- Get the maximum loan amount for the plan being used
+    SELECT max_amount INTO maxLoanAmount
+    FROM Loan_Plan
+    WHERE plan_id = NEW.plan_id;
+
+    -- Check if the loan amount exceeds the plan's maximum limit
+    IF NEW.loan_amount > maxLoanAmount THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Loan amount exceeds the maximum allowed by the loan plan.';
+    END IF;
+END$$
+
+DELIMITER ;
+
 
 -- Create  Loan installments table
 CREATE TABLE Loan_Installment (
@@ -257,21 +316,6 @@ CREATE TABLE Loan_Installment (
   FOREIGN KEY (loan_id) REFERENCES Loan(loan_id)
 );
 
-
--- Create FD table
-CREATE TABLE FD
-(
-    fd_id         INT AUTO_INCREMENT,
-    plan_id       INT,
-    account_id    INT,
-    starting_date DATE,
-    maturity_date DATE,
-    PRIMARY KEY (fd_id),
-    FOREIGN KEY (account_id) REFERENCES Customer_Account (account_id),
-    FOREIGN KEY (plan_id) REFERENCES fd_plan (plan_id)
-
-);
-
 -- Create transactions table
 CREATE TABLE Account_Transaction (
   transaction_id        INT AUTO_INCREMENT,
@@ -280,13 +324,13 @@ CREATE TABLE Account_Transaction (
   amount                NUMERIC(10,2) NOT NULL,
   trans_timestamp           TIMESTAMP NOT NULL,
   reason                VARCHAR(500),
-  trans_type                  ENUM('withdrawal', 'deposit', 'transfer'),
+  trans_type                  ENUM('credit', 'debit'),
   method                ENUM('atm-cdm','online','server','via_employee'),
   PRIMARY KEY (transaction_id),
   FOREIGN KEY (from_accnt) REFERENCES Customer_Account(account_id),
-  FOREIGN KEY (to_accnt) REFERENCES Customer_Account (account_id),
-  CHECK ((trans_type = 'withdrawal' AND from_accnt IS NOT NULL AND to_accnt IS NULL) OR (trans_type = 'deposit' AND from_accnt IS NULL AND to_Accnt IS NOT NULL) OR
-         (trans_type = 'transfer' AND from_accnt IS NOT NULL AND to_accnt IS NOT NULL) )
+  FOREIGN KEY (to_accnt) REFERENCES Customer_Account (account_id)
+--   CHECK ((trans_type = 'withdrawal' AND from_accnt IS NOT NULL AND to_accnt IS NULL) OR (trans_type = 'deposit' AND from_accnt IS NULL AND to_Accnt IS NOT NULL) OR
+--          (trans_type = 'transfer' AND from_accnt IS NOT NULL AND to_accnt IS NOT NULL) )
 
 );
 

@@ -105,4 +105,112 @@ BEGIN
     
 END $$
 
+CREATE PROCEDURE CheckSafeWithdrawal(
+    IN accountId INT,  
+    IN withdrawAmount NUMERIC(12,2), 
+    OUT isSafe BOOLEAN 
+)
+BEGIN
+    DECLARE accountBalance NUMERIC(12,2);
+    DECLARE accountType ENUM('saving', 'checking');
+    DECLARE minBalance NUMERIC(12,2);
+    DECLARE accPlanId INT;
+
+    -- Get the account balance, type, and plan ID
+    SELECT balance, account_type, plan_id INTO accountBalance, accountType, accPlanId
+    FROM Customer_Account
+    WHERE account_number = accountNo;
+
+    -- If the account is a checking account, no minimum balance requirement
+    IF accountType = 'checking' THEN
+        IF accountBalance >= withdrawAmount THEN
+            SET isSafe = TRUE;
+        ELSE
+            SET isSafe = FALSE;
+        END IF;
+    ELSEIF accountType = 'saving' THEN
+        -- For saving accounts, check the associated plan's minimum balance
+        SELECT minimum_balance INTO minBalance
+        FROM Saving_Plan
+        WHERE plan_id = accPlanId;
+
+        -- Check if balance after withdrawal meets the minimum balance requirement
+        IF (accountBalance - withdrawAmount) >= minBalance THEN
+            SET isSafe = TRUE;
+        ELSE
+            SET isSafe = FALSE;
+        END IF;
+    ELSE
+        -- If account type is neither checking nor saving, set to unsafe
+        SET isSafe = FALSE;
+    END IF;
+END$$
+-- DROP PROCEDURE CreateOnlineLoan;
+CREATE PROCEDURE CreateOnlineLoan (
+    IN customerId INT,
+    IN loanPlanId INT,
+    IN fdId INT,
+    IN requestedLoanAmount NUMERIC(10, 2),
+    IN connectedAccount INT
+)
+BEGIN
+    DECLARE fdAmount NUMERIC(10, 2);
+    DECLARE maxAllowedLoan NUMERIC(10, 2);
+    DECLARE loanPlanMaxAmount NUMERIC(10, 2);
+    
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Check if the FD exists for the customer
+    SELECT amount INTO fdAmount
+    FROM FD
+    WHERE fd_id = fdId
+    FOR UPDATE;
+
+    IF fdAmount IS NULL THEN
+        -- Rollback the transaction if no FD found
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'FD not found for the given customer.';
+    END IF;
+
+    -- Calculate the maximum allowable loan amount (60% of the FD amount, capped at 500,000)
+    SET maxAllowedLoan = LEAST(fdAmount * 0.60, 500000);
+
+    -- Check if the requested loan amount exceeds the allowable loan limit
+    IF requestedLoanAmount > maxAllowedLoan THEN
+        -- Rollback the transaction if requested loan exceeds limits
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Requested loan amount exceeds the allowable loan limit based on FD.';
+    END IF;
+
+    -- Check if the requested loan amount is less than the maximum allowed amount in the loan plan
+    SELECT max_amount INTO loanPlanMaxAmount
+    FROM Loan_Plan
+    WHERE plan_id = loanPlanId
+    FOR UPDATE;
+
+    IF requestedLoanAmount > loanPlanMaxAmount THEN
+        -- Rollback the transaction if loan amount exceeds plan limit
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Requested loan amount exceeds the maximum allowed in the loan plan.';
+    END IF;
+    
+    -- If all checks pass, insert the loan application
+    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id)
+    VALUES (loanPlanId, customerId, connectedAccount, CURDATE(), requestedLoanAmount, 'online', fdId);
+    
+    INSERT INTO Account_Transaction (from_accnt, amount, trans_timestamp, reason, trans_type, method) VALUES
+	(connectedAccount, requestedLoanAmount, CURRENT_TIMESTAMP, 'Loan Deposit', 'credit', 'server');
+    
+    UPDATE Customer_Account
+	SET balance = balance + requestedLoanAmount
+	WHERE account_id = connectedAccount;
+    
+    COMMIT;
+
+END $$
+
 DELIMITER ;

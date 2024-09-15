@@ -3,6 +3,6 @@ import FdController from "../controllers/FdController.js";
 
 const router = express.Router();
 
-router.post("/test");
+router.get("/get-all", FdController.getCustomerFds);
 
 export default router;

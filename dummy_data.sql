@@ -56,14 +56,16 @@ INSERT INTO Customer_Account (plan_id, branch_code, customer_id, balance, starti
 (null, 1, 10008, 50000.00, '2023-09-09', 'checking');
 
 -- Insert data into FD table (fixed deposits)
-INSERT INTO FD (plan_id, account_id, starting_date, maturity_date) VALUES
-(1, 3, '2024-05-01', '2024-08-01'),
-(2, 3, '2024-06-01', '2025-06-01'),
-(3, 6, '2024-07-20', '2027-07-20');
+INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
+(1, 3, '2024-05-01', 10000),
+(2, 3, '2024-06-01', 25000),
+(3, 6, '2024-07-20', 100000);
 
 -- Insert data into Loan table
 INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, approved_date) VALUES
 (1, 10000, 1, '2023-07-01', 75000.00, 'approved', '2023-08-17');
+
+CALL CreateOnlineLoan(10001, 1, 1, 5000, 3);
 
 -- Insert data into Loan_Installment table
 CALL CreateLoanInstallments(1);

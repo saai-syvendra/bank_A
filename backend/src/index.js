@@ -8,7 +8,7 @@ import accountRoute from "./routes/AccountRoute.js";
 import customerRoute from "./routes/CustomerRoute.js";
 import employeeRoute from "./routes/EmployeeRoute.js";
 import loanRoute from "./routes/LoanRoute.js";
-import fdRoute from "./routes/fdRoute.js";
+import fdRoute from "./routes/FdRoute.js";
 import reportRoute from "./routes/ReportRoute.js";
 import { authenticateJWT, authorizeRole } from "./middleware/auth.js";
 dotenv.config();
