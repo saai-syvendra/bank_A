@@ -142,7 +142,7 @@ export default function CreateOrganisationForm() {
                                         <Textarea
                                             {...field}
                                             className="bg-white"
-                                            rows={3}
+                                            rows={2}
                                         />
                                     </FormControl>
                                     <FormMessage />

@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 
 const employeeFormSchema = z.object({
     firstName: z.string().min(1, "First name is required"),
@@ -207,7 +208,11 @@ const UpdateDetailForm = ({
                                 <FormItem>
                                     <FormLabel>Address</FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Textarea
+                                            {...field}
+                                            className="bg-white"
+                                            rows={2}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

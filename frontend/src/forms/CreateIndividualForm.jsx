@@ -16,7 +16,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { callCreateCustomer } from "../api/CustomerApi";
 import { toast } from "sonner";
-import { DatePicker } from "@/components/ui/date-picker";
+import { DatePicker } from "@/components/ui/custom-date-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -196,7 +196,7 @@ export default function CreateIndividualForm() {
                                         <Textarea
                                             {...field}
                                             className="bg-white"
-                                            rows={3}
+                                            rows={2}
                                         />
                                     </FormControl>
                                     <FormMessage />

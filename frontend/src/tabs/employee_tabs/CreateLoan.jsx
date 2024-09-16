@@ -248,7 +248,6 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
                                                 {...field}
                                                 type="number"
                                                 min={0}
-                                                step={0.01}
                                             />
                                         </FormControl>
                                         <FormMessage />
