@@ -79,7 +79,7 @@ BEGIN
 	FROM Loan_Installment
 	WHERE loan_id = p_loan_id;
 	
-	IF v_Updated_Installment > 0 THEN
+	IF v_updated_installment > 0 THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'Loan Installments are already created.';
 	END IF;
@@ -105,10 +105,12 @@ BEGIN
     
 END $$
 
+-- DROP PROCEDURE CheckSafeWithdrawal;
+
 CREATE PROCEDURE CheckSafeWithdrawal(
-    IN accountId INT,  
-    IN withdrawAmount NUMERIC(12,2), 
-    OUT isSafe BOOLEAN 
+    IN accountId INT,
+    IN withdrawAmount NUMERIC(12,2),
+    OUT isSafe BOOLEAN
 )
 BEGIN
     DECLARE accountBalance NUMERIC(12,2);
@@ -119,7 +121,7 @@ BEGIN
     -- Get the account balance, type, and plan ID
     SELECT balance, account_type, plan_id INTO accountBalance, accountType, accPlanId
     FROM Customer_Account
-    WHERE account_number = accountNo;
+    WHERE account_id = accountId;
 
     -- If the account is a checking account, no minimum balance requirement
     IF accountType = 'checking' THEN
@@ -145,6 +147,7 @@ BEGIN
         SET isSafe = FALSE;
     END IF;
 END$$
+
 -- DROP PROCEDURE CreateOnlineLoan;
 CREATE PROCEDURE CreateOnlineLoan (
     IN customerId INT,

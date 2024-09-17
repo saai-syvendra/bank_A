@@ -4,7 +4,7 @@ USE bank_database;
 -- Create Customer table
 CREATE TABLE Customer (
   customer_id INT AUTO_INCREMENT,
-  c_type        ENUM('individual','organisation') NOT NULL,
+  c_type      ENUM('individual','organisation') NOT NULL,
   PRIMARY KEY (customer_id)
 )AUTO_INCREMENT = 10000;
 
