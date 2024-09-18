@@ -13,6 +13,7 @@ import {
     callGetCustomerDetail,
     callUpdateCustomerDetail,
 } from "../api/CustomerApi";
+import CreateOnlineLoan from "../tabs/customer_tabs/CreateOnlineLoan";
 
 const CustomerDashboard = () => {
     const loading = useAuthorization(["customer"]);
@@ -60,7 +61,9 @@ const CustomerDashboard = () => {
                     <TabsContent value="view-transactions">
                         <ViewTransactions />
                     </TabsContent>
-                    <TabsContent value="create-loan">Create Loan</TabsContent>
+                    <TabsContent value="create-loan">
+                        <CreateOnlineLoan triggerToRefetch={true} />
+                    </TabsContent>
                     <TabsContent value="create-fd">Create FD</TabsContent>
                     <TabsContent value="fund-trasfer">
                         Fund Transfer

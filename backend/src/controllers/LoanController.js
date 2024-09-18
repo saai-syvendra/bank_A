@@ -16,15 +16,15 @@ const createLoan = async (req, res) => {
 };
 
 const createOnlineLoan = async (req, res) => {
-    const { plan_id, customer_id, fd_id, connected_account, loan_amount } =
-        req.body;
+    const { id: customerId } = req.user;
+    const { planId, fdId, connectedAccount, loanAmount } = req.body;
     try {
         await LoanModel.createOnlineLoan(
-            plan_id,
-            customer_id,
-            fd_id,
-            connected_account,
-            loan_amount
+            planId,
+            customerId,
+            fdId,
+            connectedAccount,
+            loanAmount
         );
         res.status(201).send({ message: "Online loan created successfully!" });
     } catch (error) {

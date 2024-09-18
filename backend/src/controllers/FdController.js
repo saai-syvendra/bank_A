@@ -1,7 +1,7 @@
 import FdModel from "../models/FdModel.js";
 
-const getCustomerFds = async (req, res) => {
-    const { customerId } = req.body;
+const getThisCustomerFds = async (req, res) => {
+    const { id: customerId } = req.user;
     try {
         const fds = await FdModel.getCustomerFds(customerId);
 
@@ -16,7 +16,7 @@ const getCustomerFds = async (req, res) => {
 
         res.json({ fds: filteredFds });
     } catch (error) {
-        res.status(400).send(error.message);
+        res.status(400).json({ message: error.message });
     }
 };
-export default { getCustomerFds };
+export default { getThisCustomerFds };
