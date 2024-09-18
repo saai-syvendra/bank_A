@@ -107,7 +107,7 @@ CREATE TABLE User_login_Log (
 -- Create Savings Plan Table
 CREATE TABLE Saving_Plan (
   plan_id           INT AUTO_INCREMENT,
-  plan_name              VARCHAR(50) NOT NULL,
+  plan_name         VARCHAR(50) NOT NULL,
   interest          DECIMAL(4,2) NOT NULL,
   minimum_balance   NUMERIC(12,2),
   availability      ENUM('yes','no') NOT NULL,
@@ -319,19 +319,14 @@ CREATE TABLE Loan_Installment (
 -- Create transactions table
 CREATE TABLE Account_Transaction (
   transaction_id        INT AUTO_INCREMENT,
-  from_accnt            INT,
-  to_accnt              INT,
+  accnt                 INT,
   amount                NUMERIC(10,2) NOT NULL,
-  trans_timestamp           TIMESTAMP NOT NULL,
+  trans_timestamp       TIMESTAMP NOT NULL,
   reason                VARCHAR(500),
-  trans_type                  ENUM('credit', 'debit'),
-  method                ENUM('atm-cdm','online','server','via_employee'),
+  trans_type            ENUM('credit', 'debit'),
+  trans_method          ENUM('atm-cdm','online-transfer','server','via_employee'),
   PRIMARY KEY (transaction_id),
-  FOREIGN KEY (from_accnt) REFERENCES Customer_Account(account_id),
-  FOREIGN KEY (to_accnt) REFERENCES Customer_Account (account_id)
---   CHECK ((trans_type = 'withdrawal' AND from_accnt IS NOT NULL AND to_accnt IS NULL) OR (trans_type = 'deposit' AND from_accnt IS NULL AND to_Accnt IS NOT NULL) OR
---          (trans_type = 'transfer' AND from_accnt IS NOT NULL AND to_accnt IS NOT NULL) )
-
+  FOREIGN KEY (accnt) REFERENCES customer_account(account_id)
 );
 
 
