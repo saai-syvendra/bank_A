@@ -1,14 +1,13 @@
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 const FD_API_URL = `${VITE_API_URL}/fd`;
 
-export const callGetCustomerFds = async (customerId) => {
+export const callGetCustomerFds = async () => {
     try {
-        const response = await fetch(`${FD_API_URL}/get-all`, {
+        const response = await fetch(`${FD_API_URL}/my-fds`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ customerId }),
             credentials: "include",
         });
 

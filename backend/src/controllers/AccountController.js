@@ -12,6 +12,17 @@ const getCustomerAccounts = async (req, res) => {
     }
 };
 
+const getThisCustomerAccounts = async (req, res) => {
+    const { id: customerId } = req.user;
+    try {
+        const accounts = await AccountModel.getCustomerAccounts(customerId);
+        return res.json(accounts);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({ message: error.message });
+    }
+};
+
 const createAccount = async (req, res) => {
     const { planId, customerId, balance, accountType } = req.body;
     const branchCode = await EmployeeModel.getEmployeeBranch(req.user.id);
@@ -66,6 +77,7 @@ const getAccountDetails = async (req, res) => {
 
 export default {
     getCustomerAccounts,
+    getThisCustomerAccounts,
     createAccount,
     getSavingPlans,
     getAccountDetails,

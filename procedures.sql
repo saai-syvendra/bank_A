@@ -98,7 +98,7 @@ BEGIN
 		SET v_due_date = DATE_ADD(v_approved_date, INTERVAL v_installment_no MONTH);
 
 		INSERT INTO Loan_Installment (loan_id, installment_no, installment_amount, due_date, state)
-		VALUES (v_plan_id, v_installment_no, v_installment_amount, v_due_date, 'pending');
+		VALUES (p_loan_id, v_installment_no, v_installment_amount, v_due_date, 'pending');
 
 		SET v_installment_no = v_installment_no + 1;
 	END WHILE;
@@ -160,6 +160,7 @@ BEGIN
     DECLARE fdAmount NUMERIC(10, 2);
     DECLARE maxAllowedLoan NUMERIC(10, 2);
     DECLARE loanPlanMaxAmount NUMERIC(10, 2);
+    DECLARE newLoanId INT;
     
     -- Start a transaction
     START TRANSACTION;
@@ -202,26 +203,30 @@ BEGIN
     END IF;
     
     -- If all checks pass, insert the loan application
-    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id)
-    VALUES (loanPlanId, customerId, connectedAccount, CURDATE(), requestedLoanAmount, 'online', fdId);
+    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id, approved_date)
+    VALUES (loanPlanId, customerId, connectedAccount, CURDATE(), requestedLoanAmount, 'online', fdId, CURDATE());
     
-    INSERT INTO Account_Transaction (from_accnt, amount, trans_timestamp, reason, trans_type, method) VALUES
+    SET newLoanId = LAST_INSERT_ID();
+    
+    INSERT INTO Account_Transaction (accnt, amount, trans_timestamp, reason, trans_type, trans_method) VALUES
 	(connectedAccount, requestedLoanAmount, CURRENT_TIMESTAMP, 'Loan Deposit', 'credit', 'server');
     
     UPDATE Customer_Account
 	SET balance = balance + requestedLoanAmount
 	WHERE account_id = connectedAccount;
     
+    CALL CreateLoanInstallments(newLoanId);
+    
     COMMIT;
 
 END $$
 
-DELIMITER ;
-
---Procedure to reset the withdrawal count to 0
+-- Procedure to reset the withdrawal count to 0
 CREATE PROCEDURE ResetWithdrawalCount()
 BEGIN
   -- Reset withdrawal count to 0 for all accounts
   UPDATE customer_account
   SET withdrawal_count = 0;
 END $$
+
+DELIMITER ;
