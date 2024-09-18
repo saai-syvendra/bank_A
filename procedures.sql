@@ -217,3 +217,11 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+--Procedure to reset the withdrawal count to 0
+CREATE PROCEDURE ResetWithdrawalCount()
+BEGIN
+  -- Reset withdrawal count to 0 for all accounts
+  UPDATE customer_account
+  SET withdrawal_count = 0;
+END $$
