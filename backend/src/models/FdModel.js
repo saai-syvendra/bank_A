@@ -16,7 +16,7 @@ const getCustomerFds = async (customerId) => {
         );
 
         if (rows.length === 0)
-            throw new Error("No accounts found for this customer");
+            throw new Error("No FDs found for this customer");
 
         await connection.commit();
         return rows;

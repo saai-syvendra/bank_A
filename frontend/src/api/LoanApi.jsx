@@ -21,14 +21,14 @@ export const callCreateLoan = async (loan) => {
     }
 };
 
-export const callCreateOnlineLoan = async (data) => {
+export const callCreateOnlineLoan = async (loan) => {
     try {
         const response = await fetch(`${LOAN_API_URL}/create-online`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(loan),
             credentials: "include",
         });
 

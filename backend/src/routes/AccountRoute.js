@@ -5,6 +5,12 @@ import { validateAccountRequest } from "../middleware/validations.js";
 
 const router = express.Router();
 
+router.get(
+    "/my-accounts",
+    authorizeRole("customer"),
+    AccountController.getThisCustomerAccounts
+);
+
 router.post(
     "/create",
     authorizeRole("employee", "manager"),

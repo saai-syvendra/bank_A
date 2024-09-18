@@ -81,3 +81,24 @@ export const callGetCustomerAccounts = async (customerId) => {
         throw new Error(error.message);
     }
 };
+
+export const callGetThisCustomerAccounts = async () => {
+    try {
+        const response = await fetch(`${ACCOUNT_API_URL}/my-accounts`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        return data;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
