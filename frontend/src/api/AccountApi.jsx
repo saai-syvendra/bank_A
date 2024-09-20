@@ -63,7 +63,7 @@ export const callGetAccount = async (accountNumber) => {
 
 export const callGetCustomerAccounts = async (customerId) => {
     try {
-        const response = await fetch(`${ACCOUNT_API_URL}/${customerId}`, {
+        const response = await fetch(`${ACCOUNT_API_URL}/my-transactions/${customerId}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -98,6 +98,27 @@ export const callGetThisCustomerAccounts = async () => {
         }
 
         return data;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+export const callGetCustomerAccountTransactions = async (customerId) => {
+    try {
+        const response = await fetch(`${ACCOUNT_API_URL}/my-transactions/${customerId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        return data.transactions;
     } catch (error) {
         throw new Error(error.message);
     }

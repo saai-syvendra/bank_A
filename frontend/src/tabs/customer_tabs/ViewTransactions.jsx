@@ -1,53 +1,74 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import TransactionCard from "../../components/TransactionCard";
+import { callGetCustomerAccountTransactions } from "../../api/AccountApi";
+import { toast } from "sonner";
+
+import {
+    Tabs,
+    TabsList,
+    TabsTrigger,
+    TabsContent,
+} from "../../components/ui/tabs";
 
 const ViewTransactions = () => {
-    const transactions = [
-        {
-            transaction_id: "TXN1234567",
-            from: "ACC123456789",
-            to: "ACC987654321",
-            amount: 1500.5,
-            date: "2024-08-28T14:55:00Z",
-            reason: "Payment for services",
-            method: "online",
-        },
-        {
-            transaction_id: "TXN123456",
-            from: "ACC123456789",
-            amount: 1750.5,
-            date: "2024-08-27T10:45:00Z",
-            reason: "Random deposit",
-            method: "atm-cdm",
-        },
-        {
-            transaction_id: "TXN12345671",
-            from: "ACC123456789",
-            amount: 1500.5,
-            date: "2024-08-24T12:45:00Z",
-            reason: "Savings Interest for August",
-            method: "server",
-        },
-        {
-            transaction_id: "TXN12345672",
-            from: "ACC123456789",
-            amount: -2750.0,
-            date: "2024-08-23T11:45:00Z",
-            reason: "Random withdrawal",
-            method: "atm-cdm",
-        },
-    ];
+    const [transactions, setTransactions] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchTransactions = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            const fetchedTransactions = await callGetCustomerAccountTransactions();
+            setTransactions(fetchedTransactions);
+        } catch (error) {
+            toast.error(
+                error.message || "Failed to fetch transactions"
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchTransactions();
+    }, [fetchTransactions]);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (transactions.length === 0) {
+        return <div>No transactions found.</div>;
+    }
 
     return (
         <div className="p-6">
-            {transactions.map((transaction) => (
-                <TransactionCard
-                    transaction={transaction}
-                    key={transaction.transaction_id}
-                />
-            ))}
+            <Tabs defaultValue={transactions[0][0].account_number}>
+                <TabsList>
+                    {transactions.map((accountTransactions, index) => (
+                        <TabsTrigger key={index} value={accountTransactions[0].account_number}>
+                            {accountTransactions[0].account_number}
+                        </TabsTrigger>
+                    ))}
+                </TabsList>
+                {transactions.map((accountTransactions, index) => (
+                    <TabsContent key={index} value={accountTransactions[0].account_number}>
+                        {accountTransactions.map((transaction) => (
+                            <TransactionCard
+                                transaction={transaction}
+                                key={transaction.transaction_id}
+                                showFrom={transaction.from !== null && transaction.from !== accountTransactions[0].account_number}
+                                showTo={transaction.to !== null && transaction.to !== accountTransactions[0].account_number}
+                                />
+                        ))}
+                    </TabsContent>
+                ))}
+            </Tabs>
         </div>
     );
 };
 
 export default ViewTransactions;
+/*
+
+
+*/

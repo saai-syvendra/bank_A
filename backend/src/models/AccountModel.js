@@ -191,6 +191,58 @@ const getBranch = async (branchCode) => {
     }
 };
 
+const getCustomerAccountIds = async (customerId) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        const [rows] = await connection.query(
+            `
+              SELECT account_number
+              FROM Customer_Account 
+              WHERE customer_id = ?;
+          `,
+            [customerId]
+        );
+        if (rows.length === 0)
+            throw new Error("No accounts found for this customer");
+
+        await connection.commit();
+        return rows;
+    } catch (error) {
+        if (connection) await connection.rollback();
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
+};
+
+const getAccountTransactions = async (accountNumber) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        const [rows] = await connection.query(
+            `
+              CALL GetTransactionsByAccountNumber(?);
+          `,
+            [accountNumber]
+        );
+        if (rows.length === 0)
+            throw new Error("No accounts found for this customer");
+
+        await connection.commit();
+        return rows;
+    } catch (error) {
+        if (connection) await connection.rollback();
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
+};
+
 export default {
     getAccountByAccountNo,
     getAccountById,
@@ -199,4 +251,6 @@ export default {
     getSavingPlans,
     getSavingPlan,
     getBranch,
+    getAccountTransactions,
+    getCustomerAccountIds,
 };
