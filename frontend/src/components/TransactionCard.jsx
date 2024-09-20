@@ -1,6 +1,6 @@
 import React from "react";
 
-const TransactionCard = ({ transaction, showFrom = false }) => {
+const TransactionCard = ({ transaction, showFrom = false, showTo = false }) => {
     return (
         <div className="shadow-lg p-4 mx-20 rounded-lg bg-white mb-5 ">
             <div className="flex justify-between items-center">
@@ -29,10 +29,12 @@ const TransactionCard = ({ transaction, showFrom = false }) => {
                     transaction.amount > 0 ? "text-green-600" : "text-red-600"
                 }`}
             >
-                Amount: Rs. {transaction.amount.toFixed(2)}
+                Amount: Rs. {parseFloat(transaction.amount).toFixed(2)}
             </p>
-            {transaction.to && (
-                <p className="text-gray-600">To: {transaction.to}</p>
+            {showTo && (
+                <p className="text-gray-600">
+                    To: {transaction.to}
+                </p>
             )}
             <p className="text-gray-600">
                 Date: {new Date(transaction.date).toLocaleString()}

@@ -75,10 +75,46 @@ const getAccountDetails = async (req, res) => {
     }
 };
 
+const getThisCustomerAccountTransactions = async (req, res) => {
+    const { id: customerId } = req.user;
+    try {
+        const accounts = await AccountModel.getCustomerAccountIds(customerId);
+        const transactions = [];
+        console.log(accounts)
+        for (let acc of accounts) {
+            const temp = [];
+            const accountTransactions = await AccountModel.getAccountTransactions(acc.account_number);
+            for(let trans of accountTransactions[0]){
+                temp.push({
+                    account_number : acc.account_number, 
+                    transaction_id: trans.transaction_id,
+                    from: trans.from_accnt_number,
+                    to: trans.to_accnt_number,
+                    amount: trans.from_accnt_number===acc.account_number ? -trans.amount : trans.amount,
+                    date: trans.trans_timestamp,
+                    reason: trans.reason,
+                    method: trans.method,
+                })
+            }
+            transactions.push(temp);
+        }
+        console.log(transactions)
+        if(transactions[0].length===0){
+            return res.status(500).send({ message: "No transactions" });
+        }
+
+        return res.json({transactions:transactions});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({ message: error.message });
+    }
+};
+
 export default {
     getCustomerAccounts,
     getThisCustomerAccounts,
     createAccount,
     getSavingPlans,
     getAccountDetails,
+    getThisCustomerAccountTransactions,
 };

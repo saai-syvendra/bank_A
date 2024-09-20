@@ -108,3 +108,30 @@ VALUES
 -- (1, 1, 'System Log', 'Initial setup of the branch system'),
 -- (2, 2, 'Transaction Log', 'Customer deposited money into their account');
 
+
+-- Transactions for account 1
+INSERT INTO account_transaction (from_accnt, to_accnt, amount, trans_timestamp, reason, trans_type, method)
+VALUES
+(NULL, 1, 1000.00, '2023-03-01 10:00:00', 'Salary deposit for March 2023', 'credit', 'online'),
+(1, NULL, 200.00, '2023-03-05 14:30:00', 'ATM withdrawal at Branch 1', 'debit', 'atm-cdm'),
+(2, 1, 500.00, '2023-03-10 09:15:00', 'Transfer from savings account', 'credit', 'online'),
+
+-- Transactions for account 2
+(NULL, 2, 2000.00, '2023-03-02 11:00:00', 'Client payment for Project X', 'credit', 'online'),
+(2, NULL, 500.00, '2023-03-07 16:45:00', 'Utility bill payment - Electricity Bill for February', 'debit', 'online'),
+(2, NULL, 100.00, '2023-03-12 13:20:00', 'ATM withdrawal at Mall ATM', 'debit', 'atm-cdm'),
+
+-- Transactions for account 3
+(NULL, 3, 5000.00, '2023-03-03 09:30:00', 'Annual performance bonus', 'credit', 'online'),
+(3, NULL, 1000.00, '2023-03-08 10:00:00', 'Monthly rent payment', 'debit', 'online'),
+(NULL, 3, 200.00, '2023-03-15 14:00:00', 'Quarterly interest credit', 'credit', 'server'),
+
+-- Additional transactions to showcase all transaction methods
+(NULL, 1, 300.00, '2023-03-20 11:30:00', 'Cash deposit at branch counter', 'credit', 'via_employee'),
+(NULL, 2, 150.00, '2023-03-22 15:45:00', 'Refund for returned item', 'credit', 'server'),
+(3, NULL, 750.00, '2023-03-25 09:00:00', 'Withdrawal processed by teller', 'debit', 'via_employee'),
+
+-- Additional diverse transactions
+(1, 2, 50.00, '2023-03-26 12:00:00', 'Transfer to account 2', 'debit', 'online'),
+(2, 1, 75.00, '2023-03-27 10:30:00', 'Transfer to account 1', 'credit', 'online'),
+(NULL, 1, 400.00, '2023-03-28 09:00:00', 'Cash deposit via ATM', 'credit', 'atm-cdm');

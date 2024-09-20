@@ -11,6 +11,12 @@ router.get(
     AccountController.getThisCustomerAccounts
 );
 
+router.get(
+    "/my-transactions/:user",
+    authorizeRole("customer"),
+    AccountController.getThisCustomerAccountTransactions
+);
+
 router.post(
     "/create",
     authorizeRole("employee", "manager"),
