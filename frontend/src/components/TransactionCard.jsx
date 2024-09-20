@@ -9,7 +9,7 @@ const TransactionCard = ({ transaction, showFrom = false, showTo = false }) => {
                 </h2>
                 <span
                     className={`px-2 py-1 rounded-full text-white ${
-                        transaction.method === "online"
+                        transaction.method === "online-transfer"
                             ? "bg-blue-500"
                             : transaction.method === "atm-cdm"
                             ? "bg-green-500"
