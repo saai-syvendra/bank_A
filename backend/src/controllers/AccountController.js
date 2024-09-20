@@ -88,12 +88,10 @@ const getThisCustomerAccountTransactions = async (req, res) => {
                 temp.push({
                     account_number : acc.account_number, 
                     transaction_id: trans.transaction_id,
-                    from: trans.from_accnt_number,
-                    to: trans.to_accnt_number,
-                    amount: trans.from_accnt_number===acc.account_number ? -trans.amount : trans.amount,
+                    amount: trans.trans_type==='credit' ? trans.amount : -trans.amount,
                     date: trans.trans_timestamp,
                     reason: trans.reason,
-                    method: trans.method,
+                    method: trans.trans_method,
                 })
             }
             transactions.push(temp);

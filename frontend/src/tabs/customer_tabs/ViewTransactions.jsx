@@ -56,8 +56,6 @@ const ViewTransactions = () => {
                             <TransactionCard
                                 transaction={transaction}
                                 key={transaction.transaction_id}
-                                showFrom={transaction.from !== null && transaction.from !== accountTransactions[0].account_number}
-                                showTo={transaction.to !== null && transaction.to !== accountTransactions[0].account_number}
                                 />
                         ))}
                     </TabsContent>

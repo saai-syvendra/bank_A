@@ -500,7 +500,7 @@ END$$
 
 -- Procedure to get transactions
 CREATE PROCEDURE GetTransactions(
-    IN customerId INT
+    IN accountNumber CHAR(12)
 )
 BEGIN
     DECLARE accountID INT;
@@ -513,17 +513,13 @@ BEGIN
     
     -- Get all transactions for the account, including from_accnt_number and to_accnt_number
     SELECT 
-        at.*, 
-        IFNULL(ca_from.account_number, null) AS from_accnt_number, 
-        IFNULL(ca_to.account_number, null) AS to_accnt_number
+        at.transaction_id, at.amount, at.trans_timestamp, at.reason, at.trans_type, at.trans_method, customer_account.account_number                
     FROM 
         account_transaction at
     LEFT JOIN 
-        customer_account ca_from ON at.from_accnt = ca_from.account_id
-    LEFT JOIN 
-        customer_account ca_to ON at.to_accnt = ca_to.account_id
+        customer_account ON customer_account.account_id = at.accnt
     WHERE 
-        at.from_accnt = accountID OR at.to_accnt = accountID
+        at.accnt = accountID
     ORDER BY 
         at.trans_timestamp DESC;
 

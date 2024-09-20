@@ -226,7 +226,7 @@ const getAccountTransactions = async (accountNumber) => {
 
         const [rows] = await connection.query(
             `
-              CALL GetTransactionsByAccountNumber(?);
+              CALL GetTransactions(?);
           `,
             [accountNumber]
         );
