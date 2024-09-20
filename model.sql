@@ -316,6 +316,7 @@ CREATE TABLE Loan_Installment (
   FOREIGN KEY (loan_id) REFERENCES Loan(loan_id)
 );
 
+-- DROP TABLE Account_Trasaction
 -- Create transactions table
 CREATE TABLE Account_Transaction (
   transaction_id        INT AUTO_INCREMENT,

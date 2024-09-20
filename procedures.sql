@@ -105,9 +105,10 @@ BEGIN
     
 END $$
 
--- DROP PROCEDURE CheckSafeWithdrawal;
+--DROP PROCEDURE CheckSafeWithdrawal;
+--DROP PROCEDURE CheckSafeDeduction;
 
-CREATE PROCEDURE CheckSafeWithdrawal(
+CREATE PROCEDURE CheckSafeDeduction(
     IN accountId INT,
     IN withdrawAmount NUMERIC(12,2),
     OUT isSafe BOOLEAN
@@ -133,7 +134,7 @@ BEGIN
     ELSEIF accountType = 'saving' THEN
         -- For saving accounts, check the associated plan's minimum balance
         SELECT minimum_balance INTO minBalance
-        FROM Saving_Plan
+        FROM saving_plan
         WHERE plan_id = accPlanId;
 
         -- Check if balance after withdrawal meets the minimum balance requirement
@@ -230,38 +231,3 @@ BEGIN
 END $$
 
 DELIMITER ;
-
--- Procedure to get transactions
-DELIMITER $$
-
-CREATE PROCEDURE GetTransactions(
-    IN customerId INT
-)
-BEGIN
-    DECLARE accountID INT;
-
-    -- Start transaction
-    START TRANSACTION;
-    
-	-- Get account id
-    SELECT account_id INTO accountID FROM customer_account WHERE account_number = accountNumber;
-    
-    -- Get all transactions for the account, including from_accnt_number and to_accnt_number
-    SELECT 
-        at.*, 
-        IFNULL(ca_from.account_number, null) AS from_accnt_number, 
-        IFNULL(ca_to.account_number, null) AS to_accnt_number
-    FROM 
-        account_transaction at
-    LEFT JOIN 
-        customer_account ca_from ON at.from_accnt = ca_from.account_id
-    LEFT JOIN 
-        customer_account ca_to ON at.to_accnt = ca_to.account_id
-    WHERE 
-        at.from_accnt = accountID OR at.to_accnt = accountID
-    ORDER BY 
-        at.trans_timestamp DESC;
-
-    -- Commit transaction
-    COMMIT;
-END$$
