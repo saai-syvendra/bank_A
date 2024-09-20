@@ -1,4 +1,4 @@
---Event to reset the withdrawal count to 0 at the start of each month for all accounts.
+-- Event to reset the withdrawal count to 0 at the start of each month for all accounts.
 
 CREATE EVENT ResetWithdrawalCountMonthly
 ON SCHEDULE EVERY 1 MONTH
