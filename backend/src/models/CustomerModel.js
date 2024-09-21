@@ -142,3 +142,5 @@ const updateCustomer = async (id, data) => {
 };
 
 export default { getCustomer, getAllCustomers, createCustomer, updateCustomer };
+
+// const getCustomerDetailsFromAccountNumber
