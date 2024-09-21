@@ -270,7 +270,7 @@ CREATE TABLE Loan (
   connected_account INT NOT NULL,
   request_date      DATE NOT NULL,
   loan_amount       NUMERIC(10,2),
-  state             ENUM('pending','approved','disapproved','online'),
+  state             ENUM('pending','approved','rejected','online'),
   fd_id				INT,
   approved_date     DATE,
   reason			VARCHAR(100),

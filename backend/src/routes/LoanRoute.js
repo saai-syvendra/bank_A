@@ -5,16 +5,26 @@ import { authorizeRole } from "../middleware/auth.js";
 const router = express.Router();
 
 router.post(
-    "/create",
-    authorizeRole("employee", "manager"),
-    LoanController.createLoan
+  "/create",
+  authorizeRole("employee", "manager"),
+  LoanController.createLoan
 );
 
 router.post(
-    "/create-online",
-    authorizeRole("customer"),
-    LoanController.createOnlineLoan
+  "/create-online",
+  authorizeRole("customer"),
+  LoanController.createOnlineLoan
 );
+
+router.get(
+  "/approval-pending",
+  authorizeRole("manager"),
+  LoanController.getApprovalPendingLoans
+);
+
+router.post("/approve", authorizeRole("manager"), LoanController.approveLoan);
+
+router.post("/reject", authorizeRole("manager"), LoanController.rejectLoan);
 
 router.get("/plans", LoanController.getLoanPlans);
 
