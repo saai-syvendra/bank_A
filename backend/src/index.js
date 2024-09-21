@@ -15,12 +15,12 @@ import { authenticateJWT, authorizeRole } from "./middleware/auth.js";
 dotenv.config();
 
 const app = express();
-// app.use(
-//   cors({
-//     origin: "http://localhost:5173",
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -31,7 +31,7 @@ app.use("/employee", authenticateJWT, employeeRoute);
 app.use("/loan", authenticateJWT, loanRoute);
 app.use("/fd", authenticateJWT, fdRoute);
 app.use("/report", authenticateJWT, reportRoute);
-app.use("/transaction", transactionRoute);
+app.use("/transaction", authenticateJWT, transactionRoute);
 
 // Start the server
 const PORT = process.env.PORT;
