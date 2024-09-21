@@ -19,22 +19,28 @@ import {
 import CreateLoan from "../tabs/employee_tabs/CreateLoan";
 // import EmployeeCashDepositForm from "../forms/EmployeeCashDepositForm";
 
-const EmployeeDashboard = () => {
+const EmployeeDashboard = ({ role }) => {
   const loading = useAuthorization(["manager", "employee"]);
+
+  const isEmployee = role === "employee";
 
   if (loading) {
     return <div></div>;
   }
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow-md">
+      <div
+        className={`${isEmployee ? "max-w-4xl" : "max-w-5xl"} mx-auto bg-white p-6 rounded shadow-md`}
+      >
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">Employee Dashboard</h1>
+          <h1 className="text-3xl font-bold">
+            {isEmployee ? "Employee" : "Manager"} Dashboard
+          </h1>
           <LogoutButton />
         </div>
         <p>
-          Welcome to the employee dashboard. Here you can manage your tasks and
-          view customer information.
+          Welcome to the {isEmployee ? "employee" : "manager"} dashboard. Here
+          you can manage your tasks and view customer information.
         </p>
         <Tabs defaultValue="create-account" className="w-80%">
           <TabsList>
@@ -44,6 +50,14 @@ const EmployeeDashboard = () => {
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
             <TabsTrigger value="cash-deposit">Cash Deposit</TabsTrigger>
             <TabsTrigger value="update-details">Update Details</TabsTrigger>
+            {!isEmployee && (
+              <>
+                <TabsTrigger value="approve-loan">Approve Loan</TabsTrigger>
+                <TabsTrigger value="late-loan">
+                  Late Loan Installments
+                </TabsTrigger>
+              </>
+            )}
           </TabsList>
           <TabsContent value="create-account">
             <CreateAccount triggerFetchCustomers={true} />
@@ -66,6 +80,12 @@ const EmployeeDashboard = () => {
               employee={true}
             />
           </TabsContent>
+          {!isEmployee && (
+            <>
+              <TabsContent value="approve-loan">Approve Loan</TabsContent>
+              <TabsContent value="late-loan">Late Loan</TabsContent>
+            </>
+          )}
         </Tabs>
       </div>
     </div>

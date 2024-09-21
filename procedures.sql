@@ -155,7 +155,8 @@ CREATE PROCEDURE CreateOnlineLoan (
     IN loanPlanId INT,
     IN fdId INT,
     IN requestedLoanAmount NUMERIC(10, 2),
-    IN connectedAccount INT
+    IN connectedAccount INT,
+    IN reason VARCHAR(100)
 )
 BEGIN
     DECLARE fdAmount NUMERIC(10, 2);
@@ -204,8 +205,8 @@ BEGIN
     END IF;
     
     -- If all checks pass, insert the loan application
-    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id, approved_date)
-    VALUES (loanPlanId, customerId, connectedAccount, CURDATE(), requestedLoanAmount, 'online', fdId, CURDATE());
+    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id, approved_date, reason)
+    VALUES (loanPlanId, customerId, connectedAccount, CURDATE(), requestedLoanAmount, 'online', fdId, CURDATE(), reason);
     
     SET newLoanId = LAST_INSERT_ID();
     
