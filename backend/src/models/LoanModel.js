@@ -5,14 +5,15 @@ const createLoan = async (
   customer_id,
   connected_account,
   loan_amount,
+  branch_code,
   reason
 ) => {
   await pool.query(
     `
-          INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, reason) 
-          VALUES (?, ?, ?, CURRENT_DATE(), ?, 'pending', ?);
+          INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, branch_code, reason) 
+          VALUES (?, ?, ?, CURRENT_DATE(), ?, 'pending', ?, ?);
       `,
-    [plan_id, customer_id, connected_account, loan_amount, reason]
+    [plan_id, customer_id, connected_account, loan_amount, branch_code, reason]
   );
 };
 
@@ -48,6 +49,31 @@ const getLoanPlans = async () => {
 
     await connection.commit();
     return rows;
+  } catch (error) {
+    if (connection) await connection.rollback();
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
+const getPlan = async (plan_id) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [rows] = await connection.query(
+      `
+                SELECT * 
+                FROM Loan_Plan
+                WHERE plan_id = ?;
+            `,
+      [plan_id]
+    );
+
+    await connection.commit();
+    return rows[0];
   } catch (error) {
     if (connection) await connection.rollback();
     throw error;
@@ -132,6 +158,7 @@ export default {
   createLoan,
   createOnlineLoan,
   getLoanPlans,
+  getPlan,
   getApprovalPendingLoans,
   approveLoan,
   rejectLoan,
