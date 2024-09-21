@@ -17,6 +17,7 @@ import {
   callUpdateEmployeeDetail,
 } from "../api/EmployeeApi";
 import CreateLoan from "../tabs/employee_tabs/CreateLoan";
+import LoanApprovalList from "../tabs/manager_tabs/LoanApproval";
 // import EmployeeCashDepositForm from "../forms/EmployeeCashDepositForm";
 
 const EmployeeDashboard = ({ role }) => {
@@ -82,7 +83,9 @@ const EmployeeDashboard = ({ role }) => {
           </TabsContent>
           {!isEmployee && (
             <>
-              <TabsContent value="approve-loan">Approve Loan</TabsContent>
+              <TabsContent value="approve-loan">
+                <LoanApprovalList />
+              </TabsContent>
               <TabsContent value="late-loan">Late Loan</TabsContent>
             </>
           )}

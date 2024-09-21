@@ -1,13 +1,20 @@
 import LoanModel from "../models/LoanModel.js";
+import CustomerModel from "../models/CustomerModel.js";
+import AccountModel from "../models/AccountModel.js";
+import EmployeeModel from "../models/EmployeeModel.js";
 
 const createLoan = async (req, res) => {
+  const { id: employeeId } = req.user;
   const { planId, customerId, connectedAccount, loanAmount, reason } = req.body;
+
+  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
   try {
     await LoanModel.createLoan(
       planId,
       customerId,
       connectedAccount,
       loanAmount,
+      branchCode,
       reason
     );
     res.status(201).json({ message: "Loan created successfully!" });
@@ -45,8 +52,36 @@ const getLoanPlans = async (req, res) => {
 
 const getApprovalPendingLoans = async (req, res) => {
   try {
+    const { id: employeeId } = req.user;
+    const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
     const loans = await LoanModel.getApprovalPendingLoans();
-    res.status(200).send(loans);
+    const loanData = [];
+
+    for (const loan of loans) {
+      if (loan.branch_code === branchCode) {
+        const customer = await CustomerModel.getCustomer(loan.customer_id);
+        const account = await AccountModel.getAccountById(
+          loan.connected_account
+        );
+        const plan = await LoanModel.getPlan(loan.plan_id);
+        let customer_name = "";
+        if (customer["c_type"] === "individual") {
+          customer_name = customer["first_name"] + " " + customer["last_name"];
+        } else if (customer["c_type"] === "organisation") {
+          customer_name = customer["org_name"];
+        }
+        loanData.push({
+          ...loan,
+          customer_name: customer_name,
+          account_balance: account.balance,
+          account_number: account.account_number,
+          plan_name: plan.plan_name,
+          plan_interest: plan.interest,
+        });
+      }
+    }
+
+    res.status(200).send(loanData);
   } catch (error) {
     res.status(500).send({ message: error.message });
   }

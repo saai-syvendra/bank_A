@@ -272,6 +272,7 @@ CREATE TABLE Loan (
   loan_amount       NUMERIC(10,2),
   state             ENUM('pending','approved','rejected','online'),
   fd_id				INT,
+  branch_code		INT,
   approved_date     DATE,
   reason			VARCHAR(100),
   PRIMARY KEY (loan_id),
@@ -279,7 +280,8 @@ CREATE TABLE Loan (
   FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
   FOREIGN KEY (connected_account) REFERENCES Customer_Account(account_id),
   FOREIGN KEY (fd_id) REFERENCES FD(fd_id),
-  CHECK ( (state = 'online' AND fd_id IS NOT NULL) OR (state != 'online' AND fd_id IS NULL))
+  FOREIGN KEY (branch_code) REFERENCES Branch(branch_code),
+  CHECK ( (state = 'online' AND fd_id IS NOT NULL AND branch_code IS NULL) OR (state != 'online' AND fd_id IS NULL AND branch_code IS NOT NULL))
 );
 
 DELIMITER $$

@@ -62,8 +62,8 @@ INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
 (3, 6, '2024-07-20', 100000);
 
 -- Insert data into Loan table
-INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, approved_date, reason) VALUES
-(1, 10000, 1, '2023-07-01', 75000.00, 'approved', '2023-08-17', "Buy stuff for my house");
+INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, approved_date, branch_code, reason) VALUES
+(1, 10000, 1, '2023-07-01', 75000.00, 'approved', '2023-08-17', 1, "Buy stuff for my house");
 
 CALL CreateOnlineLoan(10001, 1, 1, 5000, 3, "Short quick loan for emergency");
 
