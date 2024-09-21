@@ -10,15 +10,16 @@ import employeeRoute from "./routes/EmployeeRoute.js";
 import loanRoute from "./routes/LoanRoute.js";
 import fdRoute from "./routes/FdRoute.js";
 import reportRoute from "./routes/ReportRoute.js";
+import transactionRoute from "./routes/TransactionRoute.js";
 import { authenticateJWT, authorizeRole } from "./middleware/auth.js";
 dotenv.config();
 
 const app = express();
 app.use(
-    cors({
-        origin: "http://localhost:5173",
-        credentials: true,
-    })
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
 );
 app.use(express.json());
 app.use(cookieParser());
@@ -30,9 +31,10 @@ app.use("/employee", authenticateJWT, employeeRoute);
 app.use("/loan", authenticateJWT, loanRoute);
 app.use("/fd", authenticateJWT, fdRoute);
 app.use("/report", authenticateJWT, reportRoute);
+app.use("/transaction",authenticateJWT, transactionRoute);
 
 // Start the server
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -270,12 +269,5 @@ const UpdateDetailForm = ({
         </Card>
     );
 };
-UpdateDetailForm.propTypes = {
-    triggerUpdateDetails: PropTypes.bool.isRequired,
-    fetchFucntion: PropTypes.func.isRequired,
-    updateFunction: PropTypes.func.isRequired,
-    employee: PropTypes.bool,
-};
 
 export default UpdateDetailForm;
-
