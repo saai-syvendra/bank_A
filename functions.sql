@@ -1,6 +1,6 @@
 DELIMITER $$
 
-DROP FUNCTION IF EXISTS AccountExists;
+-- DROP FUNCTION IF EXISTS AccountExists;
 
 CREATE FUNCTION AccountExists(
     p_account_id INT
