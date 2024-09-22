@@ -110,8 +110,10 @@ const getThisCustomerAccountTransactions = async (req, res) => {
 
 const getThisBranchAccountTransactions = async (req, res) => {
   const { id: employeeId } = req.user;
+  console.log(req.query);
   const { cusId, startDate, transactionType, minAmount, maxAmount, method } =
-    req.body;
+    req.query;
+  console.log("CusID", cusId);
   const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
   const filters = {
     cust_id: cusId || null,

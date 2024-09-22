@@ -124,15 +124,31 @@ export const callGetCustomerAccountTransactions = async (customerId) => {
   }
 };
 
-export const callGetBranchAccountTransactions = async () => {
+export const callGetBranchAccountTransactions = async ({
+  startDate,
+  transactionType,
+  minAmount,
+  maxAmount,
+  method,
+}) => {
+  const params = new URLSearchParams();
+  params.set("startDate", startDate);
+  params.set("transactionType", transactionType);
+  params.set("minAmount", minAmount);
+  params.set("maxAmount", maxAmount);
+  params.set("method", method);
+  console.log(params.toString());
   try {
-    const response = await fetch(`${ACCOUNT_API_URL}/branch-transactions`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${ACCOUNT_API_URL}/branch-transactions?${params.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
 
     const data = await response.json();
     if (!response.ok) {

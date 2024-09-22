@@ -10,17 +10,42 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-const ViewBranchTransactions = () => {
+export default function ViewBranchTransactions() {
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    startDate: "",
+    transactionType: "all",
+    minAmount: "",
+    maxAmount: "",
+    method: "all",
+  });
+  const [tempFilters, setTempFilters] = useState({ ...filters });
 
   const fetchTransactions = useCallback(async () => {
+    const apiFilters = { ...filters };
+    if (apiFilters.transactionType === "all") {
+      apiFilters.transactionType = "";
+    }
+    if (apiFilters.method === "all") {
+      apiFilters.method = "";
+    }
     try {
       setIsLoading(true);
-      const fetchedTransactions = await callGetBranchAccountTransactions();
+      const fetchedTransactions =
+        await callGetBranchAccountTransactions(apiFilters);
       const sortedTransactions = fetchedTransactions.sort((a, b) => {
         return new Date(b.trans_timestamp) - new Date(a.trans_timestamp);
       });
@@ -31,11 +56,36 @@ const ViewBranchTransactions = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [filters]);
 
   useEffect(() => {
     fetchTransactions();
   }, [fetchTransactions]);
+
+  const handleFilterChange = (key, value) => {
+    setTempFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const applyFilters = () => {
+    setFilters(tempFilters);
+  };
+
+  const cancelFilters = () => {
+    setFilters({
+      startDate: "",
+      transactionType: "all",
+      minAmount: "",
+      maxAmount: "",
+      method: "all",
+    });
+    setTempFilters({
+      startDate: "",
+      transactionType: "all",
+      minAmount: "",
+      maxAmount: "",
+      method: "all",
+    });
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -48,11 +98,69 @@ const ViewBranchTransactions = () => {
   return (
     <div className="p-6">
       <Card className="mb-4">
+        <CardHeader>
+          <h2 className="text-2xl font-bold">Branch Transactions</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-4">
+            <Select
+              value={tempFilters.transactionType}
+              onValueChange={(value) =>
+                handleFilterChange("transactionType", value)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Transaction Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="credit">Credit</SelectItem>
+                <SelectItem value="debit">Debit</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={tempFilters.method}
+              onValueChange={(value) => handleFilterChange("method", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Method" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="online-transfer">Online Transfer</SelectItem>
+                <SelectItem value="atm-cdm">ATM/CDM</SelectItem>
+                <SelectItem value="via_employee">Via Employee</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              type="date"
+              placeholder="Start Date"
+              value={tempFilters.startDate}
+              onChange={(e) => handleFilterChange("startDate", e.target.value)}
+            />
+            <Input
+              type="number"
+              placeholder="Min Amount"
+              value={tempFilters.minAmount}
+              onChange={(e) => handleFilterChange("minAmount", e.target.value)}
+            />
+            <Input
+              type="number"
+              placeholder="Max Amount"
+              value={tempFilters.maxAmount}
+              onChange={(e) => handleFilterChange("maxAmount", e.target.value)}
+            />
+          </div>
+          <div className="flex justify-start space-x-2 mt-4 pt-3">
+            <Button variant="outline" onClick={cancelFilters}>
+              Reset Filters
+            </Button>
+            <Button onClick={applyFilters}>Apply Filters</Button>
+          </div>
+        </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID.</TableHead>
+                <TableHead>ID</TableHead>
                 <TableHead>Account No</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Date</TableHead>
@@ -63,7 +171,7 @@ const ViewBranchTransactions = () => {
             </TableHeader>
             <TableBody>
               {transactions.map((transaction) => (
-                <TableRow>
+                <TableRow key={transaction.transaction_id}>
                   <TableCell>{transaction.transaction_id}</TableCell>
                   <TableCell>{transaction.account_number}</TableCell>
                   <TableCell
@@ -106,6 +214,4 @@ const ViewBranchTransactions = () => {
       </Card>
     </div>
   );
-};
-
-export default ViewBranchTransactions;
+}
