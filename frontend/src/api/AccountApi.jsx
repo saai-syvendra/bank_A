@@ -105,16 +105,34 @@ export const callGetThisCustomerAccounts = async () => {
 
 export const callGetCustomerAccountTransactions = async (customerId) => {
   try {
-    const response = await fetch(
-      `${ACCOUNT_API_URL}/my-transactions/${customerId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
+    const response = await fetch(`${ACCOUNT_API_URL}/my-transactions`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data.transactions;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const callGetBranchAccountTransactions = async () => {
+  try {
+    const response = await fetch(`${ACCOUNT_API_URL}/branch-transactions`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
     const data = await response.json();
     if (!response.ok) {

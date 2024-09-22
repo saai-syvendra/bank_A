@@ -1,54 +1,123 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import TransactionCard from "../../components/TransactionCard";
+import { callGetBranchAccountTransactions } from "../../api/AccountApi";
+import { toast } from "sonner";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "../../components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { format } from "date-fns";
 
 const ViewBranchTransactions = () => {
-    const transactions = [
-        {
-            transaction_id: "TXN12345678",
-            from: "ACC123456789",
-            to: "ACC987654321",
-            amount: 1500.5,
-            date: "2024-08-28T14:55:00Z",
-            reason: "Payment for services",
-            method: "online",
-        },
-        {
-            transaction_id: "TXN12345678",
-            from: "ACC123456789",
-            amount: 1750.5,
-            date: "2024-08-27T10:45:00Z",
-            reason: "Random deposit",
-            method: "atm-cdm",
-        },
-        {
-            transaction_id: "TXN12345678",
-            from: "ACC123456789",
-            amount: 1500.5,
-            date: "2024-08-24T12:45:00Z",
-            reason: "Savings Interest for August",
-            method: "server",
-        },
-        {
-            transaction_id: "TXN12345678",
-            from: "ACC123456789",
-            amount: -2750.0,
-            date: "2024-08-23T11:45:00Z",
-            reason: "Random withdrawal",
-            method: "atm-cdm",
-        },
-    ];
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-    return (
-        <div className="p-6 ">
-            {transactions.map((transaction) => (
-                <TransactionCard
-                    transaction={transaction}
-                    showFrom={true}
-                    key={transaction.transaction_id}
-                />
-            ))}
-        </div>
-    );
+  const fetchTransactions = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const fetchedTransactions = await callGetBranchAccountTransactions();
+      // sort fetched transaction by trans_timestamp
+      const sortedTransactions = fetchedTransactions.sort((a, b) => {
+        return new Date(b.trans_timestamp) - new Date(a.trans_timestamp);
+      });
+      console.log("Fetched Transactions", sortedTransactions);
+      setTransactions(sortedTransactions);
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch transactions");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (transactions.length === 0) {
+    return <div>No transactions found.</div>;
+  }
+
+  return (
+    <div className="p-6">
+      <Card className="mb-4">
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID.</TableHead>
+                <TableHead>Account No</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Time</TableHead>
+                <TableHead>Reason</TableHead>
+                <TableHead>Method</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {transactions.map((transaction) => (
+                <TableRow>
+                  <TableCell>{transaction.transaction_id}</TableCell>
+                  <TableCell>{transaction.account_number}</TableCell>
+                  <TableCell
+                    className={`text-gray-800 font-semibold ${
+                      transaction.trans_type === "debit"
+                        ? "text-red-600"
+                        : "text-green-600"
+                    }`}
+                  >
+                    {transaction.trans_type === "debit" ? "-" : ""} Rs.{" "}
+                    {parseFloat(transaction.amount).toFixed(2)}
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(transaction.trans_timestamp), "PP")}
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(transaction.trans_timestamp), "p")}
+                  </TableCell>
+                  <TableCell>{transaction.reason}</TableCell>
+                  <TableCell>
+                    <Badge
+                      className={`${
+                        transaction.trans_method === "online-transfer"
+                          ? "bg-blue-500"
+                          : transaction.trans_method === "atm-cdm"
+                            ? "bg-green-500"
+                            : transaction.trans_method === "via_employee"
+                              ? "bg-yellow-500"
+                              : "bg-gray-500"
+                      }`}
+                    >
+                      {transaction.trans_method}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
 
 export default ViewBranchTransactions;
+/*
+
+
+*/
