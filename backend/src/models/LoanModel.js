@@ -115,9 +115,16 @@ const approveLoan = async (loan_id) => {
     await connection.query(
       `
         UPDATE Loan
-        SET state = "approved"
+        SET state = "approved", approved_date = CURDATE()
         WHERE loan_id = ?;
       `,
+      [loan_id]
+    );
+
+    await connection.query(
+      `
+          CALL CreateLoanInstallments(?);
+        `,
       [loan_id]
     );
 
@@ -154,6 +161,70 @@ const rejectLoan = async (loan_id) => {
   }
 };
 
+const getUpcomingInstallments = async (customer_id) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [rows] = await connection.query(
+      `
+        SELECT 
+            L.loan_id, 
+            LI.installment_no, 
+            LI.installment_amount, 
+            LI.due_date, 
+            LI.state,
+            L.loan_amount,
+            LP.months
+        FROM Loan L
+        JOIN Loan_Installment LI USING(loan_id)
+        JOIN Loan_Plan LP Using(plan_id)
+        WHERE L.customer_id = 10001 
+        AND LI.state = 'pending'
+        AND LI.due_date = (
+            SELECT MIN(LI2.due_date)
+            FROM Loan_Installment LI2
+            WHERE LI2.loan_id = L.loan_id
+                AND LI2.state = 'pending'
+        )
+        ORDER BY L.loan_id;
+      `,
+      [customer_id]
+    );
+
+    await connection.commit();
+    return rows;
+  } catch (error) {
+    if (connection) await connection.rollback();
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
+const payInstallment = async (loan_id, installment_no, account_id) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    await connection.query(
+      `
+        CALL PayInstallment(?, ?, ?);
+      `,
+      [loan_id, installment_no, account_id]
+    );
+
+    await connection.commit();
+  } catch (error) {
+    if (connection) await connection.rollback();
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
 export default {
   createLoan,
   createOnlineLoan,
@@ -162,4 +233,6 @@ export default {
   getApprovalPendingLoans,
   approveLoan,
   rejectLoan,
+  getUpcomingInstallments,
+  payInstallment,
 };

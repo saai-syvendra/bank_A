@@ -45,7 +45,7 @@ export default function LoanCard({ loan, onStatusChange }) {
     }
   };
 
-  const confirmAction = (funcToBeCalled, title, message) => {
+  const confirmAction = (funcToBeCalled, title, message, positive) => {
     confirmAlert({
       title: title,
       message,
@@ -53,11 +53,11 @@ export default function LoanCard({ loan, onStatusChange }) {
         {
           label: "Yes",
           onClick: funcToBeCalled,
-          className: "bg-red-500 text-white hover:bg-red-600",
+          className: `${positive ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"} text-white `,
         },
         {
           label: "No",
-          className: "bg-green-500 text-white hover:bg-green-600",
+          className: `${positive ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"} text-white `,
         },
       ],
     });
@@ -105,7 +105,8 @@ export default function LoanCard({ loan, onStatusChange }) {
             confirmAction(
               handleApprove,
               "Confirm approval",
-              "Are you sure to approve loan?"
+              "Are you sure to approve loan?",
+              true
             )
           }
           disabled={isLoading}
@@ -117,7 +118,8 @@ export default function LoanCard({ loan, onStatusChange }) {
             confirmAction(
               handleReject,
               "Confirm rejection",
-              "Are you sure to reject loan?"
+              "Are you sure to reject loan?",
+              false
             )
           }
           variant="destructive"

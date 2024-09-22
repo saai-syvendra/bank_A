@@ -122,3 +122,43 @@ export const callRejectLoan = async (loanId) => {
     throw new Error(error.message);
   }
 };
+
+export const callGetUpcomingInstallments = async () => {
+  try {
+    const response = await fetch(`${LOAN_API_URL}/upcoming-installments`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const callPayInstallment = async (loanId, installmentNo, accountId) => {
+  try {
+    const response = await fetch(`${LOAN_API_URL}/pay-installment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ loanId, installmentNo, accountId }),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};

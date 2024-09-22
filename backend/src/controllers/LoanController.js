@@ -107,6 +107,26 @@ const rejectLoan = async (req, res) => {
   }
 };
 
+const getUpcomingInstallments = async (req, res) => {
+  const { id: customerId } = req.user;
+  try {
+    const installments = await LoanModel.getUpcomingInstallments(customerId);
+    res.status(200).send(installments);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
+const payInstallment = async (req, res) => {
+  const { loanId, installmentNo, accountId } = req.body;
+  try {
+    await LoanModel.payInstallment(loanId, installmentNo, accountId);
+    res.status(200).send({ message: "Installment paid successfully!" });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
 export default {
   createLoan,
   createOnlineLoan,
@@ -114,4 +134,6 @@ export default {
   getApprovalPendingLoans,
   approveLoan,
   rejectLoan,
+  getUpcomingInstallments,
+  payInstallment,
 };
