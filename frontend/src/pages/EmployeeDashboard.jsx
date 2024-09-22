@@ -1,4 +1,3 @@
-// src/EmployeeDashboard.jsx
 import React from "react";
 import {
   Tabs,
