@@ -30,9 +30,7 @@ const EmployeeDashboard = ({ role }) => {
   }
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <div
-        className={`${isEmployee ? "max-w-4xl" : "max-w-5xl"} mx-auto bg-white p-6 rounded shadow-md`}
-      >
+      <div className={`max-w-5xl mx-auto bg-white p-6 rounded shadow-md`}>
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold">
             {isEmployee ? "Employee" : "Manager"} Dashboard

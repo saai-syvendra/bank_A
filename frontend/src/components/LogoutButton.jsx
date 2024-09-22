@@ -3,48 +3,63 @@ import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../api/UserApi";
-import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import useTokenExpiration from "../auth/TokenExpiration";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const LogoutButton = () => {
-    const navigate = useNavigate();
-    const { cancelTimeout } = useTokenExpiration();
+  const navigate = useNavigate();
+  const { cancelTimeout } = useTokenExpiration();
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
-    const handleLogout = async () => {
-        await logout();
-        localStorage.removeItem("role");
-        cancelTimeout();
-        navigate("/login");
-        toast.success("Logout successful!");
-    };
+  const handleLogout = async () => {
+    await logout();
+    localStorage.removeItem("role");
+    cancelTimeout();
+    navigate("/login");
+    toast.success("Logout successful!");
+  };
 
-    const confirmLogout = () => {
-        confirmAlert({
-            title: "Confirm Logout",
-            message: "Are you sure you want to logout?",
-            buttons: [
-                {
-                    label: "Yes",
-                    onClick: handleLogout,
-                    className: "bg-red-500 text-white hover:bg-red-600",
-                },
-                {
-                    label: "No",
-                    className: "bg-green-500 text-white hover:bg-green-600",
-                },
-            ],
-        });
-    };
+  return (
+    <>
+      <Button
+        onClick={setIsConfirmationOpen}
+        className="bg-red-500 text-white hover:bg-red-600"
+      >
+        Logout
+      </Button>
 
-    return (
-        <Button
-            onClick={confirmLogout}
-            className="bg-red-500 text-white hover:bg-red-600"
-        >
-            Logout
-        </Button>
-    );
+      <AlertDialog
+        open={isConfirmationOpen}
+        onOpenChange={setIsConfirmationOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want ot logout?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLogout}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
 };
 
 export default LogoutButton;

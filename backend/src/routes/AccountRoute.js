@@ -6,40 +6,46 @@ import { validateAccountRequest } from "../middleware/validations.js";
 const router = express.Router();
 
 router.get(
-    "/my-accounts",
-    authorizeRole("customer"),
-    AccountController.getThisCustomerAccounts
+  "/my-accounts",
+  authorizeRole("customer"),
+  AccountController.getThisCustomerAccounts
 );
 
 router.get(
-    "/my-transactions/:user",
-    authorizeRole("customer"),
-    AccountController.getThisCustomerAccountTransactions
+  "/my-transactions",
+  authorizeRole("customer"),
+  AccountController.getThisCustomerAccountTransactions
+);
+
+router.get(
+  "/branch-transactions",
+  authorizeRole("employee", "manager"),
+  AccountController.getThisBranchAccountTransactions
 );
 
 router.post(
-    "/create",
-    authorizeRole("employee", "manager"),
-    validateAccountRequest,
-    AccountController.createAccount
+  "/create",
+  authorizeRole("employee", "manager"),
+  validateAccountRequest,
+  AccountController.createAccount
 );
 
 router.get(
-    "/saving-plans",
-    authorizeRole("employee", "manager"),
-    AccountController.getSavingPlans
+  "/saving-plans",
+  authorizeRole("employee", "manager"),
+  AccountController.getSavingPlans
 );
 
 router.get(
-    "/",
-    authorizeRole("employee", "manager"),
-    AccountController.getAccountDetails
+  "/",
+  authorizeRole("employee", "manager"),
+  AccountController.getAccountDetails
 );
 
 router.get(
-    "/:customerId",
-    authorizeRole("employee", "manager"),
-    AccountController.getCustomerAccounts
+  "/:customerId",
+  authorizeRole("employee", "manager"),
+  AccountController.getCustomerAccounts
 );
 
 // router.get(
@@ -47,6 +53,5 @@ router.get(
 //     authorizeRole("employee", "manager"),
 //     AccountController.getATMinformation
 // );
-
 
 export default router;

@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -12,10 +11,21 @@ import { callApproveLoan } from "../api/LoanApi";
 import { format } from "date-fns";
 import { callRejectLoan } from "../api/LoanApi";
 import { toast } from "sonner";
-import { confirmAlert } from "react-confirm-alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function LoanCard({ loan, onStatusChange }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [confirmationDetail, setConfirmationDetail] = useState({});
 
   const handleApprove = async () => {
     setIsLoading(true);
@@ -45,89 +55,98 @@ export default function LoanCard({ loan, onStatusChange }) {
     }
   };
 
-  const confirmAction = (funcToBeCalled, title, message, positive) => {
-    confirmAlert({
-      title: title,
-      message,
-      buttons: [
-        {
-          label: "Yes",
-          onClick: funcToBeCalled,
-          className: `${positive ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"} text-white `,
-        },
-        {
-          label: "No",
-          className: `${positive ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"} text-white `,
-        },
-      ],
-    });
+  const confirmationDetailList = {
+    approval: {
+      title: "Confirm approval",
+      message: "Are you sure to approve loan?",
+      funcToBeCalled: handleApprove,
+    },
+    rejection: {
+      title: "Confirm rejection",
+      message: "Are you sure to reject loan?",
+      funcToBeCalled: handleReject,
+    },
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle className="text-lg">
-          Loan Amount: Rs. {loan.loan_amount}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <p>
-            <strong>Customer:</strong> {loan.customer_name}
-          </p>
-          <p>
-            <strong>Account Balance:</strong> Rs. {loan.account_balance}
-          </p>
-          <p>
-            <strong>Plan Name:</strong> {loan.plan_name}
-          </p>
-          <p>
-            <strong>Loan Interest:</strong> {loan.plan_interest}%
-          </p>
-          <p>
-            <strong>Account No:</strong> {loan.account_number}
-          </p>
-          <p>
-            <strong>Loan ID: </strong> {loan.loan_id}
-          </p>
-          <p>
-            <strong>Request Date:</strong>{" "}
-            {format(new Date(loan.request_date), "PPP")}
-          </p>
-          <p>
-            <strong>Reason:</strong> {loan.reason}
-          </p>
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button
-          onClick={() =>
-            confirmAction(
-              handleApprove,
-              "Confirm approval",
-              "Are you sure to approve loan?",
-              true
-            )
-          }
-          disabled={isLoading}
-        >
-          {isLoading ? "Approving..." : "Approve"}
-        </Button>
-        <Button
-          onClick={() =>
-            confirmAction(
-              handleReject,
-              "Confirm rejection",
-              "Are you sure to reject loan?",
-              false
-            )
-          }
-          variant="destructive"
-          disabled={isLoading}
-        >
-          Reject
-        </Button>
-      </CardFooter>
-    </Card>
+    <>
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-lg">
+            Loan Amount: Rs. {loan.loan_amount}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <p>
+              <strong>Customer:</strong> {loan.customer_name}
+            </p>
+            <p>
+              <strong>Account Balance:</strong> Rs. {loan.account_balance}
+            </p>
+            <p>
+              <strong>Plan Name:</strong> {loan.plan_name}
+            </p>
+            <p>
+              <strong>Loan Interest:</strong> {loan.plan_interest}%
+            </p>
+            <p>
+              <strong>Account No:</strong> {loan.account_number}
+            </p>
+            <p>
+              <strong>Loan ID: </strong> {loan.loan_id}
+            </p>
+            <p>
+              <strong>Request Date:</strong>{" "}
+              {format(new Date(loan.request_date), "PPP")}
+            </p>
+            <p>
+              <strong>Reason:</strong> {loan.reason}
+            </p>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button
+            onClick={() => {
+              setIsConfirmationOpen(true);
+              setConfirmationDetail(confirmationDetailList.approval);
+            }}
+            disabled={isLoading}
+          >
+            {isLoading ? "Approving..." : "Approve"}
+          </Button>
+          <Button
+            onClick={() => {
+              setIsConfirmationOpen(true);
+              setConfirmationDetail(confirmationDetailList.rejection);
+            }}
+            variant="destructive"
+            disabled={isLoading}
+          >
+            Reject
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <AlertDialog
+        open={isConfirmationOpen}
+        onOpenChange={setIsConfirmationOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmationDetail.title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmationDetail.message}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmationDetail.funcToBeCalled}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
