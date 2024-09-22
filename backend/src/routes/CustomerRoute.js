@@ -17,6 +17,12 @@ router.get(
     CustomerController.getCustomerDetail
 );
 
+// router.get(
+//     "/detail/from-accnt-num",
+//     authorizeRole("employee"),
+//     CustomerController.getCustomerDetailsFromAccountNum
+// );
+
 router.put(
     "/update",
     authorizeRole("customer"),

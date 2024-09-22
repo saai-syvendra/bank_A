@@ -41,7 +41,7 @@ export const callGetSavingPlans = async () => {
 
 export const callGetAccount = async (accountNumber) => {
   try {
-    const response = await fetch(`${CUSTOMER_API_URL}`, {
+    const response = await fetch(`${ACCOUNT_API_URL}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

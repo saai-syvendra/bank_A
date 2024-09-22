@@ -13,9 +13,22 @@ router.post(
 
 // // ATM deposit by customer
 // router.post(
-//     "/atm/deposit",
+//     "/withdraw",
 //     authorizeRole("customer"),
-//     TransactionController.depositViaATM
+//     TransactionController.withdrawFromATMController
+// );
+
+// router.post(
+//     "/cdm-deposit",
+//     authorizeRole("customer"),
+//     TransactionController.cdmDepositController
+//   );
+
+
+// router.post(
+//   "/online-transfer",
+//   authorizeRole("customer"),
+//   TransactionController.makeOnlineTransferController
 // );
 
 export default router;
