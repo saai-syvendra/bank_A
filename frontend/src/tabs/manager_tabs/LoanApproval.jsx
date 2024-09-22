@@ -7,61 +7,6 @@ export default function LoanApprovalList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // const dummyLoans = [
-  //   {
-  //     loan_id: "L001",
-  //     plan_name: "Home Loan",
-  //     customer_name: "John Doe",
-  //     account_id: "A1001",
-  //     account_balance: 12000.5,
-  //     loan_amount: 250000.0,
-  //     request_date: "2023-08-15",
-  //     reason: "To purchase a new home",
-  //   },
-  //   {
-  //     loan_id: "L002",
-  //     plan_name: "Car Loan",
-  //     customer_name: "Jane Smith",
-  //     account_id: "A1002",
-  //     account_balance: 8000.25,
-  //     loan_amount: 35000.0,
-  //     request_date: "2023-09-01",
-  //     reason: "To buy a new car",
-  //   },
-  //   {
-  //     loan_id: "L003",
-  //     plan_name: "Business Loan",
-  //     customer_name: "Robert Johnson",
-  //     account_id: "A1003",
-  //     account_balance: 15000.75,
-  //     loan_amount: 100000.0,
-  //     request_date: "2023-09-10",
-  //     reason: "For business expansion",
-  //   },
-  //   {
-  //     loan_id: "L004",
-  //     plan_name: "Personal Loan",
-  //     customer_name: "Emily Davis",
-  //     account_id: "A1004",
-  //     account_balance: 2000.0,
-  //     loan_amount: 5000.0,
-  //     request_date: "2023-07-25",
-  //     reason: "For personal expenses",
-  //   },
-  //   {
-  //     loan_id: "L005",
-  //     plan_name: "Education Loan",
-  //     customer_name: "Michael Brown",
-  //     account_id: "A1005",
-  //     account_balance: 500.0,
-  //     loan_amount: 20000.0,
-  //     request_date: "2023-08-05",
-  //     reason: "For college tuition fees",
-  //   },
-  // ];
-
-  // setLoans(dummyLoans);
-
   const fetchLoans = async () => {
     setIsLoading(true);
     try {

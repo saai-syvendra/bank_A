@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from "react";
-import TransactionCard from "../../components/TransactionCard";
 import { callGetCustomerAccountTransactions } from "../../api/AccountApi";
 import { toast } from "sonner";
 import {
@@ -17,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 
 const ViewTransactions = () => {
@@ -68,12 +67,6 @@ const ViewTransactions = () => {
             key={index}
             value={accountTransactions[0].account_number}
           >
-            {/* {accountTransactions.map((transaction) => (
-              <TransactionCard
-                transaction={transaction}
-                key={transaction.transaction_id}
-              />
-            ))} */}
             <Card className="mb-4">
               <CardContent>
                 <Table>
@@ -137,7 +130,3 @@ const ViewTransactions = () => {
 };
 
 export default ViewTransactions;
-/*
-
-
-*/

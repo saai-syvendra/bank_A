@@ -1,13 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
-import TransactionCard from "../../components/TransactionCard";
 import { callGetBranchAccountTransactions } from "../../api/AccountApi";
 import { toast } from "sonner";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "../../components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -17,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 
 const ViewBranchTransactions = () => {
@@ -28,7 +21,6 @@ const ViewBranchTransactions = () => {
     try {
       setIsLoading(true);
       const fetchedTransactions = await callGetBranchAccountTransactions();
-      // sort fetched transaction by trans_timestamp
       const sortedTransactions = fetchedTransactions.sort((a, b) => {
         return new Date(b.trans_timestamp) - new Date(a.trans_timestamp);
       });
@@ -117,7 +109,3 @@ const ViewBranchTransactions = () => {
 };
 
 export default ViewBranchTransactions;
-/*
-
-
-*/

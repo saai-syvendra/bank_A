@@ -3,7 +3,7 @@ import {
   callPayInstallment,
 } from "../../api/LoanApi";
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -21,18 +21,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import {
@@ -97,14 +85,11 @@ const LoanPayment = () => {
         selectedInstallment.installment_no,
         selectedAccount
       );
-      console.log(
-        `Processing payment of ${paymentAmount} for installment ${selectedInstallment.installment_no} of loan ${selectedInstallment.loan_id} from account ${selectedAccount}`
-      );
       toast.success(
         `Payment processed for Installment ${selectedInstallment.installment_no}/${selectedInstallment.months} of loan ${selectedInstallment.loan_id}`
       );
     } catch (error) {
-      toast.error("Failed to process payment");
+      toast.error(error.message || "Failed to process payment");
     }
 
     fetchUpcomingInstallments();

@@ -10,7 +10,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,7 +25,6 @@ import { callGetCustomerFds } from "../../api/FdApi";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { callGetCustomerNames } from "../../api/CustomerApi";
 import { callGetThisCustomerAccounts } from "../../api/AccountApi";
 import { Textarea } from "@/components/ui/textarea";
 
