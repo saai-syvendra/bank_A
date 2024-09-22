@@ -78,7 +78,7 @@ const getThisCustomerAccountTransactions = async (req, res) => {
   try {
     const accounts = await AccountModel.getCustomerAccountIds(customerId);
     const transactions = [];
-    console.log(accounts);
+    // console.log(accounts);
     for (let acc of accounts) {
       const temp = [];
       const accountTransactions = await AccountModel.getAccountTransactions(
@@ -96,7 +96,7 @@ const getThisCustomerAccountTransactions = async (req, res) => {
       }
       transactions.push(temp);
     }
-    console.log(transactions);
+    // console.log(transactions);
     if (transactions[0].length === 0) {
       return res.status(500).send({ message: "No transactions" });
     }
@@ -110,18 +110,23 @@ const getThisCustomerAccountTransactions = async (req, res) => {
 
 const getThisBranchAccountTransactions = async (req, res) => {
   const { id: employeeId } = req.user;
+  console.log(req.query);
+  const { cusId, startDate, transactionType, minAmount, maxAmount, method } =
+    req.query;
+  console.log("CusID", cusId);
+  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
+  const filters = {
+    cust_id: cusId || null,
+    branch_code: branchCode || null,
+    start_date: startDate || null,
+    transaction_type: transactionType || null,
+    min_amount: minAmount || null,
+    max_amount: maxAmount || null,
+    method: method || null,
+  };
   try {
-    const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
-    const accounts = await AccountModel.getBranchAccountIds(branchCode);
-    let transactions = [];
-    for (let acc of accounts) {
-      const temp = [];
-      const accountTransactions = await AccountModel.getAccountTransactions(
-        acc.account_number
-      );
-      transactions = transactions.concat(accountTransactions[0]);
-    }
-    console.log("TRANS", transactions);
+    const transactions = await AccountModel.getTransactions(filters);
+    // console.log("TRANS", transactions);
     if (transactions.length === 0) {
       return res.status(500).send({ message: "No transactions" });
     }

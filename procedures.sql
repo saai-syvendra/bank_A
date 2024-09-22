@@ -566,3 +566,99 @@ CREATE PROCEDURE PayInstallment(
     COMMIT;
 
 END$$
+
+CREATE PROCEDURE GetTransactionsFiltered(
+    IN cust_id INT,                        -- Customer ID (can be NULL)
+    IN p_branch_code INT,                    -- Branch code (can be NULL)
+    IN start_date DATE,                    -- Filter transactions after this date
+    IN transaction_type ENUM('credit', 'debit'),  -- Filter by credit or debit transactions
+    IN min_amount NUMERIC(10,2),           -- Minimum transaction amount
+    IN max_amount NUMERIC(10,2),           -- Maximum transaction amount
+    IN method ENUM('atm-cdm', 'online-transfer', 'server', 'via_employee') -- Transaction method filter
+)
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE acc_id INT;
+    
+    -- Cursor to retrieve account_ids either by customer or branch
+    DECLARE acc_cursor CURSOR FOR 
+        SELECT account_id 
+        FROM Customer_Account 
+        WHERE (cust_id IS NOT NULL AND customer_id = cust_id) -- Filter by customer_id if given
+        OR (branch_code IS NOT NULL AND branch_code = p_branch_code); -- Filter by branch_code if given
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    -- Start transaction
+    START TRANSACTION;
+    
+    -- Declare a temporary table to store transactions
+    CREATE TEMPORARY TABLE IF NOT EXISTS TempTransactions (
+        transaction_id INT,
+        account_id INT,
+        account_number CHAR(12),
+        amount NUMERIC(10,2),
+        trans_timestamp TIMESTAMP,
+        reason VARCHAR(500),
+        trans_type ENUM('credit', 'debit'),
+        trans_method ENUM('atm-cdm', 'online-transfer', 'server', 'via_employee')
+    );
+    
+    -- Open the cursor to iterate over account_ids based on customer_id or branch_code
+    OPEN acc_cursor;
+
+    -- Loop through each account
+    read_loop: LOOP
+        FETCH acc_cursor INTO acc_id;
+
+        -- If no more rows, exit the loop
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Insert the transactions for the current account into the temporary table
+        INSERT INTO TempTransactions (transaction_id, account_id, account_number, amount, trans_timestamp, reason, trans_type, trans_method)
+        SELECT 
+            at.transaction_id, 
+            ca.account_id,
+            ca.account_number,
+            at.amount, 
+            at.trans_timestamp, 
+            at.reason, 
+            at.trans_type, 
+            at.trans_method
+        FROM 
+            Account_Transaction at
+        JOIN 
+            Customer_Account ca ON at.accnt = ca.account_id
+        WHERE 
+            ca.account_id = acc_id
+        -- Apply the filters only if the parameters are NOT NULL or within range
+        AND (start_date IS NULL OR at.trans_timestamp >= start_date)               -- Filter by start date if provided
+        AND (transaction_type IS NULL OR at.trans_type = transaction_type)         -- Filter by transaction type if provided
+        -- Apply the amount filter depending on whether min or max is provided
+        AND (
+            (min_amount IS NULL AND max_amount IS NULL)        -- No amount filter
+            OR (min_amount IS NOT NULL AND max_amount IS NULL AND at.amount >= min_amount) -- Only min_amount is provided
+            OR (min_amount IS NULL AND max_amount IS NOT NULL AND at.amount <= max_amount) -- Only max_amount is provided
+            OR (min_amount IS NOT NULL AND max_amount IS NOT NULL AND at.amount BETWEEN min_amount AND max_amount) -- Both min and max are provided
+        )
+        AND (method IS NULL OR at.trans_method = method)                           -- Filter by method if provided
+        ORDER BY 
+            at.trans_timestamp DESC;
+
+    END LOOP;
+
+    -- Close the cursor
+    CLOSE acc_cursor;
+
+    -- Select all transactions from the temporary table
+    SELECT * FROM TempTransactions;
+
+    -- Clean up the temporary table
+    DROP TEMPORARY TABLE IF EXISTS TempTransactions;
+
+    -- Commit the transaction
+    COMMIT;
+    
+END $$
