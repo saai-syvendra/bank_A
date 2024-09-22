@@ -1,7 +1,7 @@
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 const TRANSACTION_API_URL = `${VITE_API_URL}/transaction`;
 
-export const callemployeeDepositForCustomer = async (data) => {
+export const callEmployeeDepositForCustomer = async (data) => {
     try {
         const response = await fetch(`${TRANSACTION_API_URL}/employee/make-deposit`, {
             method: "POST",

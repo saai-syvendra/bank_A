@@ -42,4 +42,11 @@ router.get(
     AccountController.getCustomerAccounts
 );
 
+// router.get(
+//     "/get-ATM-info",
+//     authorizeRole("employee", "manager"),
+//     AccountController.getATMinformation
+// );
+
+
 export default router;
