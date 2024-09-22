@@ -269,6 +269,39 @@ const getAccountTransactions = async (accountNumber) => {
   }
 };
 
+const getTransactions = async (filters) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [rows] = await connection.query(
+      `
+        CALL GetTransactionsFiltered(?, ?, ?, ?, ?, ?, ?);
+      `,
+      [
+        filters.cust_id,
+        filters.branch_code,
+        filters.start_date,
+        filters.transaction_type,
+        filters.min_amount,
+        filters.max_amount,
+        filters.method,
+      ]
+    );
+    if (rows.length === 0)
+      throw new Error("No accounts found for this customer");
+
+    await connection.commit();
+    return rows[0];
+  } catch (error) {
+    if (connection) await connection.rollback();
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
 export default {
   getAccountByAccountNo,
   getAccountById,
@@ -280,4 +313,5 @@ export default {
   getAccountTransactions,
   getCustomerAccountIds,
   getBranchAccountIds,
+  getTransactions,
 };
