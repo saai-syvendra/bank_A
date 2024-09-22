@@ -314,6 +314,7 @@ CREATE TABLE Loan_Installment (
   installment_amount    NUMERIC(10,2),
   due_date              DATE,
   state                ENUM('pending','paid','late'),
+  paid_date				DATE,
   PRIMARY KEY (loan_id, installment_no),
   FOREIGN KEY (loan_id) REFERENCES Loan(loan_id)
 );

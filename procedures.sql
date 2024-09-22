@@ -231,15 +231,12 @@ BEGIN
   SET withdrawal_count = 0;
 END $$
 
-DELIMITER;
-
 -- DROP PROCEDURE OF EXISTS DepositMoney;
 -- DROP PROCEDURE IF EXISTS DeductMoney;
 -- DROP PROCEDURE IF EXISTS WithdrawMoney;
 -- DROP PROCEDURE IF EXISTS TransferMoney;
 
 
-DELIMITER $$
 
 CREATE PROCEDURE DepositMoney (
     IN p_account_id INT,
@@ -290,10 +287,6 @@ BEGIN
     SET p_transaction_id = LAST_INSERT_ID();
 
 END $$
-
-DELIMITER ;
-
-DELIMITER $$
 
 CREATE PROCEDURE DeductMoney(
     IN p_account_id INT,
@@ -361,10 +354,6 @@ BEGIN
 
 END$$
 
-DELIMITER ;
-
-DELIMITER $$
-
 CREATE PROCEDURE WithdrawMoney(
     IN p_account_id INT,
     IN p_withdraw_amount NUMERIC(12,2),
@@ -421,10 +410,6 @@ BEGIN
     END IF;
 
 END$$
-
-DELIMITER ;
-
-DELIMITER $$
 
 CREATE PROCEDURE TransferMoney (
     IN p_from_account_id INT,
@@ -514,10 +499,6 @@ BEGIN
 
 END$$
 
-DELIMITER ;
-
-DELIMITER $$
-
 -- Procedure to get transactions
 CREATE PROCEDURE GetTransactions(
     IN accountNumber CHAR(12)
@@ -545,4 +526,43 @@ BEGIN
 
     -- Commit transaction
     COMMIT;
+END$$
+
+CREATE PROCEDURE PayInstallment(
+	IN p_loan_id			INT,
+	IN p_installment_no 	INT,
+    IN p_payment_accnt_id	INT
+) BEGIN
+	DECLARE transaction_id INT;
+    DECLARE v_state          		ENUM('pending','paid','late');
+    DECLARE v_installment_amount 	NUMERIC(10,2);
+    DECLARE v_due_date				DATE;
+    
+    START TRANSACTION;
+    
+    SELECT installment_amount, due_date, state
+    INTO v_installment_amount, v_due_date, v_state
+    FROM Loan_Installment
+    WHERE loan_id = p_loan_id AND installment_no=p_installment_no;
+    
+    IF NOT v_state = 'pending' THEN
+		ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Loan Installment has already been paid';
+    END IF;
+    
+    CALL DeductMoney(p_payment_accnt_id, v_installment_amount, CONCAT('Loan payment for ', p_loan_id, ' - Installment ', p_installment_no), 'server', transaction_id);
+    
+    IF v_due_date < CURDATE() THEN
+		SET v_state = 'late';
+	ELSE
+		SET v_state = 'paid';
+	END IF;
+    
+    UPDATE Loan_Installment
+    SET state = v_state, paid_date=CURDATE()
+    WHERE loan_id=p_loan_id AND installment_no=p_installment_no;
+    
+    COMMIT;
+
 END$$

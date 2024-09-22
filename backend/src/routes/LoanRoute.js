@@ -22,6 +22,18 @@ router.get(
   LoanController.getApprovalPendingLoans
 );
 
+router.get(
+  "/upcoming-installments",
+  authorizeRole("customer"),
+  LoanController.getUpcomingInstallments
+);
+
+router.post(
+  "/pay-installment",
+  authorizeRole("customer"),
+  LoanController.payInstallment
+);
+
 router.post("/approve", authorizeRole("manager"), LoanController.approveLoan);
 
 router.post("/reject", authorizeRole("manager"), LoanController.rejectLoan);
