@@ -149,80 +149,6 @@ BEGIN
     END IF;
 END$$
 
--- DROP PROCEDURE CreateOnlineLoan;
-CREATE PROCEDURE CreateOnlineLoan (
-    IN customerId INT,
-    IN loanPlanId INT,
-    IN fdId INT,
-    IN requestedLoanAmount NUMERIC(10, 2),
-    IN connectedAccount INT,
-    IN reason VARCHAR(100)
-)
-BEGIN
-    DECLARE fdAmount NUMERIC(10, 2);
-    DECLARE maxAllowedLoan NUMERIC(10, 2);
-    DECLARE loanPlanMaxAmount NUMERIC(10, 2);
-    DECLARE newLoanId INT;
-    
-    -- Start a transaction
-    START TRANSACTION;
-
-    -- Check if the FD exists for the customer
-    SELECT amount INTO fdAmount
-    FROM FD
-    WHERE fd_id = fdId
-    FOR UPDATE;
-
-    IF fdAmount IS NULL THEN
-        -- Rollback the transaction if no FD found
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'FD not found for the given customer.';
-    END IF;
-
-    -- Calculate the maximum allowable loan amount (60% of the FD amount, capped at 500,000)
-    SET maxAllowedLoan = LEAST(fdAmount * 0.60, 500000);
-
-    -- Check if the requested loan amount exceeds the allowable loan limit
-    IF requestedLoanAmount > maxAllowedLoan THEN
-        -- Rollback the transaction if requested loan exceeds limits
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Requested loan amount exceeds the allowable loan limit based on FD.';
-    END IF;
-
-    -- Check if the requested loan amount is less than the maximum allowed amount in the loan plan
-    SELECT max_amount INTO loanPlanMaxAmount
-    FROM Loan_Plan
-    WHERE plan_id = loanPlanId
-    FOR UPDATE;
-
-    IF requestedLoanAmount > loanPlanMaxAmount THEN
-        -- Rollback the transaction if loan amount exceeds plan limit
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Requested loan amount exceeds the maximum allowed in the loan plan.';
-    END IF;
-    
-    -- If all checks pass, insert the loan application
-    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id, approved_date, reason)
-    VALUES (loanPlanId, customerId, connectedAccount, CURDATE(), requestedLoanAmount, 'online', fdId, CURDATE(), reason);
-    
-    SET newLoanId = LAST_INSERT_ID();
-    
-    INSERT INTO Account_Transaction (accnt, amount, trans_timestamp, reason, trans_type, trans_method) VALUES
-	(connectedAccount, requestedLoanAmount, CURRENT_TIMESTAMP, 'Loan Deposit', 'credit', 'server');
-    
-    UPDATE Customer_Account
-	SET balance = balance + requestedLoanAmount
-	WHERE account_id = connectedAccount;
-    
-    CALL CreateLoanInstallments(newLoanId);
-    
-    COMMIT;
-
-END $$
-
 -- Procedure to reset the withdrawal count to 0
 CREATE PROCEDURE ResetWithdrawalCount()
 BEGIN
@@ -528,6 +454,113 @@ BEGIN
     COMMIT;
 END$$
 
+-- DROP PROCEDURE CreateOnlineLoan$$
+CREATE PROCEDURE CreateOnlineLoan (
+    IN p_customer_id INT,
+    IN p_loan_plan_id INT,
+    IN p_fd_id INT,
+    IN p_req_loan_amount NUMERIC(10, 2),
+    IN p_connected_account INT,
+    IN p_reason VARCHAR(100)
+)
+BEGIN
+    DECLARE v_fd_amount NUMERIC(10,2);
+    DECLARE v_max_allowed_loan NUMERIC(10, 2);
+    DECLARE v_plan_max_amount NUMERIC(10, 2);
+    DECLARE v_new_loan_id INT;
+    DECLARE v_error_msg VARCHAR(200);
+    
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Check if the FD exists for the customer
+    SELECT amount INTO v_fd_amount
+    FROM FD LEFT JOIN Customer_Account ca USING(account_id)
+    WHERE fd_id = p_fd_id AND ca.customer_id = p_customer_id;
+
+    IF v_fd_amount IS NULL THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'FD not found for the given customer.';
+    END IF;
+
+    -- Calculate the maximum allowable loan amount (60% of the FD amount, capped at 500,000)
+    SET v_max_allowed_loan = LEAST(v_fd_amount * 0.60, 500000);
+
+    -- Check if the requested loan amount exceeds the allowable loan limit
+    IF p_req_loan_amount > v_max_allowed_loan THEN
+        -- Rollback the transaction if requested loan exceeds limits
+        SET v_error_msg = CONCAT('Requested loan amount exceeds the allowable loan limit of', v_max_allowed_loan ,' based on FD.');
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = v_error_msg;
+    END IF;
+
+    -- Check if the requested loan amount is less than the maximum allowed amount in the loan plan
+    SELECT max_amount INTO v_plan_max_amount
+    FROM Loan_Plan
+    WHERE plan_id = p_loan_plan_id
+    FOR UPDATE;
+
+    IF p_req_loan_amount > v_plan_max_amount THEN
+        -- Rollback the transaction if loan amount exceeds plan limit
+        SET v_error_msg = CONCAT('Requested loan amount exceeds the maximum allowed amount of ', v_plan_max_amount ,' in the plan.');
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = v_error_msg;
+    END IF;
+    
+    -- If all checks pass, insert the loan application
+    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id, approved_date, reason)
+    VALUES (p_loan_plan_id, p_customer_id, p_connected_account, CURDATE(), p_req_loan_amount, 'online', p_fd_id, CURDATE(), p_reason);
+    
+    SET v_new_loan_id = LAST_INSERT_ID();
+    
+    CALL DepositMoney (p_connected_account, p_req_loan_amount, CONCAT('Loan Deposit for Loan: #', v_new_loan_id), 'server', @transaction_id);
+    
+    CALL CreateLoanInstallments(v_new_loan_id);
+    
+    COMMIT;
+
+END $$
+
+CREATE PROCEDURE ApproveLoan (
+	IN p_loan_id INT
+)
+BEGIN
+	DECLARE v_loan_exists BOOLEAN;
+    DECLARE v_connected_account INT;
+    DECLARE v_loan_amount NUMERIC(10,2);
+    
+    START TRANSACTION;
+    
+    SELECT COUNT(*) > 0 INTO v_loan_exists
+    FROM Loan
+    WHERE loan_id = p_loan_id AND NOT state = 'approved';
+    
+    IF NOT v_loan_exists THEN
+		ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Loan does not exist/already approved';
+    END IF;
+    
+    SELECT connected_account, loan_amount
+    INTO v_connected_account, v_loan_amount
+    FROM Loan
+    WHERE loan_id = p_loan_id;
+    
+    UPDATE Loan
+	SET state = "approved", approved_date = CURDATE()
+	WHERE loan_id = p_loan_id;
+    
+    CALL DepositMoney (v_connected_account, v_loan_amount, CONCAT('Loan Deposit for Loan: #', p_loan_id), 'server', @transaction_id);
+    
+    CALL CreateLoanInstallments(p_loan_id);
+    
+    COMMIT;
+    
+END$$
+
 CREATE PROCEDURE PayInstallment(
 	IN p_loan_id			INT,
 	IN p_installment_no 	INT,
@@ -568,13 +601,13 @@ CREATE PROCEDURE PayInstallment(
 END$$
 
 CREATE PROCEDURE GetTransactionsFiltered(
-    IN cust_id INT,                        -- Customer ID (can be NULL)
+    IN p_cust_id INT,                        -- Customer ID (can be NULL)
     IN p_branch_code INT,                    -- Branch code (can be NULL)
-    IN start_date DATE,                    -- Filter transactions after this date
-    IN transaction_type ENUM('credit', 'debit'),  -- Filter by credit or debit transactions
-    IN min_amount NUMERIC(10,2),           -- Minimum transaction amount
-    IN max_amount NUMERIC(10,2),           -- Maximum transaction amount
-    IN method ENUM('atm-cdm', 'online-transfer', 'server', 'via_employee') -- Transaction method filter
+    IN p_start_date DATE,                    -- Filter transactions after this date
+    IN p_transaction_type ENUM('credit', 'debit'),  -- Filter by credit or debit transactions
+    IN p_min_amount NUMERIC(10,2),           -- Minimum transaction amount
+    IN p_max_amount NUMERIC(10,2),           -- Maximum transaction amount
+    IN p_method ENUM('atm-cdm', 'online-transfer', 'server', 'via_employee') -- Transaction method filter
 )
 BEGIN
     DECLARE done INT DEFAULT 0;
@@ -584,7 +617,7 @@ BEGIN
     DECLARE acc_cursor CURSOR FOR 
         SELECT account_id 
         FROM Customer_Account 
-        WHERE (cust_id IS NOT NULL AND customer_id = cust_id) -- Filter by customer_id if given
+        WHERE (p_cust_id IS NOT NULL AND customer_id = p_cust_id) -- Filter by customer_id if given
         OR (branch_code IS NOT NULL AND branch_code = p_branch_code); -- Filter by branch_code if given
     
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
@@ -634,16 +667,16 @@ BEGIN
         WHERE 
             ca.account_id = acc_id
         -- Apply the filters only if the parameters are NOT NULL or within range
-        AND (start_date IS NULL OR at.trans_timestamp >= start_date)               -- Filter by start date if provided
-        AND (transaction_type IS NULL OR at.trans_type = transaction_type)         -- Filter by transaction type if provided
+        AND (p_start_date IS NULL OR at.trans_timestamp >= p_start_date)               -- Filter by start date if provided
+        AND (p_transaction_type IS NULL OR at.trans_type = p_transaction_type)         -- Filter by transaction type if provided
         -- Apply the amount filter depending on whether min or max is provided
         AND (
-            (min_amount IS NULL AND max_amount IS NULL)        -- No amount filter
-            OR (min_amount IS NOT NULL AND max_amount IS NULL AND at.amount >= min_amount) -- Only min_amount is provided
-            OR (min_amount IS NULL AND max_amount IS NOT NULL AND at.amount <= max_amount) -- Only max_amount is provided
-            OR (min_amount IS NOT NULL AND max_amount IS NOT NULL AND at.amount BETWEEN min_amount AND max_amount) -- Both min and max are provided
+            (p_min_amount IS NULL AND p_max_amount IS NULL)        -- No amount filter
+            OR (p_min_amount IS NOT NULL AND p_max_amount IS NULL AND at.amount >= p_min_amount) -- Only min_amount is provided
+            OR (p_min_amount IS NULL AND p_max_amount IS NOT NULL AND at.amount <= p_max_amount) -- Only max_amount is provided
+            OR (p_min_amount IS NOT NULL AND p_max_amount IS NOT NULL AND at.amount BETWEEN p_min_amount AND p_max_amount) -- Both min and max are provided
         )
-        AND (method IS NULL OR at.trans_method = method)                           -- Filter by method if provided
+        AND (p_method IS NULL OR at.trans_method = p_method)                           -- Filter by method if provided
         ORDER BY 
             at.trans_timestamp DESC;
 
@@ -662,3 +695,46 @@ BEGIN
     COMMIT;
     
 END $$
+
+CREATE PROCEDURE CreateFd (
+	IN p_plan_id		INT,
+    IN p_account_id		INT,
+    IN p_amount			NUMERIC(10,2)
+) 
+BEGIN
+	DECLARE v_plan_exists BOOLEAN;
+
+	START TRANSACTION;
+    
+    -- Check if the transfer amount is positive
+    IF p_amount <= 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'FD amount must be greater than zero.';
+    END IF;
+
+    -- Check if the source account exists and get its details
+    IF NOT AccountExists(p_account_id) THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'FD creation failed: Account not found.';
+    END IF;
+    
+    SELECT COUNT(*) > 0 INTO v_plan_exists
+    FROM FD_Plan
+    WHERE plan_id = p_plan_id AND availability = 'yes';
+    
+    IF NOT v_plan_exists THEN
+		ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'FD plan not available.';
+    END IF;
+    
+    CALL DeductMoney(p_account_id, p_amount, CONCAT('Opened new FD'), 'server', @transaction_id);
+	
+    INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
+    (p_plan_id, p_account_id, CURDATE(), p_amount);
+    
+    COMMIT;
+
+END$$
