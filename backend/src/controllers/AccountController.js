@@ -78,7 +78,6 @@ const getThisCustomerAccountTransactions = async (req, res) => {
   try {
     const accounts = await AccountModel.getCustomerAccountIds(customerId);
     const transactions = [];
-    // console.log(accounts);
     for (let acc of accounts) {
       const temp = [];
       const accountTransactions = await AccountModel.getAccountTransactions(
@@ -96,7 +95,6 @@ const getThisCustomerAccountTransactions = async (req, res) => {
       }
       transactions.push(temp);
     }
-    // console.log(transactions);
     if (transactions[0].length === 0) {
       return res.status(500).send({ message: "No transactions" });
     }
@@ -110,10 +108,8 @@ const getThisCustomerAccountTransactions = async (req, res) => {
 
 const getThisBranchAccountTransactions = async (req, res) => {
   const { id: employeeId } = req.user;
-  console.log(req.query);
   const { cusId, startDate, transactionType, minAmount, maxAmount, method } =
     req.query;
-  console.log("CusID", cusId);
   const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
   const filters = {
     cust_id: cusId || null,
@@ -126,7 +122,6 @@ const getThisBranchAccountTransactions = async (req, res) => {
   };
   try {
     const transactions = await AccountModel.getTransactions(filters);
-    // console.log("TRANS", transactions);
     if (transactions.length === 0) {
       return res.status(500).send({ message: "No transactions" });
     }
