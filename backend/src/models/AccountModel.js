@@ -218,7 +218,7 @@ const getCustomerAccountIds = async (customerId) => {
   }
 };
 
-const getBranchAccountIds = async (branch_code) => {
+const getBranchAccounts = async (branch_code) => {
   let connection;
   try {
     connection = await pool.getConnection();
@@ -226,7 +226,7 @@ const getBranchAccountIds = async (branch_code) => {
 
     const [rows] = await connection.query(
       `
-              SELECT account_number
+              SELECT *
               FROM Customer_Account 
               WHERE branch_code = ?;
           `,
@@ -277,11 +277,12 @@ const getTransactions = async (filters) => {
 
     const [rows] = await connection.query(
       `
-        CALL GetTransactionsFiltered(?, ?, ?, ?, ?, ?, ?);
+        CALL GetTransactionsFiltered(?, ?, ?, ?, ?, ?, ?, ?);
       `,
       [
         filters.cust_id,
         filters.branch_code,
+        filters.account_id,
         filters.start_date,
         filters.transaction_type,
         filters.min_amount,
@@ -312,6 +313,6 @@ export default {
   getBranch,
   getAccountTransactions,
   getCustomerAccountIds,
-  getBranchAccountIds,
+  getBranchAccounts,
   getTransactions,
 };

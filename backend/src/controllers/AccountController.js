@@ -108,12 +108,20 @@ const getThisCustomerAccountTransactions = async (req, res) => {
 
 const getThisBranchAccountTransactions = async (req, res) => {
   const { id: employeeId } = req.user;
-  const { cusId, startDate, transactionType, minAmount, maxAmount, method } =
-    req.query;
+  const {
+    cusId,
+    accountId,
+    startDate,
+    transactionType,
+    minAmount,
+    maxAmount,
+    method,
+  } = req.query;
   const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
   const filters = {
     cust_id: cusId || null,
     branch_code: branchCode || null,
+    account_id: accountId || null,
     start_date: startDate || null,
     transaction_type: transactionType || null,
     min_amount: minAmount || null,
@@ -133,6 +141,24 @@ const getThisBranchAccountTransactions = async (req, res) => {
   }
 };
 
+const getBranchAccounts = async (req, res) => {
+  const { id: employeeId } = req.user;
+  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
+  try {
+    const accounts = await AccountModel.getBranchAccounts(branchCode);
+    const accountsToSend = accounts.map((account) => {
+      return {
+        account_number: account.account_number,
+        account_id: account.account_id,
+      };
+    });
+    return res.json(accountsToSend);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: error.message });
+  }
+};
+
 export default {
   getCustomerAccounts,
   getThisCustomerAccounts,
@@ -141,4 +167,5 @@ export default {
   getAccountDetails,
   getThisCustomerAccountTransactions,
   getThisBranchAccountTransactions,
+  getBranchAccounts,
 };

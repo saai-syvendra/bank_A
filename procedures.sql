@@ -603,6 +603,7 @@ END$$
 CREATE PROCEDURE GetTransactionsFiltered(
     IN p_cust_id INT,                        -- Customer ID (can be NULL)
     IN p_branch_code INT,                    -- Branch code (can be NULL)
+    IN p_account_id INT,                     -- Specific account ID
     IN p_start_date DATE,                    -- Filter transactions after this date
     IN p_transaction_type ENUM('credit', 'debit'),  -- Filter by credit or debit transactions
     IN p_min_amount NUMERIC(10,2),           -- Minimum transaction amount
@@ -617,8 +618,9 @@ BEGIN
     DECLARE acc_cursor CURSOR FOR 
         SELECT account_id 
         FROM Customer_Account 
-        WHERE (p_cust_id IS NOT NULL AND customer_id = p_cust_id) -- Filter by customer_id if given
-        OR (branch_code IS NOT NULL AND branch_code = p_branch_code); -- Filter by branch_code if given
+        WHERE (p_account_id IS NOT NULL AND account_id = p_account_id)  -- Filter by account_id if given
+        OR (p_account_id IS NULL AND ((p_cust_id IS NOT NULL AND customer_id = p_cust_id) -- Filter by customer_id if given
+        OR (p_branch_code IS NOT NULL AND branch_code = p_branch_code))); -- Filter by branch_code if given
     
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 

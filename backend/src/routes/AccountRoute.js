@@ -23,6 +23,12 @@ router.get(
   AccountController.getThisBranchAccountTransactions
 );
 
+router.get(
+  "/branch-accounts",
+  authorizeRole("employee", "manager"),
+  AccountController.getBranchAccounts
+);
+
 router.post(
   "/create",
   authorizeRole("employee", "manager"),
