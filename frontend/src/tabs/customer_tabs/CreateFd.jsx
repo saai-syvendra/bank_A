@@ -72,6 +72,7 @@ const CreateFd = ({ triggerToRefetch }) => {
     try {
       await callCreateFd(data);
       toast.success("FD created successfully");
+      fetchAccounts();
       form.reset();
     } catch (error) {
       console.log(error);
@@ -86,7 +87,7 @@ const CreateFd = ({ triggerToRefetch }) => {
       fetchAccounts();
       fetchPlans();
     }
-  }, [triggerToRefetch, onSave]);
+  }, [triggerToRefetch]);
 
   return (
     <Card className="w-full max-w-3xl mx-auto">

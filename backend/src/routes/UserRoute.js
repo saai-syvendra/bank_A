@@ -10,5 +10,7 @@ router.post("/logout", UserController.logout);
 router.post("/verify", UserController.verify);
 router.post("/auth", authenticateJWT, UserController.authUser);
 router.post("/exp", UserController.userExpiration);
+router.post("/otp", authenticateJWT, UserController.sendOtp);
+router.post("/otp/verify", authenticateJWT, UserController.verifyOtp);
 
 export default router;
