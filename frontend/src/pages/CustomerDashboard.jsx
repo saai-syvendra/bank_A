@@ -15,6 +15,7 @@ import {
 } from "../api/CustomerApi";
 import CreateOnlineLoan from "../tabs/customer_tabs/CreateOnlineLoan";
 import LoanPayment from "../tabs/customer_tabs/LoanPayment";
+import CreateFd from "../tabs/customer_tabs/CreateFd";
 
 const CustomerDashboard = () => {
   const loading = useAuthorization(["customer"]);
@@ -55,7 +56,9 @@ const CustomerDashboard = () => {
           <TabsContent value="create-loan">
             <CreateOnlineLoan triggerToRefetch={true} />
           </TabsContent>
-          <TabsContent value="create-fd">Create FD</TabsContent>
+          <TabsContent value="create-fd">
+            <CreateFd triggerToRefetch={true} />
+          </TabsContent>
           <TabsContent value="fund-trasfer">Fund Transfer</TabsContent>
           <TabsContent value="update-details">
             <UpdateDetailForm
