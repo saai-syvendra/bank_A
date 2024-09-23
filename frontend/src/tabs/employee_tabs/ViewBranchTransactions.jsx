@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { callGetBranchAccountTransactions } from "../../api/AccountApi";
+import {
+  callGetBranchAccounts,
+  callGetBranchAccountTransactions,
+} from "../../api/AccountApi";
 import { toast } from "sonner";
 import {
   Table,
@@ -25,13 +28,16 @@ import { Input } from "@/components/ui/input";
 export default function ViewBranchTransactions() {
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filters, setFilters] = useState({
+  const [accounts, setAccounts] = useState([]);
+  const defaultFilters = {
     startDate: "",
     transactionType: "all",
     minAmount: "",
     maxAmount: "",
     method: "all",
-  });
+    accountId: "",
+  };
+  const [filters, setFilters] = useState(defaultFilters);
   const [tempFilters, setTempFilters] = useState({ ...filters });
 
   const fetchTransactions = useCallback(async () => {
@@ -41,6 +47,9 @@ export default function ViewBranchTransactions() {
     }
     if (apiFilters.method === "all") {
       apiFilters.method = "";
+    }
+    if (apiFilters.accountId === "all") {
+      apiFilters.accountId = "";
     }
     try {
       setIsLoading(true);
@@ -52,11 +61,26 @@ export default function ViewBranchTransactions() {
       console.log("Fetched Transactions", sortedTransactions);
       setTransactions(sortedTransactions);
     } catch (error) {
+      setTransactions([]);
       toast.error(error.message || "Failed to fetch transactions");
     } finally {
       setIsLoading(false);
     }
   }, [filters]);
+
+  const fetchAccountIds = async () => {
+    try {
+      const accounts = await callGetBranchAccounts();
+      setAccounts(accounts);
+      console.log("Fetched Accounts", accounts);
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch accounts");
+    }
+  };
+
+  useEffect(() => {
+    fetchAccountIds();
+  }, []);
 
   useEffect(() => {
     fetchTransactions();
@@ -71,28 +95,12 @@ export default function ViewBranchTransactions() {
   };
 
   const cancelFilters = () => {
-    setFilters({
-      startDate: "",
-      transactionType: "all",
-      minAmount: "",
-      maxAmount: "",
-      method: "all",
-    });
-    setTempFilters({
-      startDate: "",
-      transactionType: "all",
-      minAmount: "",
-      maxAmount: "",
-      method: "all",
-    });
+    setFilters(defaultFilters);
+    setTempFilters(defaultFilters);
   };
 
   if (isLoading) {
     return <div>Loading...</div>;
-  }
-
-  if (transactions.length === 0) {
-    return <div>No transactions found.</div>;
   }
 
   return (
@@ -100,7 +108,7 @@ export default function ViewBranchTransactions() {
       <Card className="mb-4">
         <CardHeader>
           <h2 className="text-2xl font-bold">Branch Transactions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
             <Select
               value={tempFilters.transactionType}
               onValueChange={(value) =>
@@ -128,6 +136,25 @@ export default function ViewBranchTransactions() {
                 <SelectItem value="online-transfer">Online Transfer</SelectItem>
                 <SelectItem value="atm-cdm">ATM/CDM</SelectItem>
                 <SelectItem value="via_employee">Via Employee</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={tempFilters.accountId}
+              onValueChange={(value) => handleFilterChange("accountId", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Account ID" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                {accounts.map((account) => (
+                  <SelectItem
+                    key={account.account_id}
+                    value={account.account_id}
+                  >
+                    {account.account_number}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Input

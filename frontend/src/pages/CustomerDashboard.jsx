@@ -25,7 +25,7 @@ const CustomerDashboard = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow-md">
+      <div className="max-w-5xl mx-auto bg-white p-6 rounded shadow-md">
         <div className="mb-5">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold mb-4">Customer Dashboard</h1>

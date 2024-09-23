@@ -74,30 +74,28 @@ const getAccountDetails = async (req, res) => {
 };
 
 const getThisCustomerAccountTransactions = async (req, res) => {
-  const { id: customerId } = req.user;
+  const { id: cusId } = req.user;
+  const {
+    accountId,
+    startDate,
+    transactionType,
+    minAmount,
+    maxAmount,
+    method,
+  } = req.query;
+  const filters = {
+    cust_id: cusId,
+    branch_code: null,
+    account_id: accountId || null,
+    start_date: startDate || null,
+    transaction_type: transactionType || null,
+    min_amount: minAmount || null,
+    max_amount: maxAmount || null,
+    method: method || null,
+  };
   try {
-    const accounts = await AccountModel.getCustomerAccountIds(customerId);
-    const transactions = [];
-    // console.log(accounts);
-    for (let acc of accounts) {
-      const temp = [];
-      const accountTransactions = await AccountModel.getAccountTransactions(
-        acc.account_number
-      );
-      for (let trans of accountTransactions[0]) {
-        temp.push({
-          account_number: acc.account_number,
-          transaction_id: trans.transaction_id,
-          amount: trans.trans_type === "credit" ? trans.amount : -trans.amount,
-          date: trans.trans_timestamp,
-          reason: trans.reason,
-          method: trans.trans_method,
-        });
-      }
-      transactions.push(temp);
-    }
-    // console.log(transactions);
-    if (transactions[0].length === 0) {
+    const transactions = await AccountModel.getTransactions(filters);
+    if (transactions.length === 0) {
       return res.status(500).send({ message: "No transactions" });
     }
 
@@ -110,14 +108,20 @@ const getThisCustomerAccountTransactions = async (req, res) => {
 
 const getThisBranchAccountTransactions = async (req, res) => {
   const { id: employeeId } = req.user;
-  console.log(req.query);
-  const { cusId, startDate, transactionType, minAmount, maxAmount, method } =
-    req.query;
-  console.log("CusID", cusId);
+  const {
+    cusId,
+    accountId,
+    startDate,
+    transactionType,
+    minAmount,
+    maxAmount,
+    method,
+  } = req.query;
   const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
   const filters = {
     cust_id: cusId || null,
     branch_code: branchCode || null,
+    account_id: accountId || null,
     start_date: startDate || null,
     transaction_type: transactionType || null,
     min_amount: minAmount || null,
@@ -126,12 +130,29 @@ const getThisBranchAccountTransactions = async (req, res) => {
   };
   try {
     const transactions = await AccountModel.getTransactions(filters);
-    // console.log("TRANS", transactions);
     if (transactions.length === 0) {
       return res.status(500).send({ message: "No transactions" });
     }
 
     return res.json({ transactions: transactions });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: error.message });
+  }
+};
+
+const getBranchAccounts = async (req, res) => {
+  const { id: employeeId } = req.user;
+  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
+  try {
+    const accounts = await AccountModel.getBranchAccounts(branchCode);
+    const accountsToSend = accounts.map((account) => {
+      return {
+        account_number: account.account_number,
+        account_id: account.account_id,
+      };
+    });
+    return res.json(accountsToSend);
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error.message });
@@ -146,4 +167,5 @@ export default {
   getAccountDetails,
   getThisCustomerAccountTransactions,
   getThisBranchAccountTransactions,
+  getBranchAccounts,
 };

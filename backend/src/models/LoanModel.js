@@ -114,16 +114,7 @@ const approveLoan = async (loan_id) => {
 
     await connection.query(
       `
-        UPDATE Loan
-        SET state = "approved", approved_date = CURDATE()
-        WHERE loan_id = ?;
-      `,
-      [loan_id]
-    );
-
-    await connection.query(
-      `
-          CALL CreateLoanInstallments(?);
+          CALL ApproveLoan(?);
         `,
       [loan_id]
     );
