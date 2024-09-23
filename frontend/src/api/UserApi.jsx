@@ -123,3 +123,47 @@ export const userExpiration = async () => {
     throw new Error(error.message);
   }
 };
+
+export const callSendOtp = async (reason) => {
+  try {
+    const response = await fetch(`${USER_API_URL}/otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ reason }),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const callVerifyOtp = async (otp) => {
+  try {
+    const response = await fetch(`${USER_API_URL}/otp/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ otp }),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
