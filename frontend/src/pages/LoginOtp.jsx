@@ -85,7 +85,12 @@ export default function LoginOtp() {
       toast.success("Login successful!");
     } catch (error) {
       console.error("Error:", error.message);
-      if (incorrectCount >= 2) {
+      if (error.message === "OTP expired") {
+        toast.error("OTP expired! Try again!");
+        form.reset();
+        setIncorrectCount(0);
+        setOtpSent(false);
+      } else if (incorrectCount >= 2) {
         toast.error("OTP verification failed 3 times! Login again!");
         form.reset();
         setIncorrectCount(0);
