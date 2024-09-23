@@ -135,7 +135,7 @@ export default function ViewTransactions() {
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Transaction Type" />
+                <SelectValue placeholder="Trans Type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
