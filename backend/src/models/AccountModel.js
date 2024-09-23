@@ -191,33 +191,6 @@ const getBranch = async (branchCode) => {
   }
 };
 
-const getCustomerAccountIds = async (customerId) => {
-  let connection;
-  try {
-    connection = await pool.getConnection();
-    await connection.beginTransaction();
-
-    const [rows] = await connection.query(
-      `
-              SELECT account_number
-              FROM Customer_Account 
-              WHERE customer_id = ?;
-          `,
-      [customerId]
-    );
-    if (rows.length === 0)
-      throw new Error("No accounts found for this customer");
-
-    await connection.commit();
-    return rows;
-  } catch (error) {
-    if (connection) await connection.rollback();
-    throw error;
-  } finally {
-    if (connection) connection.release();
-  }
-};
-
 const getBranchAccounts = async (branch_code) => {
   let connection;
   try {
@@ -312,7 +285,6 @@ export default {
   getSavingPlan,
   getBranch,
   getAccountTransactions,
-  getCustomerAccountIds,
   getBranchAccounts,
   getTransactions,
 };
