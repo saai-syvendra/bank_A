@@ -102,7 +102,7 @@ export const OTPDialog = ({ onVerificationSuccess }) => {
   );
 };
 
-function OtpCountdown({ initialSeconds }) {
+export function OtpCountdown({ initialSeconds }) {
   const [seconds, setSeconds] = React.useState(initialSeconds);
 
   React.useEffect(() => {

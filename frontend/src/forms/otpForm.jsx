@@ -25,6 +25,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import LoadingButton from "@/components/LoadingButton";
+import { OtpCountdown } from "../components/OtpDialog";
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
@@ -82,6 +83,8 @@ export default function OtpForm({ onSubmit, isLoading }) {
                   </FormControl>
                   <FormDescription>
                     Please enter the one-time password sent to your email.
+                    <br /> The OTP will expire in{" "}
+                    <OtpCountdown initialSeconds={300} />.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
