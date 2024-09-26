@@ -16,6 +16,7 @@ import {
 import CreateOnlineLoan from "../tabs/customer_tabs/CreateOnlineLoan";
 import LoanPayment from "../tabs/customer_tabs/LoanPayment";
 import CreateFd from "../tabs/customer_tabs/CreateFd";
+import FundTransfer from "../tabs/customer_tabs/FundTransfer";
 
 const CustomerDashboard = () => {
   const loading = useAuthorization(["customer"]);
@@ -44,7 +45,7 @@ const CustomerDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="create-loan">Create Loan</TabsTrigger>
             <TabsTrigger value="create-fd">Create FD</TabsTrigger>
-            <TabsTrigger value="func-trasfer">Fund Transfer</TabsTrigger>
+            <TabsTrigger value="fund-transfer">Fund Transfer</TabsTrigger>
             <TabsTrigger value="update-details">Update Details</TabsTrigger>
             <TabsTrigger value="loan-payment">Loan Payment</TabsTrigger>
             <TabsTrigger value="atm">ATM</TabsTrigger>
@@ -59,7 +60,9 @@ const CustomerDashboard = () => {
           <TabsContent value="create-fd">
             <CreateFd triggerToRefetch={true} />
           </TabsContent>
-          <TabsContent value="fund-trasfer">Fund Transfer</TabsContent>
+          <TabsContent value="fund-transfer">
+            <FundTransfer triggerToRefetch={true} />
+          </TabsContent>
           <TabsContent value="update-details">
             <UpdateDetailForm
               triggerUpdateDetails={true}

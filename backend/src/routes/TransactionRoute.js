@@ -24,11 +24,10 @@ router.post(
 //     TransactionController.cdmDepositController
 //   );
 
-
-// router.post(
-//   "/online-transfer",
-//   authorizeRole("customer"),
-//   TransactionController.makeOnlineTransferController
-// );
+router.post(
+  "/online-transfer",
+  authorizeRole("customer"),
+  TransactionController.makeOnlineTransfer
+);
 
 export default router;
