@@ -103,7 +103,7 @@ const FundTransfer = ({ triggerToRefetch }) => {
     <>
       <Card className="w-full max-w-3xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Online Trasnfer</CardTitle>
+          <CardTitle className="text-2xl font-bold">Online Transfer</CardTitle>
           <p className="text-gray-400 text-sm text-secondary-foreground">
             Fill out the details to make a transfer
           </p>
