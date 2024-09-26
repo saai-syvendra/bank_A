@@ -490,7 +490,7 @@ BEGIN
     -- Check if the requested loan amount exceeds the allowable loan limit
     IF p_req_loan_amount > v_max_allowed_loan THEN
         -- Rollback the transaction if requested loan exceeds limits
-        SET v_error_msg = CONCAT('Requested loan amount exceeds the allowable loan limit of', v_max_allowed_loan ,' based on FD.');
+        SET v_error_msg = CONCAT('Requested loan amount exceeds the allowable loan limit of ', v_max_allowed_loan ,' based on FD.');
         ROLLBACK;
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = v_error_msg;
