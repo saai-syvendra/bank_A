@@ -54,20 +54,32 @@ const getAccountByAccountNo = async (accountNo) => {
   }
 };
 
-const getCustomerAccounts = async (customerId) => {
+const getCustomerAccounts = async (customerId, accountType) => {
   let connection;
+  let rows;
   try {
     connection = await pool.getConnection();
     await connection.beginTransaction();
 
-    const [rows] = await connection.query(
-      `
-              SELECT * 
-              FROM Customer_Account 
-              WHERE customer_id = ?;
-          `,
-      [customerId]
-    );
+    if (accountType) {
+      [rows] = await connection.query(
+        `
+                SELECT * 
+                FROM Customer_Account 
+                WHERE customer_id = ? AND account_type = ?;
+            `,
+        [customerId, accountType]
+      );
+    } else {
+      [rows] = await connection.query(
+        `
+                SELECT * 
+                FROM Customer_Account 
+                WHERE customer_id = ?;
+            `,
+        [customerId]
+      );
+    }
     if (rows.length === 0)
       throw new Error("No accounts found for this customer");
 
