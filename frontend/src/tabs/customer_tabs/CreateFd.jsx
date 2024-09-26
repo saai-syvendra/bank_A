@@ -27,6 +27,7 @@ import { Separator } from "@/components/ui/separator";
 import { callGetThisCustomerAccounts } from "../../api/AccountApi";
 import { useOTP } from "../../auth/OtpContext";
 import { OTPDialog } from "@/components/OtpDialog";
+import { formatAccountDetails } from "../../helper/stringFormatting";
 
 const formSchema = z.object({
   planId: z.coerce.number().min(1, "Please select a plan"),
@@ -61,7 +62,7 @@ const CreateFd = ({ triggerToRefetch }) => {
 
   const fetchAccounts = async () => {
     try {
-      const fetchedAccounts = await callGetThisCustomerAccounts();
+      const fetchedAccounts = await callGetThisCustomerAccounts("saving");
       console.log("Accounts", fetchedAccounts);
       setAccounts(fetchedAccounts);
     } catch (error) {
@@ -157,7 +158,7 @@ const CreateFd = ({ triggerToRefetch }) => {
                   name="connectedAccount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Connected Account</FormLabel>
+                      <FormLabel>Connected Savings Account</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
@@ -173,7 +174,7 @@ const CreateFd = ({ triggerToRefetch }) => {
                               key={account.account_id}
                               value={account.account_id.toString()}
                             >
-                              {`${account.account_number} - Balance: Rs. ${account.balance}`}
+                              {formatAccountDetails(account)}
                             </SelectItem>
                           ))}
                         </SelectContent>

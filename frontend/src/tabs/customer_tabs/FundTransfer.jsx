@@ -28,6 +28,7 @@ import { callMakeOnlineTransfer } from "../../api/TransactionApi";
 import { Textarea } from "@/components/ui/textarea";
 import { useOTP } from "../../auth/OtpContext";
 import { OTPDialog } from "@/components/OtpDialog";
+import { formatAccountDetails } from "../../helper/stringFormatting";
 
 const formSchema = z.object({
   fromAccountId: z.coerce
@@ -133,7 +134,7 @@ const FundTransfer = ({ triggerToRefetch }) => {
                               key={account.account_id}
                               value={account.account_id.toString()}
                             >
-                              {`${account.account_number} - Balance: Rs. ${account.balance}`}
+                              {formatAccountDetails(account)}
                             </SelectItem>
                           ))}
                         </SelectContent>

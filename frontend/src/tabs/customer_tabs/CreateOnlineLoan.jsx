@@ -29,6 +29,7 @@ import { callGetThisCustomerAccounts } from "../../api/AccountApi";
 import { Textarea } from "@/components/ui/textarea";
 import { useOTP } from "../../auth/OtpContext";
 import { OTPDialog } from "@/components/OtpDialog";
+import { formatAccountDetails } from "../../helper/stringFormatting";
 
 const formSchema = z.object({
   planId: z.coerce.number().min(1, "Please select a plan"),
@@ -233,7 +234,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
                               key={account.account_id}
                               value={account.account_id.toString()}
                             >
-                              {`${account.account_number} - Balance: Rs. ${account.balance}`}
+                              {formatAccountDetails(account)}
                             </SelectItem>
                           ))}
                         </SelectContent>

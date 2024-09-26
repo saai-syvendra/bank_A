@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { callGetThisCustomerAccounts } from "../../api/AccountApi";
 import { useOTP } from "../../auth/OtpContext";
 import { OTPDialog } from "@/components/OtpDialog";
+import { formatAccountDetails } from "../../helper/stringFormatting";
 
 const LoanPayment = () => {
   const [upcomingInstallments, setUpcomingInstallments] = useState([]);
@@ -175,7 +176,7 @@ const LoanPayment = () => {
                     key={account.account_id}
                     value={account.account_id.toString()}
                   >
-                    {`${account.account_number} - Balance: Rs. ${account.balance}`}
+                    {formatAccountDetails(account)}
                   </SelectItem>
                 ))}
               </SelectContent>
