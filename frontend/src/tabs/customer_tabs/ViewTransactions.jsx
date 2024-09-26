@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/custom-date-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -50,6 +51,11 @@ export default function ViewTransactions() {
     }
     if (apiFilters.accountId === "all") {
       apiFilters.accountId = "";
+    }
+    if (apiFilters.startDate !== "") {
+      apiFilters.startDate = new Date(apiFilters.startDate)
+        .toISOString()
+        .split("T")[0]; // Convert Date to YYYY-MM-DD
     }
     try {
       setIsLoading(true);
@@ -109,72 +115,136 @@ export default function ViewTransactions() {
         <CardHeader>
           <h2 className="text-2xl font-bold">Account Transactions</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
-            <Select
-              value={tempFilters.accountId}
-              onValueChange={(value) => handleFilterChange("accountId", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Account No" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                {accounts.map((account) => (
-                  <SelectItem
-                    key={account.account_id}
-                    value={account.account_id}
-                  >
-                    {account.account_number}
+            <div>
+              <Select
+                id="transactionType"
+                value={tempFilters.transactionType}
+                onValueChange={(value) =>
+                  handleFilterChange("transactionType", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Transaction Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="credit">Credit</SelectItem>
+                  <SelectItem value="debit">Debit</SelectItem>
+                </SelectContent>
+              </Select>
+              <label
+                htmlFor="transactionType"
+                className="flex justify-center text-xs font-medium text-gray-700 mb-1"
+              >
+                Transaction Type
+              </label>
+            </div>
+            <div>
+              <Select
+                id="method"
+                value={tempFilters.method}
+                onValueChange={(value) => handleFilterChange("method", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="online-transfer">
+                    Online Transfer
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={tempFilters.transactionType}
-              onValueChange={(value) =>
-                handleFilterChange("transactionType", value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Trans Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="credit">Credit</SelectItem>
-                <SelectItem value="debit">Debit</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={tempFilters.method}
-              onValueChange={(value) => handleFilterChange("method", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Method" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="online-transfer">Online Transfer</SelectItem>
-                <SelectItem value="atm-cdm">ATM/CDM</SelectItem>
-                <SelectItem value="via_employee">Via Employee</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input
-              type="date"
-              placeholder="Start Date"
-              value={tempFilters.startDate}
-              onChange={(e) => handleFilterChange("startDate", e.target.value)}
-            />
-            <Input
-              type="number"
-              placeholder="Min Amount"
-              value={tempFilters.minAmount}
-              onChange={(e) => handleFilterChange("minAmount", e.target.value)}
-            />
-            <Input
-              type="number"
-              placeholder="Max Amount"
-              value={tempFilters.maxAmount}
-              onChange={(e) => handleFilterChange("maxAmount", e.target.value)}
-            />
+                  <SelectItem value="atm-cdm">ATM/CDM</SelectItem>
+                  <SelectItem value="server">Server</SelectItem>
+                  <SelectItem value="via_employee">Via Employee</SelectItem>
+                </SelectContent>
+              </Select>
+              <label
+                htmlFor="method"
+                className="flex justify-center text-xs font-medium text-gray-700 mb-1"
+              >
+                Transaction Method
+              </label>
+            </div>
+            <div>
+              <Select
+                id="accountId"
+                value={tempFilters.accountId}
+                onValueChange={(value) =>
+                  handleFilterChange("accountId", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Account No" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {accounts.map((account) => (
+                    <SelectItem
+                      key={account.account_id}
+                      value={account.account_id}
+                    >
+                      {account.account_number}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <label
+                htmlFor="accountId"
+                className="flex justify-center text-xs font-medium text-gray-700 mb-1"
+              >
+                Account Number
+              </label>
+            </div>
+            <div>
+              <DatePicker
+                id="start-date"
+                field={{
+                  value: tempFilters.startDate,
+                  onChange: (value) => handleFilterChange("startDate", value),
+                  dateFormat: "P",
+                }}
+              />
+              <label
+                htmlFor="startDate"
+                className="flex justify-center text-xs font-medium text-gray-700 mb-1"
+              >
+                Start Date
+              </label>
+            </div>
+            <div>
+              <Input
+                id="minAmount"
+                type="number"
+                placeholder="Min Amount"
+                value={tempFilters.minAmount}
+                onChange={(e) =>
+                  handleFilterChange("minAmount", e.target.value)
+                }
+              />
+              <label
+                htmlFor="minAmount"
+                className="flex justify-center text-xs font-medium text-gray-700 mb-1"
+              >
+                Min Amount
+              </label>
+            </div>
+            <div>
+              <Input
+                id="maxAmount"
+                type="number"
+                placeholder="Max Amount"
+                value={tempFilters.maxAmount}
+                onChange={(e) =>
+                  handleFilterChange("maxAmount", e.target.value)
+                }
+              />
+              <label
+                htmlFor="maxAmount"
+                className="flex justify-center text-xs font-medium text-gray-700 mb-1"
+              >
+                Max Amount
+              </label>
+            </div>
           </div>
           <div className="flex justify-start space-x-2 mt-4 pt-3">
             <Button variant="outline" onClick={cancelFilters}>

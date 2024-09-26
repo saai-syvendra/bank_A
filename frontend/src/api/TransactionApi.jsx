@@ -26,3 +26,26 @@ export const callEmployeeDepositForCustomer = async (data) => {
     throw new Error(error.message);
   }
 };
+
+export const callMakeOnlineTransfer = async (data) => {
+  try {
+    const response = await fetch(`${TRANSACTION_API_URL}/online-transfer`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = await response.json();
+    if (!response.ok) {
+      throw new Error(responseData.message);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
