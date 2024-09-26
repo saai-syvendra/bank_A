@@ -2,6 +2,7 @@ import { pool } from "../middleware/constants.js";
 
 const employeeDepositForCustomer = async (account_id, amount, reason) => {
   let connection;
+  let transaction_id = null;
   const method = "via_employee";
   try {
     connection = await pool.getConnection();
@@ -19,7 +20,7 @@ const employeeDepositForCustomer = async (account_id, amount, reason) => {
     );
 
     /// Get the transaction ID
-    const transaction_id = result[0].transaction_id;
+    transaction_id = result[0].transaction_id;
 
     // Check if transaction_id is null
     if (transaction_id === null) {
@@ -35,8 +36,25 @@ const employeeDepositForCustomer = async (account_id, amount, reason) => {
     if (error.sqlMessage) {
       throw new Error(`${error.sqlMessage}`);
     } else {
-      throw new Error("Deposit failed due to an unexpected error.");
-      //Code to delete the transaction from the table and also
+      try {
+        // Revert the transaction if a transaction ID was generated
+        if (transaction_id) {
+          await connection.query(
+            `DELETE FROM Account_Transaction WHERE transaction_id = ?`,
+            [transaction_id]
+          );
+
+          // Revert the account balance
+          await connection.query(
+            `UPDATE Customer_Account SET balance = balance - ? WHERE account_id = ?`,
+            [amount, account_id]
+          );
+        }
+      } catch (revertError) {
+        throw new Error(
+          "Deposit failed due to an unexpected error, and cannot revert transaction."
+        );
+      }
     }
   } finally {
     if (connection) connection.release();
