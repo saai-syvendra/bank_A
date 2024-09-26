@@ -201,7 +201,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
                               key={fd.fd_id}
                               value={fd.fd_id.toString()}
                             >
-                              {`${fd.fd_id} - Amount: Rs. ${parseFloat(
+                              {`FD #${fd.fd_id} - Amount: Rs. ${parseFloat(
                                 fd.amount
                               ).toLocaleString()}`}
                             </SelectItem>
