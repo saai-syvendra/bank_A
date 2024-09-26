@@ -42,7 +42,7 @@ const getAccountByAccountNo = async (accountNo) => {
       [accountNo]
     );
     const account = row[0];
-    if (!account) throw new Error("Invalid accountId");
+    if (!account) throw new Error("Invalid Account Number");
 
     await connection.commit();
     return account;
