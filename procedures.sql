@@ -570,6 +570,7 @@ CREATE PROCEDURE PayInstallment(
     DECLARE v_state          		ENUM('pending','paid','late');
     DECLARE v_installment_amount 	NUMERIC(10,2);
     DECLARE v_due_date				DATE;
+    DECLARE v_months				INT;
     
     START TRANSACTION;
     
@@ -584,7 +585,12 @@ CREATE PROCEDURE PayInstallment(
         SET MESSAGE_TEXT = 'Loan Installment has already been paid';
     END IF;
     
-    CALL DeductMoney(p_payment_accnt_id, v_installment_amount, CONCAT('Loan payment for ', p_loan_id, ' - Installment ', p_installment_no), 'server', transaction_id);
+    SELECT months INTO v_months
+    FROM Loan 
+    LEFT JOIN Loan_Plan USING(plan_id)
+    WHERE loan_id = p_loan_id;
+    
+    CALL DeductMoney(p_payment_accnt_id, v_installment_amount, CONCAT('Payment for Loan #', p_loan_id, ' - Installment ', p_installment_no , '/', v_months), 'server', transaction_id);
     
     IF v_due_date < CURDATE() THEN
 		SET v_state = 'late';
@@ -705,6 +711,8 @@ CREATE PROCEDURE CreateFd (
 ) 
 BEGIN
 	DECLARE v_plan_exists BOOLEAN;
+    DECLARE v_safe_to_deduct BOOLEAN;
+    DECLARE v_fd_id INT;
 
 	START TRANSACTION;
     
@@ -732,10 +740,20 @@ BEGIN
         SET MESSAGE_TEXT = 'FD plan not available.';
     END IF;
     
-    CALL DeductMoney(p_account_id, p_amount, CONCAT('Opened new FD'), 'server', @transaction_id);
+    CALL CheckSafeDeduction(p_account_id, p_amount, v_safe_to_deduct);
+    
+    IF v_safe_to_deduct = FALSE THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Insufficient funds to create FD.';
+    END IF;
 	
     INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
     (p_plan_id, p_account_id, CURDATE(), p_amount);
+    
+    SET v_fd_id = LAST_INSERT_ID();
+    
+    CALL DeductMoney(p_account_id, p_amount, CONCAT('Opened new FD - #', v_fd_id), 'server', @transaction_id);
     
     COMMIT;
 
