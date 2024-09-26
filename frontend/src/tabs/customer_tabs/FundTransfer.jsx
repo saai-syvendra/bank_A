@@ -26,6 +26,9 @@ import { Separator } from "@/components/ui/separator";
 import { callGetThisCustomerAccounts } from "../../api/AccountApi";
 import { callMakeOnlineTransfer } from "../../api/TransactionApi";
 import { Textarea } from "@/components/ui/textarea";
+import { useOTP } from "../../auth/OtpContext";
+import { OTPDialog } from "@/components/OtpDialog";
+import { formatAccountDetails } from "../../helper/stringFormatting";
 
 const formSchema = z.object({
   fromAccountId: z.coerce
@@ -39,9 +42,9 @@ const formSchema = z.object({
 });
 
 const FundTransfer = ({ triggerToRefetch }) => {
-  const [plans, setPlans] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { sendOtp, isVerifying } = useOTP();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -63,10 +66,21 @@ const FundTransfer = ({ triggerToRefetch }) => {
     }
   };
 
-  const onSave = async (data) => {
+  const onSave = async () => {
     setIsLoading(true);
-    console.log(data);
     try {
+      await sendOtp();
+    } catch (error) {
+      toast.error("Failed to initiate OTP verification");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFundTransfer = async () => {
+    setIsLoading(true);
+    try {
+      const data = form.getValues();
       await callMakeOnlineTransfer(data);
       toast.success("Online transfer successful");
       fetchAccounts();
@@ -86,100 +100,106 @@ const FundTransfer = ({ triggerToRefetch }) => {
   }, [triggerToRefetch]);
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Online Trasnfer</CardTitle>
-        <p className="text-gray-400 text-sm text-secondary-foreground">
-          Fill out the details to make a transfer
-        </p>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSave)} className="space-y-6">
-            <Separator />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="fromAccountId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>From Account</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+    <>
+      <Card className="w-full max-w-3xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Online Trasnfer</CardTitle>
+          <p className="text-gray-400 text-sm text-secondary-foreground">
+            Fill out the details to make a transfer
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSave)} className="space-y-6">
+              <Separator />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="fromAccountId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>From Account</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select an account" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {accounts.map((account) => (
+                            <SelectItem
+                              key={account.account_id}
+                              value={account.account_id.toString()}
+                            >
+                              {formatAccountDetails(account)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="toAccountNo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>To Account</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select an account" />
-                        </SelectTrigger>
+                        <Input {...field} type="number" min={0} />
                       </FormControl>
-                      <SelectContent>
-                        {accounts.map((account) => (
-                          <SelectItem
-                            key={account.account_id}
-                            value={account.account_id.toString()}
-                          >
-                            {`${account.account_number} - Balance: Rs. ${account.balance}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="toAccountNo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>To Account</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" min={0} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Transfer Amount</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="number" min={0} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Transfer Amount</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" min={0} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="reason"
+                  render={({ field }) => (
+                    <FormItem className="col-span-1">
+                      <FormLabel>Reason</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} className="bg-white" rows={1} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="reason"
-                render={({ field }) => (
-                  <FormItem className="col-span-1">
-                    <FormLabel>Reason</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} className="bg-white" rows={1} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {isLoading ? (
-              <LoadingButton className="w-full" />
-            ) : (
-              <Button type="submit" className="w-full">
-                Make Transfer
-              </Button>
-            )}
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+              {isLoading || isVerifying ? (
+                <LoadingButton className="w-full" />
+              ) : (
+                <Button type="submit" className="w-full">
+                  Make Transfer
+                </Button>
+              )}
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      <OTPDialog onVerificationSuccess={handleFundTransfer} />
+    </>
   );
 };
 

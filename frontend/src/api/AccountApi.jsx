@@ -82,15 +82,21 @@ export const callGetCustomerAccounts = async (customerId) => {
   }
 };
 
-export const callGetThisCustomerAccounts = async () => {
+export const callGetThisCustomerAccounts = async (accountType) => {
+  if (!accountType) accountType = "";
+  const params = new URLSearchParams();
+  params.set("accountType", accountType);
   try {
-    const response = await fetch(`${ACCOUNT_API_URL}/my-accounts`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${ACCOUNT_API_URL}/my-accounts?${params.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
 
     const data = await response.json();
     if (!response.ok) {

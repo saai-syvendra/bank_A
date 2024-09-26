@@ -14,8 +14,12 @@ const getCustomerAccounts = async (req, res) => {
 
 const getThisCustomerAccounts = async (req, res) => {
   const { id: customerId } = req.user;
+  const { accountType } = req.query;
   try {
-    const accounts = await AccountModel.getCustomerAccounts(customerId);
+    const accounts = await AccountModel.getCustomerAccounts(
+      customerId,
+      accountType
+    );
     return res.json(accounts);
   } catch (error) {
     console.log(error);
