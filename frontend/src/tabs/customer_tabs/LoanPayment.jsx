@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { callGetThisCustomerAccounts } from "../../api/AccountApi";
+import { useOTP } from "../../auth/OtpContext";
+import { OTPDialog } from "@/components/OtpDialog";
 
 const LoanPayment = () => {
   const [upcomingInstallments, setUpcomingInstallments] = useState([]);
@@ -40,6 +42,7 @@ const LoanPayment = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [accounts, setAccounts] = useState([]);
+  const { sendOtp, isVerifying } = useOTP();
 
   const fetchUpcomingInstallments = async () => {
     try {
@@ -71,7 +74,7 @@ const LoanPayment = () => {
     setSelectedAccount(value);
   };
 
-  const submitPayment = async () => {
+  const onSave = async () => {
     if (!selectedAccount) {
       toast.error("Please select an account to make payment");
       return;
@@ -79,6 +82,16 @@ const LoanPayment = () => {
       toast.error("Please select an installment to make payment");
       return;
     }
+    setIsPaymentModalOpen(false);
+    try {
+      console.log("Sending OTP");
+      await sendOtp();
+    } catch (error) {
+      toast.error("Failed to initiate OTP verification");
+    }
+  };
+
+  const submitPayment = async () => {
     try {
       await callPayInstallment(
         selectedInstallment.loan_id,
@@ -94,7 +107,6 @@ const LoanPayment = () => {
 
     fetchUpcomingInstallments();
     fetchAccounts();
-    setIsPaymentModalOpen(false);
   };
 
   useEffect(() => {
@@ -170,10 +182,12 @@ const LoanPayment = () => {
             </Select>
           </div>
           <DialogFooter>
-            <Button onClick={submitPayment}>Confirm Payment</Button>
+            <Button onClick={onSave}>Confirm Payment</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <OTPDialog onVerificationSuccess={submitPayment} />
     </div>
   );
 };

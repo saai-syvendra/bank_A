@@ -25,6 +25,8 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { callGetThisCustomerAccounts } from "../../api/AccountApi";
+import { useOTP } from "../../auth/OtpContext";
+import { OTPDialog } from "@/components/OtpDialog";
 
 const formSchema = z.object({
   planId: z.coerce.number().min(1, "Please select a plan"),
@@ -36,6 +38,7 @@ const CreateFd = ({ triggerToRefetch }) => {
   const [plans, setPlans] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { sendOtp, isVerifying } = useOTP();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -66,10 +69,21 @@ const CreateFd = ({ triggerToRefetch }) => {
     }
   };
 
-  const onSave = async (data) => {
+  const onSave = async () => {
     setIsLoading(true);
-    console.log(data);
     try {
+      await sendOtp();
+    } catch (error) {
+      toast.error("Failed to initiate OTP verification");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFdCreation = async (data) => {
+    setIsLoading(true);
+    try {
+      const data = form.getValues();
       await callCreateFd(data);
       toast.success("FD created successfully");
       fetchAccounts();
@@ -90,104 +104,113 @@ const CreateFd = ({ triggerToRefetch }) => {
   }, [triggerToRefetch]);
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">
-          Create Fixed Deposit
-        </CardTitle>
-        <p className="text-gray-400 text-sm text-secondary-foreground">
-          Fill out the form to create a Fixed Deposit
-        </p>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSave)} className="space-y-6">
-            <Separator />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="planId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Loan Plan</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+    <>
+      <Card className="w-full max-w-3xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">
+            Create Fixed Deposit
+          </CardTitle>
+          <p className="text-gray-400 text-sm text-secondary-foreground">
+            Fill out the form to create a Fixed Deposit
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSave)} className="space-y-6">
+              <Separator />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="planId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Loan Plan</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a FD plan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {plans.map((plan) => (
+                            <SelectItem
+                              key={plan.plan_id}
+                              value={plan.plan_id.toString()}
+                            >
+                              {`${plan.plan_name} - ${
+                                plan.interest
+                              }% , ${plan.months} Months`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="connectedAccount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Connected Account</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select an account" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {accounts.map((account) => (
+                            <SelectItem
+                              key={account.account_id}
+                              value={account.account_id.toString()}
+                            >
+                              {`${account.account_number} - Balance: Rs. ${account.balance}`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="fdAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>FD Amount</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a FD plan" />
-                        </SelectTrigger>
+                        <Input {...field} type="number" min={0} />
                       </FormControl>
-                      <SelectContent>
-                        {plans.map((plan) => (
-                          <SelectItem
-                            key={plan.plan_id}
-                            value={plan.plan_id.toString()}
-                          >
-                            {`${plan.plan_name} - ${
-                              plan.interest
-                            }% , ${plan.months} Months`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="connectedAccount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Connected Account</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select an account" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {accounts.map((account) => (
-                          <SelectItem
-                            key={account.account_id}
-                            value={account.account_id.toString()}
-                          >
-                            {`${account.account_number} - Balance: Rs. ${account.balance}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="fdAmount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>FD Amount</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" min={0} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {isLoading ? (
-              <LoadingButton className="w-full" />
-            ) : (
-              <Button type="submit" className="w-full">
-                Create Fixed Deposit
-              </Button>
-            )}
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+              {isLoading ? (
+                <LoadingButton className="w-full" />
+              ) : (
+                <Button type="submit" className="w-full">
+                  Create Fixed Deposit
+                </Button>
+              )}
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      <OTPDialog onVerificationSuccess={handleFdCreation} />
+    </>
   );
 };
 
