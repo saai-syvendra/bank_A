@@ -43,6 +43,12 @@ router.get(
 );
 
 router.get(
+  "/get-atm-info",
+  authorizeRole("customer"),
+  AccountController.getATMinformation
+);
+
+router.get(
   "/",
   authorizeRole("employee", "manager"),
   AccountController.getAccountDetails
@@ -54,17 +60,10 @@ router.get(
   AccountController.getCustomerAccounts
 );
 
-// router.get(
-//     "/get-ATM-info",
-//     authorizeRole("employee", "manager"),
-//     AccountController.getATMinformation
-// );
-
 router.post(
   "/get-account-id",
   authorizeRole("employee"),
   AccountController.getAccountIDByAccountNo
 );
-
 
 export default router;

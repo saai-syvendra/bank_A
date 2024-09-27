@@ -17,6 +17,7 @@ import CreateOnlineLoan from "../tabs/customer_tabs/CreateOnlineLoan";
 import LoanPayment from "../tabs/customer_tabs/LoanPayment";
 import CreateFd from "../tabs/customer_tabs/CreateFd";
 import FundTransfer from "../tabs/customer_tabs/FundTransfer";
+import CDM from "../tabs/customer_tabs/cdm";
 
 const CustomerDashboard = () => {
   const loading = useAuthorization(["customer"]);
@@ -75,7 +76,9 @@ const CustomerDashboard = () => {
             <LoanPayment />
           </TabsContent>
           <TabsContent value="atm">ATM</TabsContent>
-          <TabsContent value="cdm">CDM</TabsContent>
+          <TabsContent value="cdm">
+            <CDM />
+          </TabsContent>
         </Tabs>
       </div>
     </div>

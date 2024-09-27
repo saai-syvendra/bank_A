@@ -1,5 +1,6 @@
 import AccountModel from "../models/AccountModel.js";
 import EmployeeModel from "../models/EmployeeModel.js";
+import CustomerModel from "../models/CustomerModel.js";
 
 const getCustomerAccounts = async (req, res) => {
   const { customerId } = req.params;
@@ -163,11 +164,37 @@ const getBranchAccounts = async (req, res) => {
   }
 };
 
-const getAccountIDByAccountNo = async (req,res) => {
+const getAccountIDByAccountNo = async (req, res) => {
   const { accountNo } = req.body;
   try {
     const account = await AccountModel.getAccountByAccountNo(accountNo);
     return res.json({ account_id: account.account_id });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: error.message });
+  }
+};
+
+const getATMinformation = async (req, res) => {
+  const { accountNo } = req.query;
+  console.log(accountNo);
+  try {
+    const account = await AccountModel.getAccountByAccountNo(accountNo);
+    const customer = await CustomerModel.getCustomer(account.customer_id);
+    let customerName;
+    if (customer.c_type === "individual") {
+      customerName = `${customer.first_name} ${customer.last_name}`;
+    } else if (customer.c_type === "organisation") {
+      customerName = customer.org_name;
+    }
+    const atmInfo = {
+      accountNo: account.account_number,
+      accountId: account.account_id,
+      balance: account.balance,
+      accountType: account.account_type,
+      name: customerName,
+    };
+    return res.json(atmInfo);
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error.message });
@@ -184,4 +211,5 @@ export default {
   getThisBranchAccountTransactions,
   getBranchAccounts,
   getAccountIDByAccountNo,
+  getATMinformation,
 };

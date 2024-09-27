@@ -229,3 +229,26 @@ export const callGetAccountIDfromAccountNo = async (accountNo) => {
     throw new Error(error.message);
   }
 };
+
+export const callGetATMInformation = async (accountNo) => {
+  try {
+    const response = await fetch(
+      `${ACCOUNT_API_URL}/get-atm-info?accountNo=${accountNo}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
