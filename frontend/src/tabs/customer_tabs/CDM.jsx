@@ -9,17 +9,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { callGetATMInformation } from "../../api/AccountApi";
+import { callGetCDMInformation } from "../../api/AccountApi";
 import { callMakeCDMdeposit } from "../../api/TransactionApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -65,7 +63,7 @@ export default function CDM() {
   const handleAccountSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const info = await callGetATMInformation(data.accountNumber);
+      const info = await callGetCDMInformation(data.accountNumber);
       setAccountInfo(info);
       setStep(2);
       toast.success("Account verified");
