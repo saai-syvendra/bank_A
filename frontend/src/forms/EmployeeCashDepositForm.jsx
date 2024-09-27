@@ -26,9 +26,9 @@ const depositFormSchema = z.object({
   accountID: z.number().min(1, "Account ID is required"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  amount: z
-    .string()
-    .min(1, "Amount is required")
+  amount: z.coerce
+    .number()
+    .min(0.01, "Amount is required")
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
       message: "Amount must be a positive number",
     }),
@@ -47,7 +47,7 @@ const EmployeeCashDepositForm = () => {
       accountID: "",
       firstName: "",
       lastName: "",
-      amount: "",
+      amount: 0,
       reason: "",
     },
   });
@@ -58,7 +58,7 @@ const EmployeeCashDepositForm = () => {
       const data = await callGetCustomerDetailsFromAccountNo(accountNo);
       form.setValue("firstName", data.firstName);
       form.setValue("lastName", data.lastName);
-      
+
       // Fetch accountID
       const accountID = await callGetAccountIDfromAccountNo(accountNo);
       form.setValue("accountID", accountID);
@@ -86,7 +86,7 @@ const EmployeeCashDepositForm = () => {
       const formattedData = {
         accountNo: data.accountNo.toString(),
         account_id: Number(data.accountID),
-        amount: Number(data.amount),
+        amount: data.amount,
         reason: data.reason,
       };
       //console.log("Sending data:", formattedData); // Log the data being sent
@@ -179,7 +179,12 @@ const EmployeeCashDepositForm = () => {
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input {...field} type="number" step="0.01" />
+                    <Input
+                      {...field}
+                      type="number"
+                      step="0.01"
+                      min="0"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
