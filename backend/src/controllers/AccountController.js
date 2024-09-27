@@ -163,6 +163,17 @@ const getBranchAccounts = async (req, res) => {
   }
 };
 
+const getAccountIDByAccountNo = async (req,res) => {
+  const { accountNo } = req.body;
+  try {
+    const account = await AccountModel.getAccountByAccountNo(accountNo);
+    return res.json({ account_id: account.account_id });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: error.message });
+  }
+};
+
 export default {
   getCustomerAccounts,
   getThisCustomerAccounts,
@@ -172,4 +183,5 @@ export default {
   getThisCustomerAccountTransactions,
   getThisBranchAccountTransactions,
   getBranchAccounts,
+  getAccountIDByAccountNo,
 };

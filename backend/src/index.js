@@ -25,13 +25,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/user", userRoute);
-app.use("/account", authenticateJWT, accountRoute);
+app.use("/account", authenticateJWT,accountRoute);
 app.use("/customer", authenticateJWT, customerRoute);
 app.use("/employee", authenticateJWT, employeeRoute);
 app.use("/loan", authenticateJWT, loanRoute);
 app.use("/fd", authenticateJWT, fdRoute);
 app.use("/report", authenticateJWT, reportRoute);
-app.use("/transaction",authenticateJWT, transactionRoute);
+app.use("/transaction", authenticateJWT, transactionRoute);
 
 // Start the server
 const PORT = process.env.PORT;

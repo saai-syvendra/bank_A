@@ -3,6 +3,7 @@ import AccountModel from "../models/AccountModel.js";
 
 const employeeDepositForCustomerController = async (req, res) => {
   const { account_id, amount, reason } = req.body;
+  //console.log("Received data:", req.body);
 
   try {
     const result = await TransactionModel.employeeDepositForCustomer(

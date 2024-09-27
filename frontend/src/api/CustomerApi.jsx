@@ -102,3 +102,26 @@ export const callUpdateCustomerDetail = async (data) => {
     throw new Error(error.message);
   }
 };
+
+export const callGetCustomerDetailsFromAccountNo = async (accountNo) => {
+  try {
+    const response = await fetch(`${CUSTOMER_API_URL}/detail/from-accnt-num`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ accountNo }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
