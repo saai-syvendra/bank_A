@@ -758,3 +758,5 @@ BEGIN
     COMMIT;
 
 END$$
+
+DELIMITER ;

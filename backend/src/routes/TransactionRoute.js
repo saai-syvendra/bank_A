@@ -24,6 +24,7 @@ router.post(
 //     TransactionController.cdmDepositController
 //   );
 
+//Make online transfer
 router.post(
   "/online-transfer",
   authorizeRole("customer"),
