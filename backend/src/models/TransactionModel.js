@@ -1,9 +1,8 @@
 import { pool } from "../middleware/constants.js";
 
-const employeeDepositForCustomer = async (account_id, amount, reason) => {
+const cashDeposit = async (account_id, amount, reason, method) => {
   let connection;
   let transaction_id = null;
-  const method = "via_employee";
   try {
     connection = await pool.getConnection();
     await connection.beginTransaction();
@@ -38,7 +37,6 @@ const employeeDepositForCustomer = async (account_id, amount, reason) => {
     if (error.sqlMessage) {
       //console.log(error.sqlMessage);
       throw new Error(`${error.sqlMessage}`);
-      
     } else {
       try {
         // Revert the transaction if a transaction ID was generated
@@ -49,14 +47,18 @@ const employeeDepositForCustomer = async (account_id, amount, reason) => {
             [transaction_id]
           );
 
-           // Call the procedure to revert the account balance
-           await connection.query(
-            `CALL DeductMoney(?, ?, ?, ?);`,
-            [account_id, amount, "Revert deposit due to server error in deposit.", "server"]
-          );
+          // Call the procedure to revert the account balance
+          await connection.query(`CALL DeductMoney(?, ?, ?, ?);`, [
+            account_id,
+            amount,
+            "Revert deposit due to server error in deposit.",
+            "server",
+          ]);
         }
       } catch (revertError) {
-        console.log("Deposit failed due to an unexpected error, and cannot revert transaction.");
+        console.log(
+          "Deposit failed due to an unexpected error, and cannot revert transaction."
+        );
         throw new Error(
           "Deposit failed due to an unexpected error, and cannot revert transaction."
         );
@@ -115,4 +117,4 @@ const makeOnlineTransfer = async (
   }
 };
 
-export default { employeeDepositForCustomer, makeOnlineTransfer };
+export default { cashDeposit, makeOnlineTransfer };

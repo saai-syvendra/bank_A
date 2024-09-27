@@ -2,45 +2,45 @@ import { pool } from "../middleware/constants.js";
 import CustomerModel from "../models/CustomerModel.js";
 
 const getEmployeeBranch = async (employeeId) => {
-    const [row] = await pool.query(
-        `
+  const [row] = await pool.query(
+    `
           SELECT branch_code 
           FROM Employee 
           WHERE emp_id = ?;
       `,
-        [employeeId]
-    );
-    const branch = row[0];
-    if (!branch) throw new Error("Invalid employeeId");
+    [employeeId]
+  );
+  const branch = row[0];
+  if (!branch) throw new Error("Invalid employeeId");
 
-    return branch.branch_code;
+  return branch.branch_code;
 };
 
 const getEmployee = async (id) => {
-    const [row] = await pool.query(
-        `
+  const [row] = await pool.query(
+    `
           SELECT * 
           FROM Employee 
           WHERE emp_id = ?;
       `,
-        [id]
-    );
-    const employee = row[0];
+    [id]
+  );
+  const employee = row[0];
 
-    if (!employee) throw new Error("Invalid employeeId");
+  if (!employee) throw new Error("Invalid employeeId");
 
-    return employee;
+  return employee;
 };
 
 const updateEmployee = async (id, data) => {
-    await pool.query(
-        `
+  await pool.query(
+    `
           UPDATE Employee 
           SET ? 
           WHERE emp_id = ?;
       `,
-        [data, id]
-    );
+    [data, id]
+  );
 };
 
 export default { getEmployeeBranch, getEmployee, updateEmployee };

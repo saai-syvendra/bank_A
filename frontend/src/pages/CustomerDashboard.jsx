@@ -17,7 +17,7 @@ import CreateOnlineLoan from "../tabs/customer_tabs/CreateOnlineLoan";
 import LoanPayment from "../tabs/customer_tabs/LoanPayment";
 import CreateFd from "../tabs/customer_tabs/CreateFd";
 import FundTransfer from "../tabs/customer_tabs/FundTransfer";
-import CDM from "../tabs/customer_tabs/cdm";
+import CDM from "../tabs/customer_tabs/CDM";
 
 const CustomerDashboard = () => {
   const loading = useAuthorization(["customer"]);
