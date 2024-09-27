@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,31 +6,40 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { callGetATMInformation } from "../../api/AccountApi";
 import { Separator } from "@/components/ui/separator";
+import { callGetATMInformation } from "../../api/AccountApi";
+import { callMakeCDMdeposit } from "../../api/TransactionApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 
-// // Mock function for API call
-// const callGetATMInformation = async (accountNumber) => {
-//   // Simulating API call
-//   await new Promise((resolve) => setTimeout(resolve, 1000));
-//   if (accountNumber === "1234567890") {
-//     return { success: true, name: "John Doe" };
-//   }
-//   throw new Error("Invalid account number");
-// };
+const accountFormSchema = z.object({
+  accountNumber: z.string().min(1, "Account number is required"),
+});
 
-// Mock function for deposit
-const makeDeposit = async (accountNumber, amount, reason) => {
-  // Simulating API call
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-  return { success: true, message: "Deposit successful" };
-};
+const depositFormSchema = z.object({
+  amount: z
+    .string()
+    .min(1, "Amount is required")
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+      message: "Amount must be a positive number",
+    }),
+  reason: z.string().min(1, "Reason is required"),
+});
 
 export default function CDM() {
   const [step, setStep] = useState(1);
@@ -39,14 +47,25 @@ export default function CDM() {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const { register, handleSubmit, reset } = useForm();
+  const accountForm = useForm({
+    resolver: zodResolver(accountFormSchema),
+    defaultValues: {
+      accountNumber: "",
+    },
+  });
+
+  const depositForm = useForm({
+    resolver: zodResolver(depositFormSchema),
+    defaultValues: {
+      amount: "",
+      reason: "",
+    },
+  });
 
   const handleAccountSubmit = async (data) => {
     setIsLoading(true);
     try {
-      console.log(data.accountNumber);
       const info = await callGetATMInformation(data.accountNumber);
-      console.log(info);
       setAccountInfo(info);
       setStep(2);
       toast.success("Account verified");
@@ -64,21 +83,22 @@ export default function CDM() {
     // Simulate counting money
     for (let i = 0; i <= 100; i++) {
       setProgress(i);
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 15));
     }
 
     try {
-      await makeDeposit(
-        data.accountNumber,
-        parseFloat(data.amount),
-        data.reason
-      );
+      await callMakeCDMdeposit({
+        account_id: accountInfo.accountId,
+        amount: parseFloat(data.amount),
+        reason: data.reason,
+      });
       toast.success("Deposit successful");
-      reset();
+      accountForm.reset();
+      depositForm.reset();
       setStep(1);
       setAccountInfo(null);
     } catch (error) {
-      toast.error("Error: Deposit failed");
+      toast.error(error.message || "Error: Deposit failed");
     } finally {
       setIsLoading(false);
       setProgress(0);
@@ -98,47 +118,86 @@ export default function CDM() {
       <CardContent>
         <Separator className="mb-4" />
         {step === 1 && (
-          <form onSubmit={handleSubmit(handleAccountSubmit)}>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="accountNumber">Account Number</Label>
-                <Input
-                  id="accountNumber"
-                  placeholder="Enter your account number"
-                  {...register("accountNumber", { required: true })}
-                />
-              </div>
-            </div>
-            <Button className="w-full mt-4" type="submit" disabled={isLoading}>
-              {isLoading ? "Verifying..." : "Verify Account"}
-            </Button>
-          </form>
+          <Form {...accountForm}>
+            <form
+              onSubmit={accountForm.handleSubmit(handleAccountSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={accountForm.control}
+                name="accountNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Account Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your account number"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button className="w-full" type="submit" disabled={isLoading}>
+                {isLoading ? "Verifying..." : "Verify Account"}
+              </Button>
+            </form>
+          </Form>
         )}
         {step === 2 && (
-          <form onSubmit={handleSubmit(handleDepositSubmit)}>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="amount">Deposit Amount</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  placeholder="Enter amount"
-                  {...register("amount", { required: true, min: 1 })}
-                />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="reason">Reason for Deposit</Label>
-                <Input
-                  id="reason"
-                  placeholder="Enter reason"
-                  {...register("reason", { required: true })}
-                />
-              </div>
-            </div>
-            <Button className="w-full mt-4" type="submit" disabled={isLoading}>
-              {isLoading ? "Processing..." : "Make Deposit"}
-            </Button>
-          </form>
+          <Form {...depositForm}>
+            <form
+              onSubmit={depositForm.handleSubmit(handleDepositSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={depositForm.control}
+                name="name"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Account holder name</FormLabel>
+                    <FormControl>
+                      <Input value={accountInfo.name} disabled />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={depositForm.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Deposit Amount</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Enter amount"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={depositForm.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reason for Deposit</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter reason" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button className="w-full" type="submit" disabled={isLoading}>
+                {isLoading ? "Processing..." : "Make Deposit"}
+              </Button>
+            </form>
+          </Form>
         )}
         {step === 3 && (
           <div className="flex flex-col items-center space-y-4">
@@ -147,9 +206,6 @@ export default function CDM() {
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        {accountInfo && <p>Welcome, {accountInfo.name}</p>}
-      </CardFooter>
     </Card>
   );
 }
