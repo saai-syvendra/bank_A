@@ -7,7 +7,7 @@ const employeeDepositForCustomer = async (account_id, amount, reason) => {
   try {
     connection = await pool.getConnection();
     await connection.beginTransaction();
-
+    //console.log(account_id, amount, reason, method);
     // Call the stored procedure
     await connection.query(
       `CALL DepositMoney(?, ?, ?, ?, @p_transaction_id);`,
@@ -18,6 +18,8 @@ const employeeDepositForCustomer = async (account_id, amount, reason) => {
     const [result] = await connection.query(
       `SELECT @p_transaction_id AS transaction_id;`
     );
+
+    //console.log(result);
 
     /// Get the transaction ID
     transaction_id = result[0].transaction_id;
@@ -34,23 +36,27 @@ const employeeDepositForCustomer = async (account_id, amount, reason) => {
     if (connection) await connection.rollback();
 
     if (error.sqlMessage) {
+      //console.log(error.sqlMessage);
       throw new Error(`${error.sqlMessage}`);
+      
     } else {
       try {
         // Revert the transaction if a transaction ID was generated
+
         if (transaction_id) {
           await connection.query(
             `DELETE FROM Account_Transaction WHERE transaction_id = ?`,
             [transaction_id]
           );
 
-          // Revert the account balance
-          await connection.query(
-            `UPDATE Customer_Account SET balance = balance - ? WHERE account_id = ?`,
-            [amount, account_id]
+           // Call the procedure to revert the account balance
+           await connection.query(
+            `CALL DeductMoney(?, ?, ?, ?);`,
+            [account_id, amount, "Revert deposit due to server error in deposit.", "server"]
           );
         }
       } catch (revertError) {
+        console.log("Deposit failed due to an unexpected error, and cannot revert transaction.");
         throw new Error(
           "Deposit failed due to an unexpected error, and cannot revert transaction."
         );

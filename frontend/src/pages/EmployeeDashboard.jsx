@@ -17,7 +17,7 @@ import {
 } from "../api/EmployeeApi";
 import CreateLoan from "../tabs/employee_tabs/CreateLoan";
 import LoanApprovalList from "../tabs/manager_tabs/LoanApproval";
-// import EmployeeCashDepositForm from "../forms/EmployeeCashDepositForm";
+import EmployeeCashDepositForm from "../forms/EmployeeCashDepositForm";
 
 const EmployeeDashboard = ({ role }) => {
   const loading = useAuthorization(["manager", "employee"]);
@@ -69,7 +69,9 @@ const EmployeeDashboard = ({ role }) => {
           <TabsContent value="transactions">
             <ViewBranchTransactions />
           </TabsContent>
-          <TabsContent value="cash-deposit">Cash Deposit</TabsContent>
+          <TabsContent value="cash-deposit">
+            <EmployeeCashDepositForm/>
+          </TabsContent>
           <TabsContent value="update-details">
             <UpdateDetailForm
               triggerUpdateDetails={true}

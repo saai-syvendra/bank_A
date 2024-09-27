@@ -60,4 +60,11 @@ router.get(
 //     AccountController.getATMinformation
 // );
 
+router.post(
+  "/get-account-id",
+  authorizeRole("employee"),
+  AccountController.getAccountIDByAccountNo
+);
+
+
 export default router;

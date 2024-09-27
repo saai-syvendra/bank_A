@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/user", userRoute);
-app.use("/account", authenticateJWT, accountRoute);
+app.use("/account", authenticateJWT,accountRoute);
 app.use("/customer", authenticateJWT, customerRoute);
 app.use("/employee", authenticateJWT, employeeRoute);
 app.use("/loan", authenticateJWT, loanRoute);

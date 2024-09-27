@@ -207,3 +207,25 @@ export const callGetBranchAccounts = async () => {
     throw new Error(error.message);
   }
 };
+
+export const callGetAccountIDfromAccountNo = async (accountNo) => {
+  try {
+    const response = await fetch(`${ACCOUNT_API_URL}/get-account-id`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ accountNo }),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data.account_id;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};

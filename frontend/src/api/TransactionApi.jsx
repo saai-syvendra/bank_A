@@ -3,6 +3,7 @@ const TRANSACTION_API_URL = `${VITE_API_URL}/transaction`;
 
 export const callEmployeeDepositForCustomer = async (data) => {
   try {
+    const { account_id, amount, reason } = data; // Destructure the required fields
     const response = await fetch(
       `${TRANSACTION_API_URL}/employee/make-deposit`,
       {
@@ -11,7 +12,7 @@ export const callEmployeeDepositForCustomer = async (data) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ account_id: account_id, amount, reason }), // Send only the required fields
       }
     );
 
