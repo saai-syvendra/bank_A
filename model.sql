@@ -355,3 +355,16 @@ CREATE TABLE Otps (
     expires_at DATETIME,
     FOREIGN KEY (username) REFERENCES User_Account(username)
 );
+
+-- Table to log daily account balance
+CREATE TABLE Daily_Account_Balance (
+    customer_id     INT NOT NULL,
+    account_id      INT NOT NULL,
+    account_number  CHAR(12) NOT NULL,
+    balance_date    DATE NOT NULL,
+    account_balance NUMERIC(12,2) NOT NULL,
+    PRIMARY KEY (customer_id, account_id, balance_date),
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    FOREIGN KEY (account_id) REFERENCES Customer_Account(account_id),
+    FOREIGN KEY (account_number) REFERENCES Customer_Account(account_number)
+);
