@@ -216,6 +216,61 @@ const payInstallment = async (loan_id, installment_no, account_id) => {
   }
 };
 
+const getLateLoanInstallments = async (filters) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [rows] = await connection.query(
+      `
+        CALL GetLateLoanInstallments(?, ?, ?, ?, ?, ?); 
+      `,
+      [
+        filters.branch_code,
+        filters.min_amount,
+        filters.max_amount,
+        filters.customer_id,
+        filters.start_date,
+        filters.end_date,
+      ]
+    );
+
+    await connection.commit();
+    return rows[0];
+  } catch (error) {
+    if (connection) await connection.rollback();
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
+const getLoanCustomers = async (branch_code) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [rows] = await connection.query(
+      `
+        SELECT DISTINCT customer_id
+        FROM Loan
+        WHERE branch_code = ?;
+      `,
+      [branch_code]
+    );
+
+    await connection.commit();
+    return rows;
+  } catch (error) {
+    if (connection) await connection.rollback();
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
 export default {
   createLoan,
   createOnlineLoan,
@@ -226,4 +281,6 @@ export default {
   rejectLoan,
   getUpcomingInstallments,
   payInstallment,
+  getLateLoanInstallments,
+  getLoanCustomers,
 };

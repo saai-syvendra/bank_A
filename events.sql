@@ -10,7 +10,7 @@ DELIMITER $$
 
 CREATE EVENT InsertDailyAccountBalance
 ON SCHEDULE EVERY 1 DAY
-STARTS '2024-09-28 23:59:59'5
+STARTS '2024-09-28 23:59:59'
 DO
 BEGIN
     -- Insert account balances for all 'saving' accounts into Daily_Account_Balance table

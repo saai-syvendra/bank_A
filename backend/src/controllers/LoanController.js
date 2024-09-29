@@ -127,6 +127,39 @@ const payInstallment = async (req, res) => {
   }
 };
 
+const getLateLoanInstallments = async (req, res) => {
+  const { id: employeeId } = req.user;
+  const branch_code = await EmployeeModel.getEmployeeBranch(employeeId);
+  const { minAmount, maxAmount, customerId, startDate, endDate } = req.query;
+
+  // If any of the above is undefined, set it to null
+  const filters = {
+    branch_code: branch_code,
+    min_amount: minAmount || null,
+    max_amount: maxAmount || null,
+    customer_id: customerId || null,
+    start_date: startDate || null,
+    end_date: endDate || null,
+  };
+  try {
+    const installments = await LoanModel.getLateLoanInstallments(filters);
+    res.status(200).send(installments);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
+const getLoanCustomers = async (req, res) => {
+  const { id: employeeId } = req.user;
+  const branch_code = await EmployeeModel.getEmployeeBranch(employeeId);
+  try {
+    const customers = await LoanModel.getLoanCustomers(branch_code);
+    res.status(200).send(customers);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
 export default {
   createLoan,
   createOnlineLoan,
@@ -136,4 +169,6 @@ export default {
   rejectLoan,
   getUpcomingInstallments,
   payInstallment,
+  getLateLoanInstallments,
+  getLoanCustomers,
 };

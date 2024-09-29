@@ -162,3 +162,51 @@ export const callPayInstallment = async (loanId, installmentNo, accountId) => {
     throw new Error(error.message);
   }
 };
+
+export const callGetLateLoanInstallments = async (filters) => {
+  const params = new URLSearchParams();
+  params.set("minAmount", filters.minAmount);
+  params.set("maxAmount", filters.maxAmount);
+  params.set("customerId", filters.customerId);
+  params.set("startDate", filters.startDate);
+  params.set("endDate", filters.endDate);
+  try {
+    const response = await fetch(
+      `${LOAN_API_URL}/late-installments?${params.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+export const callGetLoanCustomers = async () => {
+  try {
+    const response = await fetch(`${LOAN_API_URL}/loan-customers`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
