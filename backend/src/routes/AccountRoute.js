@@ -68,7 +68,7 @@ router.get(
 
 router.post(
   "/get-account-id",
-  authorizeRole("employee"),
+  authorizeRole("employee", "manager"),
   AccountController.getAccountIDByAccountNo
 );
 

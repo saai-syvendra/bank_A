@@ -7,7 +7,7 @@ const router = express.Router();
 // Employee making deposit on behalf of customer
 router.post(
   "/employee/make-deposit",
-  authorizeRole("employee"),
+  authorizeRole("employee", "manager"),
   TransactionController.employeeDepositForCustomerController
 );
 
