@@ -765,4 +765,38 @@ BEGIN
 
 END$$
 
+CREATE PROCEDURE GetLateLoanInstallments(
+    IN p_branch_code INT,
+    IN p_min_amount NUMERIC(10,2),  
+    IN p_max_amount NUMERIC(10,2),
+    IN p_customer_id INT,
+    IN p_start_date DATE,
+    IN p_end_date DATE
+)
+BEGIN
+    -- Query to select late loan installments based on the filters
+    SELECT 
+        li.loan_id,
+        li.installment_no,
+        li.installment_amount,
+        li.due_date,
+        li.paid_date,
+        l.customer_id,
+        lp.months
+    FROM 
+        Loan_Installment li
+    LEFT JOIN 
+        Loan l ON li.loan_id = l.loan_id
+	LEFT JOIN
+		Loan_Plan lp ON l.plan_id=lp.plan_id
+    WHERE 
+        li.state = 'late'
+        AND l.branch_code = p_branch_code
+        AND (p_min_amount IS NULL OR li.installment_amount >= p_min_amount)
+        AND (p_max_amount IS NULL OR li.installment_amount <= p_max_amount)
+        AND (p_customer_id IS NULL OR l.customer_id = p_customer_id)
+        AND (p_start_date IS NULL OR li.due_date >= p_start_date)
+        AND (p_end_date IS NULL OR li.due_date <= p_end_date);
+END$$
+
 DELIMITER ;

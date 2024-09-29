@@ -40,4 +40,16 @@ router.post("/reject", authorizeRole("manager"), LoanController.rejectLoan);
 
 router.get("/plans", LoanController.getLoanPlans);
 
+router.get(
+  "/late-installments",
+  authorizeRole("manager"),
+  LoanController.getLateLoanInstallments
+);
+
+router.get(
+  "/loan-customers",
+  authorizeRole("manager"),
+  LoanController.getLoanCustomers
+);
+
 export default router;
