@@ -469,6 +469,7 @@ BEGIN
     DECLARE v_plan_max_amount NUMERIC(10, 2);
     DECLARE v_new_loan_id INT;
     DECLARE v_error_msg VARCHAR(200);
+    DECLARE v_branch_code INT;
     
     -- Start a transaction
     START TRANSACTION;
@@ -510,9 +511,14 @@ BEGIN
         SET MESSAGE_TEXT = v_error_msg;
     END IF;
     
+    -- Get branch code
+    SELECT branch_code INTO v_branch_code
+    FROM Customer_Account
+    WHERE account_id = p_connected_account;
+    
     -- If all checks pass, insert the loan application
-    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id, approved_date, reason)
-    VALUES (p_loan_plan_id, p_customer_id, p_connected_account, CURDATE(), p_req_loan_amount, 'online', p_fd_id, CURDATE(), p_reason);
+    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id, branch_code, approved_date, reason)
+    VALUES (p_loan_plan_id, p_customer_id, p_connected_account, CURDATE(), p_req_loan_amount, 'online', p_fd_id, v_branch_code, CURDATE(), p_reason);
     
     SET v_new_loan_id = LAST_INSERT_ID();
     
