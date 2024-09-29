@@ -36,7 +36,7 @@ export default function ViewBranchTransactions() {
     minAmount: "",
     maxAmount: "",
     method: "all",
-    accountId: "",
+    accountId: "all",
   };
   const [filters, setFilters] = useState(defaultFilters);
   const [tempFilters, setTempFilters] = useState({ ...filters });
