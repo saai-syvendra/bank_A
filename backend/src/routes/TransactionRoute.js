@@ -18,12 +18,6 @@ router.post(
 //     TransactionController.withdrawFromATMController
 // );
 
-router.post(
-  "/cdm-deposit",
-  authorizeRole("customer"),
-  TransactionController.makeCDMdeposit
-);
-
 //Make online transfer
 router.post(
   "/online-transfer",

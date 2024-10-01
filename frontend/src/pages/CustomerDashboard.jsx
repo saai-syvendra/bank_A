@@ -17,7 +17,7 @@ import CreateOnlineLoan from "../tabs/customer_tabs/CreateOnlineLoan";
 import LoanPayment from "../tabs/customer_tabs/LoanPayment";
 import CreateFd from "../tabs/customer_tabs/CreateFd";
 import FundTransfer from "../tabs/customer_tabs/FundTransfer";
-import CDM from "../tabs/customer_tabs/CDM";
+import CDM from "../tabs/CDM";
 
 const CustomerDashboard = () => {
   const loading = useAuthorization(["customer"]);
@@ -41,6 +41,7 @@ const CustomerDashboard = () => {
         </div>
         <Tabs defaultValue="view-transactions">
           <TabsList>
+            <TabsTrigger value="summary">Summary</TabsTrigger>
             <TabsTrigger value="view-transactions">
               View Transactions
             </TabsTrigger>
@@ -49,9 +50,8 @@ const CustomerDashboard = () => {
             <TabsTrigger value="fund-transfer">Fund Transfer</TabsTrigger>
             <TabsTrigger value="update-details">Update Details</TabsTrigger>
             <TabsTrigger value="loan-payment">Loan Payment</TabsTrigger>
-            <TabsTrigger value="atm">ATM</TabsTrigger>
-            <TabsTrigger value="cdm">CDM</TabsTrigger>
           </TabsList>
+          <TabsContent value="summary">Summary</TabsContent>
           <TabsContent value="view-transactions">
             <ViewTransactions />
           </TabsContent>
@@ -74,10 +74,6 @@ const CustomerDashboard = () => {
           </TabsContent>
           <TabsContent value="loan-payment">
             <LoanPayment />
-          </TabsContent>
-          <TabsContent value="atm">ATM</TabsContent>
-          <TabsContent value="cdm">
-            <CDM />
           </TabsContent>
         </Tabs>
       </div>

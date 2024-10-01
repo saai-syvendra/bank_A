@@ -49,12 +49,6 @@ router.get(
 );
 
 router.get(
-  "/get-cdm-info",
-  authorizeRole("customer"),
-  AccountController.getCDMinformation
-);
-
-router.get(
   "/",
   authorizeRole("employee", "manager"),
   AccountController.getAccountDetails

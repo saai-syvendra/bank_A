@@ -11,6 +11,7 @@ import loanRoute from "./routes/LoanRoute.js";
 import fdRoute from "./routes/FdRoute.js";
 import reportRoute from "./routes/ReportRoute.js";
 import transactionRoute from "./routes/TransactionRoute.js";
+import machineRoute from "./routes/MachineRoute.js";
 import { authenticateJWT, authorizeRole } from "./middleware/auth.js";
 dotenv.config();
 
@@ -25,13 +26,14 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/user", userRoute);
-app.use("/account", authenticateJWT,accountRoute);
+app.use("/account", authenticateJWT, accountRoute);
 app.use("/customer", authenticateJWT, customerRoute);
 app.use("/employee", authenticateJWT, employeeRoute);
 app.use("/loan", authenticateJWT, loanRoute);
 app.use("/fd", authenticateJWT, fdRoute);
 app.use("/report", authenticateJWT, reportRoute);
 app.use("/transaction", authenticateJWT, transactionRoute);
+app.use("/machine", machineRoute);
 
 // Start the server
 const PORT = process.env.PORT;
