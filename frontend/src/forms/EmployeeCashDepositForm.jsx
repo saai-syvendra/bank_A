@@ -150,7 +150,7 @@ const EmployeeCashDepositForm = () => {
                   <FormItem>
                     <FormLabel>First Name</FormLabel>
                     <FormControl>
-                      <Input {...field} disabled={isCustomerLoading} />
+                      <Input {...field} disabled={true} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -164,7 +164,7 @@ const EmployeeCashDepositForm = () => {
                   <FormItem>
                     <FormLabel>Last Name</FormLabel>
                     <FormControl>
-                      <Input {...field} disabled={isCustomerLoading} />
+                      <Input {...field} disabled={true} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -179,12 +179,7 @@ const EmployeeCashDepositForm = () => {
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      step="0.01"
-                      min="0"
-                    />
+                    <Input {...field} type="number" step="0.01" min="0" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

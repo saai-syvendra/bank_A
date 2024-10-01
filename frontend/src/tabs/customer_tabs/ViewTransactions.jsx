@@ -32,11 +32,11 @@ export default function ViewTransactions() {
   const [accounts, setAccounts] = useState([]);
   const defaultFilters = {
     startDate: "",
-    transactionType: "",
+    transactionType: "all",
     minAmount: "",
     maxAmount: "",
-    method: "",
-    accountId: "",
+    method: "all",
+    accountId: "all",
   };
   const [filters, setFilters] = useState(defaultFilters);
   const [tempFilters, setTempFilters] = useState({ ...filters });

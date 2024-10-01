@@ -11,8 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { callGetCDMInformation } from "../../api/AccountApi";
-import { callMakeCDMdeposit } from "../../api/TransactionApi";
+import { callGetCDMInformation, callMakeCDMdeposit } from "../api/MachineApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
