@@ -201,6 +201,7 @@ const getATMinformation = async (req, res) => {
   }
 };
 
+
 export default {
   getCustomerAccounts,
   getThisCustomerAccounts,
@@ -213,3 +214,4 @@ export default {
   getAccountIDByAccountNo,
   getATMinformation,
 };
+

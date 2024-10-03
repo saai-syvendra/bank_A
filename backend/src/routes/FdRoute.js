@@ -14,4 +14,6 @@ router.get("/plans", FdController.getFdPlans);
 
 router.post("/create", authorizeRole("customer"), FdController.createFd);
 
+router.get("/account-fds", FdController.getFDsForThisAccount);
+
 export default router;

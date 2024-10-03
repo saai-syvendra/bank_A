@@ -159,6 +159,18 @@ const getLoanCustomers = async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
+const getLoansForThisAccount = async (req, res) => {
+  const { accountId } = req.query;
+  try {
+    const loans = await LoanModel.getLoansByAccountId(accountId);
+    return res.json({ loans });  // Wrap loans in an array, even if it's a single object
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
 
 export default {
   createLoan,
@@ -171,4 +183,5 @@ export default {
   payInstallment,
   getLateLoanInstallments,
   getLoanCustomers,
+  getLoansForThisAccount
 };

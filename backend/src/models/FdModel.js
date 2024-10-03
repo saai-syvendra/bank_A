@@ -72,4 +72,31 @@ const createFd = async (plan_id, account_id, amount) => {
   }
 };
 
-export default { getCustomerFds, getFdPlans, createFd };
+const getFixedDepositsByAccountId = async (accountId) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();  // Get a connection from the pool
+    await connection.beginTransaction();  // Begin a transaction
+
+    const [rows] = await connection.query(
+      `
+        SELECT fd.*,fd_plan.interest
+        FROM fd
+        join fd_plan on fd.plan_id=fd_plan.plan_id
+        WHERE account_id = ?;
+      `,
+      [accountId]  // Use accountId as a parameter
+    );
+
+    await connection.commit();  // Commit the transaction
+    return rows;  // Return the results
+  } catch (error) {
+    if (connection) await connection.rollback();  // Rollback if there is an error
+    throw error;
+  } finally {
+    if (connection) connection.release();  // Release the connection back to the pool
+  }
+};
+
+
+export default { getCustomerFds, getFdPlans, createFd,getFixedDepositsByAccountId };

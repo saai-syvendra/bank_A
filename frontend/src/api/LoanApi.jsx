@@ -210,3 +210,28 @@ export const callGetLoanCustomers = async () => {
     throw new Error(error.message);
   }
 };
+
+export const callGetLoansByAccountId = async (accountId) => {
+  try {
+    const response = await fetch(`${LOAN_API_URL}/account-loans?accountId=${accountId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",  // If you need cookies to be included
+    });
+
+    const data = await response.json();
+    console.log(`API response for accountId: ${accountId}:`, data);
+
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return data.loans;  // Return the loans data
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+

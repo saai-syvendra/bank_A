@@ -252,3 +252,5 @@ export const callGetATMInformation = async (accountNo) => {
     throw new Error(error.message);
   }
 };
+
+

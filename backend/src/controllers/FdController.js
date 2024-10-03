@@ -39,4 +39,15 @@ const createFd = async (req, res) => {
   }
 };
 
-export default { getThisCustomerFds, getFdPlans, createFd };
+const getFDsForThisAccount = async (req, res) => {
+  const { accountId } = req.query; // Account ID passed as a parameter
+  try {
+    const fixedDeposits = await FdModel.getFixedDepositsByAccountId(accountId);
+    return res.json({fixedDeposits});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export default { getThisCustomerFds, getFdPlans, createFd,getFDsForThisAccount };
