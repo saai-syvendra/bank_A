@@ -273,29 +273,28 @@ const getLoanCustomers = async (branch_code) => {
 const getLoansByAccountId = async (accountId) => {
   let connection;
   try {
-    connection = await pool.getConnection();  // Get a connection from the pool
-    await connection.beginTransaction();  // Begin a transaction
+    connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.beginTransaction(); // Begin a transaction
 
     const [rows] = await connection.query(
       `
-        SELECT loan.*, loan_plan.interest
+        SELECT loan.*, loan_plan.interest, loan_plan.plan_name
         FROM loan 
         JOIN loan_plan ON loan.plan_id = loan_plan.plan_id
         WHERE loan.connected_account = ?;
       `,
-      [accountId]  // Use accountId as a parameter
+      [accountId] // Use accountId as a parameter
     );
 
-    await connection.commit();  // Commit the transaction
-    return rows;  // Return the results
+    await connection.commit(); // Commit the transaction
+    return rows; // Return the results
   } catch (error) {
-    if (connection) await connection.rollback();  // Rollback if there is an error
+    if (connection) await connection.rollback(); // Rollback if there is an error
     throw error;
   } finally {
-    if (connection) connection.release();  // Release the connection back to the pool
+    if (connection) connection.release(); // Release the connection back to the pool
   }
 };
-
 
 export default {
   createLoan,

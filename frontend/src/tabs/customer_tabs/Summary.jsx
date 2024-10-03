@@ -1,11 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { callGetThisCustomerAccounts } from './../../api/AccountApi';
-import { callGetLoansByAccountId } from './../../api/LoanApi';
-import { callGetFixedDepositsByAccountId } from './../../api/FdApi'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ChevronDown } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { callGetThisCustomerAccounts } from "./../../api/AccountApi";
+import { callGetLoansByAccountId } from "./../../api/LoanApi";
+import { callGetFixedDepositsByAccountId } from "./../../api/FdApi";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ChevronDown } from "lucide-react";
 
 export default function Summary() {
   const [customerData, setCustomerData] = useState(null);
@@ -18,30 +35,34 @@ export default function Summary() {
         const accounts = await callGetThisCustomerAccounts();
 
         // Fetch loans and fixed deposits for each account
-        const loanPromises = accounts.map(account => callGetLoansByAccountId(account.account_id));
-        const fdPromises = accounts.map(account => callGetFixedDepositsByAccountId(account.account_id));
+        const loanPromises = accounts.map((account) =>
+          callGetLoansByAccountId(account.account_id)
+        );
+        const fdPromises = accounts.map((account) =>
+          callGetFixedDepositsByAccountId(account.account_id)
+        );
 
         const loansData = await Promise.all(loanPromises);
         const fdsData = await Promise.all(fdPromises);
         console.log(loansData);
-        console.log(fdsData)
+        console.log(fdsData);
 
         // Combine loans and fixed deposits with respective accounts
         const combinedAccounts = accounts.map((account, index) => ({
           ...account,
           loans: loansData[index] || [],
-          fixedDeposits: fdsData[index] || []
+          fixedDeposits: fdsData[index] || [],
         }));
 
         console.log(combinedAccounts);
 
         setCustomerData({
-          accounts: combinedAccounts
+          accounts: combinedAccounts,
         });
 
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching data', error);
+        console.error("Error fetching data", error);
         setLoading(false);
       }
     };
@@ -64,8 +85,17 @@ export default function Summary() {
       {customerData.accounts.map((account) => (
         <Card key={account.id} className="w-full">
           <CardHeader>
-            <CardTitle>{account.account_type} account - {account.account_number}</CardTitle>
-            <CardDescription>Current Balance: ${!isNaN(account.balance) ? parseFloat(account.balance).toFixed(2) : '0.00'}</CardDescription>
+            <CardTitle>
+              {account.account_type.charAt(0).toUpperCase() +
+                account.account_type.slice(1)}{" "}
+              Account - {account.account_number}
+            </CardTitle>
+            <CardDescription>
+              Current Balance: Rs.{" "}
+              {!isNaN(account.balance)
+                ? parseFloat(account.balance).toFixed(2)
+                : "0.00"}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Collapsible>
@@ -78,7 +108,8 @@ export default function Summary() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Type</TableHead>
+                        <TableHead>Loan ID</TableHead>
+                        <TableHead>Plan Name</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Interest Rate</TableHead>
                         <TableHead>Approved Date</TableHead>
@@ -88,15 +119,23 @@ export default function Summary() {
                       {account.loans.map((loan) => (
                         <TableRow key={loan.loan_id}>
                           <TableCell>{loan.loan_id}</TableCell>
-                          <TableCell>${parseFloat(loan.loan_amount).toFixed(2)}</TableCell>
+                          <TableCell>{loan.plan_name}</TableCell>
+                          <TableCell>
+                            Rs. {parseFloat(loan.loan_amount).toFixed(2)}
+                          </TableCell>
                           <TableCell>{loan.interest}%</TableCell>
-                          <TableCell>{new Date(loan.approved_date).toLocaleDateString()}</TableCell> {/* Original value retained */}
+                          <TableCell>
+                            {new Date(loan.approved_date).toLocaleDateString()}
+                          </TableCell>{" "}
+                          {/* Original value retained */}
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 ) : (
-                  <p className="text-muted-foreground">No loans associated with this account.</p>
+                  <p className="text-muted-foreground">
+                    No loans associated with this account.
+                  </p>
                 )}
               </CollapsibleContent>
             </Collapsible>
@@ -111,6 +150,7 @@ export default function Summary() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead>FD ID</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Interest Rate</TableHead>
                         <TableHead>Maturity Date</TableHead>
@@ -119,15 +159,23 @@ export default function Summary() {
                     <TableBody>
                       {account.fixedDeposits.map((fd) => (
                         <TableRow key={fd.fd_id}>
-                          <TableCell>${parseFloat(fd.amount).toFixed(2)}</TableCell>
-                          <TableCell>{fd.interest}%</TableCell> {/* Original value retained */}
-                          <TableCell>{new Date(fd.maturity_date).toLocaleDateString()}</TableCell>
+                          <TableCell>{fd.fd_id}</TableCell>
+                          <TableCell>
+                            Rs. {parseFloat(fd.amount).toFixed(2)}
+                          </TableCell>
+                          <TableCell>{fd.interest}%</TableCell>{" "}
+                          {/* Original value retained */}
+                          <TableCell>
+                            {new Date(fd.maturity_date).toLocaleDateString()}
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 ) : (
-                  <p className="text-muted-foreground">No fixed deposits associated with this account.</p>
+                  <p className="text-muted-foreground">
+                    No fixed deposits associated with this account.
+                  </p>
                 )}
               </CollapsibleContent>
             </Collapsible>
