@@ -17,6 +17,7 @@ import CreateOnlineLoan from "../tabs/customer_tabs/CreateOnlineLoan";
 import LoanPayment from "../tabs/customer_tabs/LoanPayment";
 import CreateFd from "../tabs/customer_tabs/CreateFd";
 import FundTransfer from "../tabs/customer_tabs/FundTransfer";
+import Summary from "../tabs/customer_tabs/Summary";
 import CDM from "../tabs/CDM";
 
 const CustomerDashboard = () => {
@@ -51,7 +52,7 @@ const CustomerDashboard = () => {
             <TabsTrigger value="update-details">Update Details</TabsTrigger>
             <TabsTrigger value="loan-payment">Loan Payment</TabsTrigger>
           </TabsList>
-          <TabsContent value="summary">Summary</TabsContent>
+          <TabsContent value="summary"><Summary/></TabsContent>
           <TabsContent value="view-transactions">
             <ViewTransactions />
           </TabsContent>

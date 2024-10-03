@@ -52,4 +52,10 @@ router.get(
   LoanController.getLoanCustomers
 );
 
+router.get(
+  "/account-loans",
+  authorizeRole("customer"),
+  LoanController.getLoansForThisAccount
+)
+
 export default router;
