@@ -60,15 +60,20 @@ const getAccountDetails = async (req, res) => {
   const { accountNumber } = req.body;
   try {
     const account = await AccountModel.getAccountByAccountNo(accountNumber);
-    const branchName = await AccountModel.getBranch(account["branch_code)"]);
-    const plan = await AccountModel.getSavingPlan(account["plan_id"]);
+    const branch = await AccountModel.getBranch(account["branch_code"]);
+    let plan;
+    if (account["account_type"] === "saving") {
+      plan = await AccountModel.getSavingPlan(account["plan_id"]);
+    } else {
+      plan = { name: "N/A" };
+    }
 
     const accountDetails = {
       accountNumber: account["account_number"],
       balance: account["balance"],
       accountType: account["account_type"],
-      branchName: branchName["branch_name"],
-      plan: plan["plan_name"],
+      branchName: branch["city"],
+      plan: plan["name"],
     };
 
     return res.json({ accountDetails });
@@ -185,7 +190,7 @@ const getATMinformation = async (req, res) => {
     if (customer.c_type === "individual") {
       customerName = `${customer.first_name} ${customer.last_name}`;
     } else if (customer.c_type === "organisation") {
-      customerName = customer.org_name;
+      customerName = customer.name;
     }
     const atmInfo = {
       accountNo: account.account_number,
@@ -201,7 +206,6 @@ const getATMinformation = async (req, res) => {
   }
 };
 
-
 export default {
   getCustomerAccounts,
   getThisCustomerAccounts,
@@ -214,4 +218,3 @@ export default {
   getAccountIDByAccountNo,
   getATMinformation,
 };
-
