@@ -4,32 +4,43 @@ const getCustomer = async (id) => {
   let row;
   [row] = await pool.query(
     `
-          SELECT * 
-          FROM Customer 
-          WHERE customer_id = ?;
-      `,
+      SELECT * 
+      FROM Customer 
+      WHERE customer_id = ?;
+    `,
     [id]
   );
   const customer = row[0];
-
   if (!customer) throw new Error("Invalid customerId");
+
+  [row] = await pool.query(
+    `
+      SELECT email, address, mobile
+      FROM User_Account
+      WHERE user_id = ?;
+    `,
+    [id]
+  );
+
+  const userDeatils = row[0];
+
   let detail;
   if (customer["c_type"] === "individual") {
     [row] = await pool.query(
       `
-              SELECT * 
-              FROM Person 
-              WHERE customer_id = ?;
-          `,
+        SELECT * 
+        FROM Individual_Customer 
+        WHERE customer_id = ?;
+      `,
       [id]
     );
   } else if (customer["c_type"] === "organisation") {
     [row] = await pool.query(
       `
-              SELECT * 
-              FROM Organisation 
-              WHERE customer_id = ?;
-          `,
+        SELECT * 
+        FROM Organisation 
+        WHERE customer_id = ?;
+      `,
       [id]
     );
   }
@@ -39,6 +50,7 @@ const getCustomer = async (id) => {
   const customerDetail = {
     c_type: customer["c_type"],
     ...detail,
+    ...userDeatils,
   };
 
   return customerDetail;
@@ -47,9 +59,9 @@ const getCustomer = async (id) => {
 const getAllCustomers = async () => {
   const [rows] = await pool.query(
     `
-          SELECT * 
-          FROM Customer;
-      `
+      SELECT * 
+      FROM Customer;
+    `
   );
 
   const customers = [];
@@ -62,6 +74,7 @@ const getAllCustomers = async () => {
   return customers;
 };
 
+// MAKE A PROCEDURE!!
 const createCustomer = async (c_type, customerDetails) => {
   const connection = await pool.getConnection();
   let customerId;
@@ -130,26 +143,26 @@ const createCustomer = async (c_type, customerDetails) => {
   }
 };
 
+// MAKE A PROCEDURE!!
 const updateCustomer = async (id, data) => {
   await pool.query(
     `
-          UPDATE Person 
-          SET ? 
-          WHERE customer_id = ?;
-      `,
+      UPDATE Person 
+      SET ? 
+      WHERE customer_id = ?;
+    `,
     [data, id]
   );
 };
 
 const getCustomerIDFromAccountNo = async (accountNo) => {
   let row;
-  let customerDetail;
   [row] = await pool.query(
     `
-          SELECT customer_id 
-          FROM Customer_Account 
-          WHERE account_number = ?;
-      `,
+      SELECT customer_id 
+      FROM Customer_Account 
+      WHERE account_number = ?;
+    `,
     [accountNo]
   );
   const customerId = row[0]["customer_id"];
@@ -159,4 +172,10 @@ const getCustomerIDFromAccountNo = async (accountNo) => {
   return customerId;
 };
 
-export default { getCustomer, getAllCustomers, createCustomer, updateCustomer, getCustomerIDFromAccountNo };
+export default {
+  getCustomer,
+  getAllCustomers,
+  createCustomer,
+  updateCustomer,
+  getCustomerIDFromAccountNo,
+};
