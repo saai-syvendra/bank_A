@@ -6,7 +6,7 @@ USE bank_database;
 -- SHOW TABLES;
 CREATE TABLE User_Account (
   user_id           INT AUTO_INCREMENT,
-  role				ENUM('customer', 'employee', 'admin') NOT NULL,
+  role				ENUM('customer', 'employee', 'admin', 'manager') NOT NULL,
   email             VARCHAR(50) NOT NULL UNIQUE,
   address			VARCHAR(255) NOT NULL,
   mobile			CHAR(10) NOT NULL,
