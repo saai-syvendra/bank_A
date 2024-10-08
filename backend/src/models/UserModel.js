@@ -63,7 +63,6 @@ const verifyOtp = async (username, otp) => {
       [username]
     );
     const otpDetails = row[0];
-    console.log(username, otpDetails);
     if (!otpDetails) throw new Error("OTP not found");
 
     if (otpDetails["wrong_count"] >= 3)

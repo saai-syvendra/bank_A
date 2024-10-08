@@ -200,10 +200,10 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
                         <SelectContent>
                           {plans.map((plan) => (
                             <SelectItem
-                              key={plan.plan_id}
-                              value={plan.plan_id.toString()}
+                              key={plan.id}
+                              value={plan.id.toString()}
                             >
-                              {`${plan.plan_name} - ${
+                              {`${plan.name} - ${
                                 plan.interest
                               }% , Max Amount: Rs. ${parseFloat(
                                 plan.max_amount

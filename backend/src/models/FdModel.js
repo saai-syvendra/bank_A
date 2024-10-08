@@ -82,7 +82,8 @@ const getFixedDepositsByAccountId = async (accountId) => {
       `
         SELECT fd.*,fd_plan.interest
         FROM fd
-        JOIN fd_plan on fd.plan_id=fd_plan.id
+        JOIN Customer_Account ca USING(account_id)
+        JOIN fd_plan ON fd.plan_id=fd_plan.id
         WHERE account_id = ?;
       `,
       [accountId] // Use accountId as a parameter

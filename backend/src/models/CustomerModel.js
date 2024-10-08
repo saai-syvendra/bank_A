@@ -38,7 +38,7 @@ const getCustomer = async (id) => {
     [row] = await pool.query(
       `
         SELECT * 
-        FROM Organisation 
+        FROM Organisation_Customer 
         WHERE customer_id = ?;
       `,
       [id]
@@ -74,84 +74,31 @@ const getAllCustomers = async () => {
   return customers;
 };
 
-// MAKE A PROCEDURE!!
 const createCustomer = async (c_type, customerDetails) => {
-  const connection = await pool.getConnection();
-  let customerId;
+  const { email, address, mobile, nic, firstName, lastName, dob, brc, name } =
+    customerDetails;
 
-  try {
-    await connection.beginTransaction();
-
-    // Insert into Customer table
-    const [result] = await connection.query(
-      `INSERT INTO Customer (c_type) VALUES (?)`,
-      [c_type]
-    );
-
-    customerId = result.insertId;
-
-    // Based on c_type, call the appropriate stored procedure
-    if (c_type === "individual") {
-      const { nic, firstName, lastName, mobile, email, dob, address } =
-        customerDetails;
-
-      await connection.query(`CALL createPerson(?, ?, ?, ?, ?, ?, ?, ?)`, [
-        nic,
-        firstName,
-        lastName,
-        mobile,
-        email,
-        dob,
-        address,
-        customerId,
-      ]);
-    } else if (c_type === "organisation") {
-      const { brc, orgName, address, telephone, email } = customerDetails;
-
-      await connection.query(`CALL createOrganisation(?, ?, ?, ?, ?, ?)`, [
-        brc,
-        orgName,
-        address,
-        telephone,
-        email,
-        customerId,
-      ]);
-    }
-
-    await connection.commit();
-  } catch (error) {
-    console.error("Error occurred:", error.message);
-
-    try {
-      if (customerId) {
-        await connection.query(`DELETE FROM Customer WHERE customer_id = ?`, [
-          customerId,
-        ]);
-        connection.commit();
-      }
-    } catch (deleteError) {
-      console.error(
-        "Error occurred during customer deletion:",
-        deleteError.message
-      );
-    }
-
-    await connection.rollback();
-    throw new Error("Error creating customer: " + error.message);
-  } finally {
-    connection.release();
-  }
+  await pool.query(`CALL CreateCustomer(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
+    email,
+    address,
+    mobile,
+    c_type,
+    nic,
+    firstName,
+    lastName,
+    dob,
+    brc,
+    name,
+  ]);
 };
 
-// MAKE A PROCEDURE!!
-const updateCustomer = async (id, data) => {
+const updateCustomer = async (id, customerDetails) => {
+  const { address, mobile, firstName, lastName, name } = customerDetails;
   await pool.query(
     `
-      UPDATE Person 
-      SET ? 
-      WHERE customer_id = ?;
+      CALL UpdateCustomer(?, ?, ?, ?, ?, ?);
     `,
-    [data, id]
+    [id, address, mobile, firstName, lastName, name]
   );
 };
 

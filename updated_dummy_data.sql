@@ -1,10 +1,10 @@
 USE bank_database;
 
 INSERT INTO User_Account (email, hashed_pwd, role, address, mobile) VALUES
-('emp1@bank.abc', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'employee', '123 Palm St, Victoria, Mahe', '0771234567'),
-('emp2@bank.abc', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'employee', '456 Coral Ave, Beau Vallon, Mahe', '0777654321'),
-('emp3@bank.abc', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'admin', '789 Manager Dr, Anse Royale, Mahe', '0779876543'),
-('emp4@bank.abc', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'admin', '101 Admin Rd, Takamaka, Mahe', '0776549871'),
+('man1@bank.abc', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'manager', '123 Palm St, Victoria, Mahe', '0771234567'),
+('emp1@bank.abc', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'employee', '456 Coral Ave, Beau Vallon, Mahe', '0777654321'),
+('emp2@bank.abc', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'manager', '789 Manager Dr, Anse Royale, Mahe', '0779876543'),
+('man2@bank.abc', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'employee', '101 Admin Rd, Takamaka, Mahe', '0776549871'),
 ('cus1@abc.def', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'customer', '12 Coconut St, La Digue', '0771122334'),
 ('cus2@abc.def', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'customer', '34 Mango Ave, Praslin', '0772233445'),
 ('cus3@abc.def', '$2b$10$1ZZL9N6NxS3dCfU2qQqfre8vAhDScNPFiDejSCjoRUAa3Av3oRNcO', 'customer', '56 Frangipani St, Baie Lazare, Mahe', '0773344556'),
@@ -74,25 +74,28 @@ INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
 
 INSERT INTO Loan (plan_id, connected_account, loan_type, loan_amount, start_date) VALUES
 (1, 1, 'branch', 75000.00, '2023-08-17'),
-(1, 2, 'online', 9500.00, '2023-09-02');
+(1, 2, 'online', 9500.00, '2023-09-02'),
+(1, 1, 'online', 45000.00, CURDATE());
 
 INSERT INTO Branch_Loan (loan_id, request_date, state, reason) VALUES
-(1, '2023-08-02', 'approved', 'Buy stuff for house');
+(1, '2023-08-02', 'pending', 'Buy stuff for house');
 
 INSERT INTO Online_Loan (loan_id, fd_id) VALUES
-(2, 2);
+(2, 2),
+(3, 2);
 
-INSERT INTO Loan_Installment (loan_id, installment_no, installment_amount, due_date, state) VALUES
-(1, 1, 12500.00, '2023-09-17', 'paid'),
-(1, 2, 12500.00, '2023-10-17', 'paid'),
-(1, 3, 12500.00, '2023-11-17', 'paid'),
-(1, 4, 12500.00, '2023-12-17', 'late'),
-(1, 5, 12500.00, '2024-01-17', 'paid'),
-(1, 6, 12500.00, '2024-02-17', 'paid'),
-(2, 1, 197.92, '2023-10-02', 'paid'),
-(2, 2, 197.92, '2023-11-02', 'late'),
-(2, 3, 197.92, '2023-12-02', 'late'),
-(2, 4, 197.92, '2024-01-02', 'paid'),
-(2, 5, 197.92, '2024-02-02', 'paid'),
-(2, 6, 197.92, '2024-03-02', 'late');
+CALL CreateLoanInstallments(3);
+INSERT INTO Loan_Installment (loan_id, installment_no, installment_amount, due_date, state, paid_date) VALUES
+-- (1, 1, 12500.00, '2023-09-17', 'paid', '2023-09-15'),
+-- (1, 2, 12500.00, '2023-10-17', 'paid', '2023-10-17'),
+-- (1, 3, 12500.00, '2023-11-17', 'paid', '2023-11-17'),
+-- (1, 4, 12500.00, '2023-12-17', 'late', '2023-12-17'),
+-- (1, 5, 12500.00, '2024-01-17', 'paid', '2024-01-17'),
+-- (1, 6, 12500.00, '2024-02-17', 'paid', '2024-02-17'),
+(2, 1, 197.92, '2023-10-02', 'paid', '2023-10-02'),
+(2, 2, 197.92, '2023-11-02', 'late', '2023-11-12'),
+(2, 3, 197.92, '2023-12-02', 'late', '2023-12-08'),
+(2, 4, 197.92, '2024-01-02', 'paid', '2024-01-01'),
+(2, 5, 197.92, '2024-02-02', 'paid', '2024-01-30'),
+(2, 6, 197.92, '2024-03-02', 'late', '2024-03-12');
 

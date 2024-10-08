@@ -16,7 +16,9 @@ const getEmployeeBranch = async (employeeId) => {
 };
 
 const getEmployee = async (id) => {
-  const [row] = await pool.query(
+  let row;
+
+  [row] = await pool.query(
     `
       SELECT * 
       FROM Employee 
@@ -26,20 +28,42 @@ const getEmployee = async (id) => {
   );
   const employee = row[0];
 
+  [row] = await pool.query(
+    `
+      SELECT email, address, mobile
+      FROM User_Account
+      WHERE user_id = ?;
+    `,
+    [id]
+  );
+
+  const userDeatils = row[0];
+
+  [row] = await pool.query(
+    `
+      SELECT position
+      FROM Employee_Position
+      WHERE id = ?;
+    `,
+    [employee["position_id"]]
+  );
+
+  const position = row[0];
+
   if (!employee) throw new Error("Invalid employeeId");
 
-  return employee;
+  return { ...employee, ...userDeatils, ...position };
 };
 
 // MAKE A PROCEDURE!!
-const updateEmployee = async (id, data) => {
+const updateEmployee = async (id, employeeDetails) => {
+  const { first_name, last_name, mobile, address, experience } =
+    employeeDetails;
   await pool.query(
     `
-          UPDATE Employee 
-          SET ? 
-          WHERE emp_id = ?;
+      CALL UpdateEmployee(?, ?, ?, ?, ?, ?);
       `,
-    [data, id]
+    [id, first_name, last_name, mobile, address, experience]
   );
 };
 

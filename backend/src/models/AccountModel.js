@@ -97,7 +97,6 @@ const getCustomerAccounts = async (customerId, accountType) => {
   }
 };
 
-//WRITE A PROCEDURE!!!
 const createAccount = async (
   plan_id,
   branch_code,
@@ -112,10 +111,9 @@ const createAccount = async (
 
     await connection.query(
       `
-        INSERT INTO Customer_Account (plan_id, branch_code, customer_id, balance, starting_date, account_type)
-        VALUES (?, ?, ?, ?, CURRENT_DATE(), ?);
+        CALL CreateAccount(?, ?, ?, ?, ?);
       `,
-      [plan_id, branch_code, customer_id, balance, account_type]
+      [branch_code, customer_id, balance, account_type, plan_id]
     );
 
     await connection.commit();
@@ -161,7 +159,7 @@ const getSavingPlan = async (planId) => {
       `
         SELECT *
         FROM Saving_Plan
-        WHERE id = ?;
+        WHERE availability = 1 AND id = ?;
       `,
       [planId]
     );
@@ -235,31 +233,6 @@ const getBranchAccounts = async (branch_code) => {
   }
 };
 
-const getAccountTransactions = async (accountNumber) => {
-  let connection;
-  try {
-    connection = await pool.getConnection();
-    await connection.beginTransaction();
-
-    const [rows] = await connection.query(
-      `
-        CALL GetTransactions(?);
-      `,
-      [accountNumber]
-    );
-    if (rows.length === 0)
-      throw new Error("No accounts found for this customer");
-
-    await connection.commit();
-    return rows;
-  } catch (error) {
-    if (connection) await connection.rollback();
-    throw error;
-  } finally {
-    if (connection) connection.release();
-  }
-};
-
 const getTransactions = async (filters) => {
   let connection;
   try {
@@ -302,7 +275,6 @@ export default {
   getSavingPlans,
   getSavingPlan,
   getBranch,
-  getAccountTransactions,
   getBranchAccounts,
   getTransactions,
 };
