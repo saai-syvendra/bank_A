@@ -6,10 +6,10 @@ USE bank_database;
 -- SHOW TABLES;
 CREATE TABLE User_Account (
   user_id           INT AUTO_INCREMENT,
-  role         		  ENUM('customer', 'employee', 'admin') NOT NULL,
-  email             VARCHAR(50) NOT NULL,
-  address			      VARCHAR(255) NOT NULL,
-  mobile			      CHAR(10) NOT NULL,
+  role				ENUM('customer', 'employee', 'admin') NOT NULL,
+  email             VARCHAR(50) NOT NULL UNIQUE,
+  address			VARCHAR(255) NOT NULL,
+  mobile			CHAR(10) NOT NULL,
   hashed_pwd        VARCHAR(75) NOT NULL,
   PRIMARY KEY (user_id)
 )AUTO_INCREMENT = 10000;
