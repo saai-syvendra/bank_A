@@ -74,8 +74,7 @@ const loginOtp = async (req, res) => {
     await UserModel.verifyOtp(username, otp);
 
     const user = await UserModel.getUserByUsername(username);
-    const id =
-      user["role"] === "customer" ? user["customer_id"] : user["emp_id"];
+    const id = user["user_id"];
 
     const token = jwt.sign(
       {
