@@ -6,7 +6,7 @@ const getThisCustomerFds = async (req, res) => {
     const fds = await FdModel.getCustomerFds(customerId);
 
     const filteredFds = fds.map((fd) => ({
-      fd_id: fd.fd_id,
+      id: fd.id,
       starting_date: fd.starting_date,
       amount: fd.amount,
       maturity_date: fd.maturity_date,
@@ -43,11 +43,16 @@ const getFDsForThisAccount = async (req, res) => {
   const { accountId } = req.query; // Account ID passed as a parameter
   try {
     const fixedDeposits = await FdModel.getFixedDepositsByAccountId(accountId);
-    return res.json({fixedDeposits});
+    return res.json({ fixedDeposits });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: error.message });
   }
 };
 
-export default { getThisCustomerFds, getFdPlans, createFd,getFDsForThisAccount };
+export default {
+  getThisCustomerFds,
+  getFdPlans,
+  createFd,
+  getFDsForThisAccount,
+};
