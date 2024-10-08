@@ -8,10 +8,11 @@ const getAccountById = async (id) => {
 
     const [row] = await connection.query(
       `
-              SELECT * 
-              FROM Customer_Account 
-              WHERE account_id = ?;
-          `,
+        SELECT * 
+        FROM Customer_Account 
+        LEFT JOIN Saving_Account USING(account_id)
+        WHERE account_id = ?;
+      `,
       [id]
     );
     const account = row[0];
@@ -35,10 +36,11 @@ const getAccountByAccountNo = async (accountNo) => {
 
     const [row] = await connection.query(
       `
-              SELECT * 
-              FROM Customer_Account 
-              WHERE account_number = ?;
-          `,
+        SELECT * 
+        FROM Customer_Account 
+        LEFT JOIN Saving_Account USING(account_id)
+        WHERE account_number = ?;
+      `,
       [accountNo]
     );
     const account = row[0];
@@ -64,19 +66,21 @@ const getCustomerAccounts = async (customerId, accountType) => {
     if (accountType) {
       [rows] = await connection.query(
         `
-                SELECT * 
-                FROM Customer_Account 
-                WHERE customer_id = ? AND account_type = ?;
-            `,
+          SELECT * 
+          FROM Customer_Account 
+          LEFT JOIN Saving_Account USING(account_id)
+          WHERE customer_id = ? AND account_type = ?;
+        `,
         [customerId, accountType]
       );
     } else {
       [rows] = await connection.query(
         `
-                SELECT * 
-                FROM Customer_Account 
-                WHERE customer_id = ?;
-            `,
+          SELECT * 
+          FROM Customer_Account 
+          LEFT JOIN Saving_Account USING(account_id)
+          WHERE customer_id = ?;
+        `,
         [customerId]
       );
     }
@@ -93,6 +97,7 @@ const getCustomerAccounts = async (customerId, accountType) => {
   }
 };
 
+//WRITE A PROCEDURE!!!
 const createAccount = async (
   plan_id,
   branch_code,
@@ -107,9 +112,9 @@ const createAccount = async (
 
     await connection.query(
       `
-              INSERT INTO Customer_Account (plan_id, branch_code, customer_id, balance, starting_date, account_type)
-              VALUES (?, ?, ?, ?, CURRENT_DATE(), ?);
-          `,
+        INSERT INTO Customer_Account (plan_id, branch_code, customer_id, balance, starting_date, account_type)
+        VALUES (?, ?, ?, ?, CURRENT_DATE(), ?);
+      `,
       [plan_id, branch_code, customer_id, balance, account_type]
     );
 
@@ -130,10 +135,10 @@ const getSavingPlans = async () => {
 
     const [rows] = await connection.query(
       `
-              SELECT * 
-              FROM Saving_Plan
-              WHERE availability = "yes";
-          `
+        SELECT * 
+        FROM Saving_Plan
+        WHERE availability = 1;
+      `
     );
 
     await connection.commit();
@@ -154,16 +159,16 @@ const getSavingPlan = async (planId) => {
 
     const [row] = await connection.query(
       `
-                SELECT *
-                FROM Saving_Plan
-                WHERE plan_id = ?;
-            `,
+        SELECT *
+        FROM Saving_Plan
+        WHERE id = ?;
+      `,
       [planId]
     );
 
     const plan = row[0];
     if (!plan) throw new Error("Invalid planId");
-    if (plan["availability"] === "no") throw new Error("Plan unavailable");
+    if (plan["availability"] === 0) throw new Error("Plan unavailable");
 
     await connection.commit();
     return plan;
@@ -183,10 +188,10 @@ const getBranch = async (branchCode) => {
 
     const [row] = await connection.query(
       `
-                SELECT *
-                FROM Branch
-                WHERE branch_code = ?;
-            `,
+        SELECT *
+        FROM Branch
+        WHERE branch_code = ?;
+      `,
       [branchCode]
     );
 
@@ -211,10 +216,11 @@ const getBranchAccounts = async (branch_code) => {
 
     const [rows] = await connection.query(
       `
-              SELECT *
-              FROM Customer_Account 
-              WHERE branch_code = ?;
-          `,
+        SELECT *
+        FROM Customer_Account 
+        LEFT JOIN Saving_Account USING(account_id)
+        WHERE branch_code = ?;
+      `,
       [branch_code]
     );
     if (rows.length === 0) throw new Error("No accounts found for this branch");
@@ -237,8 +243,8 @@ const getAccountTransactions = async (accountNumber) => {
 
     const [rows] = await connection.query(
       `
-              CALL GetTransactions(?);
-          `,
+        CALL GetTransactions(?);
+      `,
       [accountNumber]
     );
     if (rows.length === 0)

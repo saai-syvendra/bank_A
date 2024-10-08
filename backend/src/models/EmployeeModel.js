@@ -1,13 +1,12 @@
 import { pool } from "../middleware/constants.js";
-import CustomerModel from "../models/CustomerModel.js";
 
 const getEmployeeBranch = async (employeeId) => {
   const [row] = await pool.query(
     `
-          SELECT branch_code 
-          FROM Employee 
-          WHERE emp_id = ?;
-      `,
+      SELECT branch_code 
+      FROM Employee 
+      WHERE emp_id = ?;
+    `,
     [employeeId]
   );
   const branch = row[0];
@@ -19,10 +18,10 @@ const getEmployeeBranch = async (employeeId) => {
 const getEmployee = async (id) => {
   const [row] = await pool.query(
     `
-          SELECT * 
-          FROM Employee 
-          WHERE emp_id = ?;
-      `,
+      SELECT * 
+      FROM Employee 
+      WHERE emp_id = ?;
+    `,
     [id]
   );
   const employee = row[0];
@@ -32,6 +31,7 @@ const getEmployee = async (id) => {
   return employee;
 };
 
+// MAKE A PROCEDURE!!
 const updateEmployee = async (id, data) => {
   await pool.query(
     `

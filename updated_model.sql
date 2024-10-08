@@ -217,7 +217,7 @@ BEGIN
     -- Retrieve the number of months from FD_Plan based on plan_id
     SELECT months INTO plan_months
     FROM FD_Plan
-    WHERE id = NEW.id;
+    WHERE id = NEW.plan_id;
 
     -- Calculate maturity_date
     SET NEW.maturity_date = DATE_ADD(NEW.starting_date, INTERVAL plan_months MONTH);
@@ -285,11 +285,11 @@ CREATE TABLE Loan_Installment (
  -- Check and Modify this table
 CREATE TABLE Otps (
     id 				INT AUTO_INCREMENT PRIMARY KEY,
-    user_id 		INT NOT NULL,
+    email	 		VARCHAR(50) NOT NULL,
     otp 			VARCHAR(6) NOT NULL,
     wrong_count 	INT DEFAULT 0,
     resend_count 	INT DEFAULT 0,
     expires_at 		DATETIME,
-    FOREIGN KEY (user_id) REFERENCES User_Account(user_id)
+    FOREIGN KEY (email) REFERENCES User_Account(email)
 );
 

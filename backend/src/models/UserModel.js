@@ -9,10 +9,10 @@ const getUserByUsername = async (username) => {
 
     const [row] = await connection.query(
       `
-              SELECT *
-              FROM User_Account
-              WHERE username = ?;
-          `,
+        SELECT *
+        FROM User_Account
+        WHERE email = ?;
+      `,
       [username]
     );
     const user = row[0];
@@ -56,13 +56,14 @@ const verifyOtp = async (username, otp) => {
 
     const [row] = await connection.query(
       `
-              SELECT *
-              FROM Otps
-              WHERE username = ?;
-          `,
+        SELECT *
+        FROM Otps
+        WHERE email = ?;
+      `,
       [username]
     );
     const otpDetails = row[0];
+    console.log(username, otpDetails);
     if (!otpDetails) throw new Error("OTP not found");
 
     if (otpDetails["wrong_count"] >= 3)
@@ -71,8 +72,8 @@ const verifyOtp = async (username, otp) => {
     if (otpDetails["expires_at"] < new Date()) {
       await connection.query(
         `
-                DELETE FROM Otps WHERE username = ?;    
-            `,
+          DELETE FROM Otps WHERE email = ?;    
+        `,
         [username]
       );
       throw new Error("OTP expired");
@@ -81,16 +82,16 @@ const verifyOtp = async (username, otp) => {
     if (otp != otpDetails["otp"]) {
       await connection.query(
         `
-                UPDATE Otps SET wrong_count = wrong_count + 1 WHERE username = ?    
-            `,
+          UPDATE Otps SET wrong_count = wrong_count + 1 WHERE email = ?    
+        `,
         [username]
       );
       throw new Error("OTP incorrect");
     } else {
       await connection.query(
         `
-                DELETE FROM Otps WHERE username = ?;    
-            `,
+          DELETE FROM Otps WHERE email = ?;    
+        `,
         [username]
       );
     }
@@ -112,8 +113,8 @@ const deleteUserOtps = async (username) => {
 
     await connection.query(
       `
-            DELETE FROM Otps WHERE username = ?;
-        `,
+        DELETE FROM Otps WHERE email = ?;
+      `,
       [username]
     );
 
@@ -135,8 +136,8 @@ const insertOtp = async (username, otp) => {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
     await connection.query(
       `
-            INSERT INTO Otps (username, otp, expires_at) VALUES (?, ?, ?);
-        `,
+        INSERT INTO Otps (email, otp, expires_at) VALUES (?, ?, ?);
+      `,
       [username, otp, expiresAt]
     );
 
