@@ -7,7 +7,7 @@ USE bank_database;
 CREATE TABLE User_Account (
   user_id           INT AUTO_INCREMENT,
   role         		ENUM('customer', 'employee', 'admin') NOT NULL,
-  email             VARCHAR(50) NOT NULL,
+  email             VARCHAR(50) UNIQUE NOT NULL,
   address			VARCHAR(255) NOT NULL,
   mobile			CHAR(10) NOT NULL,
   hashed_pwd        VARCHAR(75) NOT NULL,
@@ -285,11 +285,11 @@ CREATE TABLE Loan_Installment (
  -- Check and Modify this table
 CREATE TABLE Otps (
     id 				INT AUTO_INCREMENT PRIMARY KEY,
-    user_id 		INT NOT NULL,
+    email	 		VARCHAR(50) NOT NULL,
     otp 			VARCHAR(6) NOT NULL,
     wrong_count 	INT DEFAULT 0,
     resend_count 	INT DEFAULT 0,
     expires_at 		DATETIME,
-    FOREIGN KEY (user_id) REFERENCES User_Account(user_id)
+    FOREIGN KEY (email) REFERENCES User_Account(email)
 );
 

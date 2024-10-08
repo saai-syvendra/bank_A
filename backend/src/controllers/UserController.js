@@ -40,7 +40,7 @@ const login = async (req, res) => {
     const jwtSecret = process.env.JWT_SECRET;
     const user = await UserModel.verifyUser(username, password);
     await generateAndEmailOtp(username, "Login verification");
-    const token = jwt.sign({ username: user["username"] }, jwtSecret, {
+    const token = jwt.sign({ username: user["email"] }, jwtSecret, {
       expiresIn: "5m",
     });
     res.cookie("token", token, {
@@ -81,7 +81,7 @@ const loginOtp = async (req, res) => {
       {
         role: user["user_role"],
         id,
-        username: user["username"],
+        username: user["email"],
       },
       jwtSecret,
       {
