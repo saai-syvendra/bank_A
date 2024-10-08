@@ -115,6 +115,9 @@ BEGIN
 
 END$$
 
+-- ADD THE OTHER TRANSACTION PROCEDURES HERE
+-- SOME ARE USED IN THE BELOW TRANSACTIONS
+
 CREATE PROCEDURE CreateAccount(
 	IN p_branch_code	INT,
     IN p_customer_id	INT,
@@ -252,6 +255,223 @@ BEGIN
     -- Commit the transaction
     COMMIT;
     
+END $$
+
+CREATE PROCEDURE CreateFd (
+	IN p_plan_id		INT,
+    IN p_account_id		INT,
+    IN p_amount			NUMERIC(10,2)
+) 
+BEGIN
+	DECLARE v_plan_exists BOOLEAN;
+    DECLARE v_safe_to_deduct BOOLEAN;
+    DECLARE v_fd_id INT;
+    DECLARE v_error_message VARCHAR(255);
+    
+    -- Error handler to capture error message
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            v_error_message = MESSAGE_TEXT;
+
+        -- Rollback the transaction
+        ROLLBACK;
+
+        -- Signal an error with a custom message
+        SIGNAL SQLSTATE '45000' 
+		SET MESSAGE_TEXT = v_error_message;
+    END;
+
+	START TRANSACTION;
+    
+    -- Check if the transfer amount is positive
+    IF p_amount <= 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'FD amount must be greater than zero.';
+    END IF;
+
+    -- Check if the source account exists and get its details
+    IF NOT AccountExists(p_account_id) THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'FD creation failed: Account not found.';
+    END IF;
+    
+    SELECT COUNT(*) > 0 INTO v_plan_exists
+    FROM FD_Plan
+    WHERE id = p_plan_id AND availability = 1;
+    
+    IF NOT v_plan_exists THEN
+		ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'FD plan not available.';
+    END IF;
+    
+    CALL CheckSafeDeduction(p_account_id, p_amount, v_safe_to_deduct);
+    
+    IF v_safe_to_deduct = FALSE THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Insufficient funds to create FD.';
+    END IF;
+	
+    INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
+    (p_plan_id, p_account_id, CURDATE(), p_amount);
+    
+    SET v_fd_id = LAST_INSERT_ID();
+    
+    CALL DeductMoney(p_account_id, p_amount, CONCAT('Opened new FD - #', v_fd_id), 'server', @transaction_id);
+    
+    COMMIT;
+
+END$$
+
+CREATE PROCEDURE CreateLoanInstallments(
+    IN p_loan_id INT
+)
+BEGIN
+    DECLARE v_plan_id INT;
+    DECLARE v_loan_amount NUMERIC(10,2);
+    DECLARE v_months INT;
+    DECLARE v_interest DECIMAL(5, 2);
+    DECLARE v_approved_date DATE;
+    DECLARE v_installment_amount NUMERIC(10,2);
+    DECLARE v_state ENUM('online', 'pending', 'approved', 'disapproved');
+    DECLARE v_due_date DATE;
+    DECLARE v_installment_no INT DEFAULT 1;
+    DECLARE v_updated_installment INT;
+
+    -- Get loan details
+    SELECT plan_id, loan_amount, start_date 
+    INTO v_plan_id, v_loan_amount, v_approved_date
+    FROM Loan
+    WHERE id = p_loan_id;
+	
+    IF v_approved_date IS NULL THEN
+		SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = "Loan hasn\'t been approved yet.";
+	END IF;
+    
+	-- To check if installments are already updated
+	SELECT COUNT(*)
+	INTO v_updated_installment
+	FROM Loan_Installment
+	WHERE loan_id = p_loan_id;
+	
+	IF v_updated_installment > 0 THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Loan Installments are already created.';
+	END IF;
+    
+	-- Get loan type details
+	SELECT months, interest
+	INTO v_months, v_interest
+	FROM Loan_Plan
+	WHERE id = v_plan_id;
+
+	-- Calculate installment amount
+	SET v_installment_amount = ROUND((v_loan_amount + (v_loan_amount * v_interest / 100)) / v_months, 2);
+
+	-- Generate loan installments
+	WHILE v_installment_no <= v_months DO
+		SET v_due_date = DATE_ADD(v_approved_date, INTERVAL v_installment_no MONTH);
+
+		INSERT INTO Loan_Installment (loan_id, installment_no, installment_amount, due_date, state)
+		VALUES (p_loan_id, v_installment_no, v_installment_amount, v_due_date, 'pending');
+
+		SET v_installment_no = v_installment_no + 1;
+	END WHILE;
+    
+END $$
+
+CREATE PROCEDURE CreateOnlineLoan (
+    IN p_customer_id INT,
+    IN p_loan_plan_id INT,
+    IN p_fd_id INT,
+    IN p_req_loan_amount NUMERIC(10, 2),
+    IN p_connected_account INT
+)
+BEGIN
+    DECLARE v_fd_amount NUMERIC(10,2);
+    DECLARE v_max_allowed_loan NUMERIC(10, 2);
+    DECLARE v_plan_max_amount NUMERIC(10, 2);
+    DECLARE v_new_loan_id INT;
+    DECLARE v_error_msg VARCHAR(200);
+    DECLARE v_branch_code INT;
+    
+    -- Error handler to capture error message
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            v_error_msg = MESSAGE_TEXT;
+
+        -- Rollback the transaction
+        ROLLBACK;
+
+        -- Signal an error with a custom message
+        SIGNAL SQLSTATE '45000' 
+		SET MESSAGE_TEXT = v_error_msg;
+    END;
+    
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Check if the FD exists for the customer
+    SELECT amount INTO v_fd_amount
+    FROM FD LEFT JOIN Customer_Account ca USING(account_id)
+    WHERE id = p_fd_id AND ca.customer_id = p_customer_id;
+
+    IF v_fd_amount IS NULL THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'FD not found for the given customer.';
+    END IF;
+
+    -- Calculate the maximum allowable loan amount (60% of the FD amount, capped at 500,000)
+    SET v_max_allowed_loan = LEAST(v_fd_amount * 0.60, 500000);
+
+    -- Check if the requested loan amount exceeds the allowable loan limit
+    IF p_req_loan_amount > v_max_allowed_loan THEN
+        -- Rollback the transaction if requested loan exceeds limits
+        SET v_error_msg = CONCAT('Requested loan amount exceeds the allowable loan limit of ', v_max_allowed_loan ,' based on FD.');
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = v_error_msg;
+    END IF;
+
+    -- Check if the requested loan amount is less than the maximum allowed amount in the loan plan
+    SELECT max_amount INTO v_plan_max_amount
+    FROM Loan_Plan
+    WHERE id = p_loan_plan_id;
+
+    IF p_req_loan_amount > v_plan_max_amount THEN
+        -- Rollback the transaction if loan amount exceeds plan limit
+        SET v_error_msg = CONCAT('Requested loan amount exceeds the maximum allowed amount of ', v_plan_max_amount ,' in the plan.');
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = v_error_msg;
+    END IF;
+    
+    -- Get branch code
+    SELECT branch_code INTO v_branch_code
+    FROM Customer_Account
+    WHERE account_id = p_connected_account;
+    
+    -- If all checks pass, insert the loan application
+    INSERT INTO Loan (plan_id, connected_account, loan_type, loan_amount, start_date)
+    VALUES (p_loan_plan_id, p_connected_account, 'online', p_req_loan_amount, CURDATE());
+    
+    SET v_new_loan_id = LAST_INSERT_ID();
+    
+    INSERT INTO Online_Loan (loan_id, fd_id) VALUE (v_new_loan_id, p_fd_id);
+    
+    CALL DepositMoney (p_connected_account, p_req_loan_amount, CONCAT('Loan Deposit for Loan: #', v_new_loan_id), 'server', @transaction_id);
+    
+    CALL CreateLoanInstallments(v_new_loan_id);
+    
+    COMMIT;
+
 END $$
 
 CREATE PROCEDURE UpdateCustomer(
