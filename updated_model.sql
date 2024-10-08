@@ -217,7 +217,7 @@ BEGIN
     -- Retrieve the number of months from FD_Plan based on plan_id
     SELECT months INTO plan_months
     FROM FD_Plan
-    WHERE id = NEW.id;
+    WHERE id = NEW.plan_id;
 
     -- Calculate maturity_date
     SET NEW.maturity_date = DATE_ADD(NEW.starting_date, INTERVAL plan_months MONTH);

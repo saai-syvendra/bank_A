@@ -54,7 +54,7 @@ INSERT INTO Customer_Account (branch_code, customer_id, balance, starting_date, 
 
 INSERT INTO Saving_Account (account_id, plan_id) VALUES
 (1, 3),
-(2, 2);
+(3, 2);
 
 INSERT INTO Account_Transaction (account_id, amount, trans_timestamp, reason, trans_type, trans_method) VALUES
 (1, 1000.00, CURRENT_TIMESTAMP, 'Saving Interest', 'credit', 'server'),
@@ -70,7 +70,7 @@ INSERT INTO Online_Transfer (transaction_id, to_account_id) VALUES
 
 INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
 (1, 1, '2024-05-01', 10000),
-(2, 2, '2024-06-01', 25000);
+(2, 3, '2024-06-01', 25000);
 
 INSERT INTO Loan (plan_id, connected_account, loan_type, loan_amount, start_date) VALUES
 (1, 1, 'branch', 75000.00, '2023-08-17'),
