@@ -6,10 +6,10 @@ USE bank_database;
 -- SHOW TABLES;
 CREATE TABLE User_Account (
   user_id           INT AUTO_INCREMENT,
-  role				ENUM('customer', 'employee', 'admin', 'manager') NOT NULL,
+  role				      ENUM('customer', 'employee', 'admin', 'manager') NOT NULL,
   email             VARCHAR(50) NOT NULL UNIQUE,
-  address			VARCHAR(255) NOT NULL,
-  mobile			CHAR(10) NOT NULL,
+  address			      VARCHAR(255) NOT NULL,
+  mobile			      CHAR(10) NOT NULL,
   hashed_pwd        VARCHAR(75) NOT NULL,
   PRIMARY KEY (user_id)
 )AUTO_INCREMENT = 10000;
@@ -87,7 +87,7 @@ CREATE TABLE Log (
 );
 
 CREATE TABLE Customer_Account (
-  account_id        INT AUTO_INCREMENT,
+  account_id        INT,
   account_number    CHAR(12) UNIQUE,
   branch_code       INT NOT NULL,
   customer_id       INT NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE Customer_Account (
   PRIMARY KEY (account_id),
   FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
   FOREIGN KEY (branch_code) REFERENCES Branch(branch_code)
-)AUTO_INCREMENT = 1;
+);
 
 DELIMITER //
 CREATE TRIGGER AccountNumberCreation
