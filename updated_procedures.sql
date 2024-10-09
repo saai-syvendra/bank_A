@@ -1,4 +1,6 @@
 
+-- SHOW PROCEDURE STATUS  WHERE Db = 'bank_database';
+
 DELIMITER $$
 
 CREATE PROCEDURE CheckSafeDeduction(
@@ -74,7 +76,7 @@ BEGIN
     IF NOT AccountExists(p_account_id) THEN
         ROLLBACK;
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Transaction failed: Source account not found.';
+        SET MESSAGE_TEXT = 'Transaction failed: Source account not found or not active';
     END IF;
 
     -- Use the CheckSafeWithdrawal procedure to verify if withdrawal is safe
@@ -112,11 +114,192 @@ BEGIN
     -- Commit the transaction
     COMMIT;
 
+END$$
+
+-- DROP PROCEDURE WithdrawMoney;
+
+CREATE PROCEDURE WithdrawMoney(
+    IN p_account_id INT,
+    IN p_withdraw_amount NUMERIC(12,2),
+    OUT p_transaction_id INT
+)
+BEGIN
+    DECLARE account_num CHAR(12);
+    DECLARE v_withdrawal_count INT;
+    DECLARE v_account_type ENUM('saving','checking');
+    DECLARE error_message VARCHAR(255);
+
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Check if the source account exists
+    IF NOT AccountExists(p_account_id) THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Transaction failed: Account does not exist or not active';
+    END IF;
+
+    -- Fetch account details: account number, type, and withdrawal count (if it's a saving account)
+    SELECT CA.account_number, CA.account_type, IFNULL(SA.withdrawal_count, 0)
+    INTO account_num, v_account_type, v_withdrawal_count
+    FROM Customer_Account CA
+    LEFT JOIN Saving_Account SA ON CA.account_id = SA.account_id
+    WHERE CA.account_id = p_account_id
+    FOR UPDATE;  -- Lock the account for update
+
+
+    -- Check for withdrawal limit on savings accounts (5 withdrawals per month in this example)
+    IF v_account_type = 'saving' AND v_withdrawal_count >= 5 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Withdrawal limit exceeded for savings account (5 withdrawals per month).';
+    ELSEIF v_account_type = 'saving' THEN
+        -- Increment withdrawal count for savings accounts
+        UPDATE Saving_Account
+        SET withdrawal_count = withdrawal_count + 1
+        WHERE account_id = p_account_id;
+    END IF;
+
+    -- Call the DeductMoney procedure to deduct the amount from the account
+    CALL DeductMoney(p_account_id, p_withdraw_amount, CONCAT('ATM Withdrawal at ', CURRENT_TIMESTAMP, ' from account ', account_num), 'atm-cdm', p_transaction_id);
+
+    -- Check if DeductMoney succeeded
+    IF p_transaction_id IS NULL THEN
+        -- DeductMoney failed, set error message
+        SET error_message = CONCAT('Withdrawal from account number ', account_num, ' failed.');
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = error_message;
+    ELSE
+        -- DeductMoney succeeded, commit the transaction
+        COMMIT;
+    END IF;
 
 END$$
 
--- ADD THE OTHER TRANSACTION PROCEDURES HERE
--- SOME ARE USED IN THE BELOW TRANSACTIONS
+-- DROP PROCEDURE IF EXISTS DepositMoney;
+
+CREATE PROCEDURE DepositMoney (
+    IN p_account_id INT,
+    IN p_amount NUMERIC(10,2),
+    IN p_reason VARCHAR(500),
+    IN p_method ENUM('atm-cdm','online-transfer','server','via_employee'),
+    OUT p_transaction_id INT
+)
+BEGIN
+    DECLARE v_current_balance NUMERIC(12,2);
+
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Check if the destination account exists
+    IF NOT AccountExists(p_account_id) THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Transaction failed: Destination account not found or is inactive';
+    END IF;
+
+    -- Get the current balance
+    SELECT balance INTO v_current_balance
+    FROM Customer_Account
+    WHERE account_id = p_account_id
+    FOR UPDATE;
+
+    -- Check if the deposit amount is valid
+    IF p_amount <= 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Deposit amount must be greater than zero.';
+    END IF;
+
+    -- Update the account balance
+    UPDATE Customer_Account
+    SET balance = balance + p_amount
+    WHERE account_id = p_account_id;
+
+    -- Insert the transaction into the Account_Transaction table
+    INSERT INTO Account_Transaction (account_id, amount, trans_timestamp, reason, trans_type, trans_method)
+    VALUES (p_account_id, p_amount, CURRENT_TIMESTAMP, p_reason, 'credit', p_method);
+
+    -- Commit the transaction
+    COMMIT;
+
+    -- Capture the last inserted transaction_id
+    SET p_transaction_id = LAST_INSERT_ID();
+
+END $$
+
+CREATE PROCEDURE TransferMoney (
+    IN p_from_account_id INT,
+    IN p_to_account_id INT,
+    IN p_transfer_amount NUMERIC(10,2),
+    IN p_reason VARCHAR(500),
+    OUT p_transaction_id INT
+)
+BEGIN
+    DECLARE v_from_balance NUMERIC(12,2);
+    DECLARE v_safe_to_deduct BOOLEAN;
+
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Check if the transfer amount is positive
+    IF p_transfer_amount <= 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Transfer amount must be greater than zero.';
+    END IF;
+
+    -- Check if the source account exists and is active
+    IF NOT AccountExists(p_from_account_id) THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Transfer failed: Source account not found or inactive.';
+    END IF;
+
+    -- Check if the destination account exists and is active
+    IF NOT AccountExists(p_to_account_id) THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Transfer failed: Destination account not found or inactive.';
+    END IF;
+
+    -- Fetch the balance of the source account
+    SELECT balance
+    INTO v_from_balance
+    FROM Customer_Account
+    WHERE account_id = p_from_account_id
+    FOR UPDATE;
+
+    -- Check if the source account is safe to deduct the amount
+    CALL CheckSafeDeduction(p_from_account_id, p_transfer_amount, v_safe_to_deduct);
+
+    IF v_safe_to_deduct = FALSE THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Transfer failed: Insufficient funds or not safe to withdraw from the source account.';
+    END IF;
+
+    -- Deduct amount from the source account
+    UPDATE Customer_Account
+    SET balance = v_from_balance - p_transfer_amount
+    WHERE account_id = p_from_account_id;
+
+    -- Insert the transaction into the Account_Transaction table (only for the from account)
+    INSERT INTO Account_Transaction (account_id, amount, trans_timestamp, reason, trans_type, trans_method)
+    VALUES (p_from_account_id, p_transfer_amount, CURRENT_TIMESTAMP,
+            CONCAT('Transfer to account ', p_to_account_id, ': ', p_reason, ' from account ', p_from_account_id), 'debit', 'online-transfer');
+
+    -- Capture the last inserted transaction_id
+    SET p_transaction_id = LAST_INSERT_ID();
+
+    -- Insert into the Online_Transfer table for the to_account details
+    INSERT INTO Online_Transfer (transaction_id, to_account_id)
+    VALUES (p_transaction_id, p_to_account_id);
+
+    -- Commit the transaction if everything is successful
+    COMMIT;
+END$$
 
 CREATE PROCEDURE CreateAccount(
 	IN p_branch_code	INT,
