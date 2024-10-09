@@ -1,4 +1,4 @@
-DROP DATABASE bank_database;
+DROP DATABASE IF EXISTS bank_database;
 
 CREATE DATABASE bank_database;
 USE bank_database;
@@ -6,10 +6,10 @@ USE bank_database;
 -- SHOW TABLES;
 CREATE TABLE User_Account (
   user_id           INT AUTO_INCREMENT,
-  role				ENUM('customer', 'employee', 'admin', 'manager') NOT NULL,
+  role				      ENUM('customer', 'employee', 'admin', 'manager') NOT NULL,
   email             VARCHAR(50) NOT NULL UNIQUE,
-  address			VARCHAR(255) NOT NULL,
-  mobile			CHAR(10) NOT NULL,
+  address			      VARCHAR(255) NOT NULL,
+  mobile			      CHAR(10) NOT NULL,
   hashed_pwd        VARCHAR(75) NOT NULL,
   PRIMARY KEY (user_id)
 )AUTO_INCREMENT = 10000;
@@ -173,10 +173,10 @@ CREATE TABLE Saving_Account (
 );
 
 CREATE TABLE Daily_Account_Balance (
-  account_id  INT,
-  date        DATE NOT NULL,
-  balance     NUMERIC(10,2) NOT NULL,
-  PRIMARY KEY (account_id, date),
+  account_id          INT,
+  c_date              DATE NOT NULL,
+  balance             NUMERIC(10,2) NOT NULL,
+  PRIMARY KEY (account_id, c_date),
   FOREIGN KEY (account_id) REFERENCES Saving_Account(account_id)
 );
 
