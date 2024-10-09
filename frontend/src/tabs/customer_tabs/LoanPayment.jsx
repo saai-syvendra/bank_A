@@ -95,12 +95,12 @@ const LoanPayment = () => {
   const submitPayment = async () => {
     try {
       await callPayInstallment(
-        selectedInstallment.loan_id,
+        selectedInstallment.id,
         selectedInstallment.installment_no,
         selectedAccount
       );
       toast.success(
-        `Payment processed for Installment ${selectedInstallment.installment_no}/${selectedInstallment.months} of loan ${selectedInstallment.loan_id}`
+        `Payment processed for Installment ${selectedInstallment.installment_no}/${selectedInstallment.months} of loan ${selectedInstallment.id}`
       );
     } catch (error) {
       toast.error(error.message || "Failed to process payment");
@@ -133,7 +133,7 @@ const LoanPayment = () => {
             <TableBody>
               {upcomingInstallments.map((loan) => (
                 <TableRow>
-                  <TableCell>{loan.loan_id}</TableCell>
+                  <TableCell>{loan.id}</TableCell>
                   <TableCell>
                     {loan.installment_no}/{loan.months}
                   </TableCell>
@@ -161,7 +161,7 @@ const LoanPayment = () => {
             <DialogDescription>
               Are you sure you want to make a payment of Rs. {paymentAmount} for
               installment {selectedInstallment?.installment_no} of{" "}
-              {selectedInstallment?.loan_id}?
+              {selectedInstallment?.id}?
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
