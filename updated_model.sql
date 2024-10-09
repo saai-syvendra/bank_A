@@ -1,4 +1,4 @@
-DROP DATABASE bank_database;
+DROP DATABASE IF EXISTS bank_database;
 
 CREATE DATABASE bank_database;
 USE bank_database;
@@ -87,7 +87,7 @@ CREATE TABLE Log (
 );
 
 CREATE TABLE Customer_Account (
-  account_id        INT,
+  account_id        INT AUTO_INCREMENT,
   account_number    CHAR(12) UNIQUE,
   branch_code       INT NOT NULL,
   customer_id       INT NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE Customer_Account (
   PRIMARY KEY (account_id),
   FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
   FOREIGN KEY (branch_code) REFERENCES Branch(branch_code)
-);
+)AUTO_INCREMENT = 1;
 
 DELIMITER //
 CREATE TRIGGER AccountNumberCreation
@@ -173,10 +173,10 @@ CREATE TABLE Saving_Account (
 );
 
 CREATE TABLE Daily_Account_Balance (
-  account_id  INT,
-  date        DATE NOT NULL,
-  balance     NUMERIC(10,2) NOT NULL,
-  PRIMARY KEY (account_id, date),
+  account_id          INT,
+  c_date              DATE NOT NULL,
+  balance             NUMERIC(10,2) NOT NULL,
+  PRIMARY KEY (account_id, c_date),
   FOREIGN KEY (account_id) REFERENCES Saving_Account(account_id)
 );
 
