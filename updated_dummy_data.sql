@@ -82,6 +82,7 @@ INSERT INTO Branch_Loan (loan_id, request_date, state, reason) VALUES
 INSERT INTO Online_Loan (loan_id, fd_id) VALUES
 (2, 2);
 
+CALL CreateBranchLoan(10004,2,70500,2,"Home renovations");
 CALL CreateOnlineLoan(10005,1,2,9500,3);
 CALL CreateLoanInstallments(2);
 -- INSERT INTO Loan_Installment (loan_id, installment_no, installment_amount, due_date, state, paid_date) VALUES

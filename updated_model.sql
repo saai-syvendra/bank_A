@@ -255,7 +255,7 @@ CREATE TABLE Loan (
 CREATE TABLE Branch_Loan (
     loan_id      INT,
     request_date DATE NOT NULL,
-    state        ENUM ('pending','approved','disapproved'),
+    state        ENUM ('pending','approved','disapproved') DEFAULT 'pending',
     reason       VARCHAR(100),
     PRIMARY KEY (loan_id),
     FOREIGN KEY (loan_id) REFERENCES Loan (id)
