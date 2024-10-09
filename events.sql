@@ -14,51 +14,50 @@ STARTS '2024-09-28 23:59:59'
 DO
 BEGIN
     -- Insert account balances for all 'saving' accounts into Daily_Account_Balance table
-    INSERT INTO Daily_Account_Balance (customer_id, account_id, account_number, balance_date, account_balance)
+    INSERT INTO Daily_Account_Balance (account_id,balance,c_date)
     SELECT
-        ca.customer_id,
         ca.account_id,
-        ca.account_number,
-        CURDATE() AS balance_date,
-        ca.balance
+        ca.balance,
+        CURDATE() AS balance_date
     FROM
         Customer_Account ca
     WHERE
         ca.account_type = 'saving';
 END $$
 
+-- DROP EVENT CalculateMonthlyInterest;
 
--- Create the event to calculate monthly interest
 CREATE EVENT CalculateMonthlyInterest
 ON SCHEDULE EVERY 1 MONTH
-STARTS '2024-09-30 23:59:59'
+STARTS '2024-01-01 00:00:00'
 DO
 BEGIN
     DECLARE avg_balance DECIMAL(12,2);
     DECLARE interest_amount DECIMAL(12,2);
     DECLARE interest_rate DECIMAL(5,2);
-    DECLARE customer_id INT;
     DECLARE account_id INT;
-    -- DECLARE account_number CHAR(12);
     DECLARE done BOOLEAN DEFAULT FALSE;
 
-    -- Cursor to iterate over each saving account
+    -- Cursor to iterate over each saving account's balance for the current month
     DECLARE account_cursor CURSOR FOR
     SELECT
-        dab.customer_id AS customer_id,
-        dab.account_id AS account_id,
-        AVG(dab.account_balance) AS avg_balance,
+        dab.account_id AS account_Id,
+        AVG(dab.balance) AS avg_balance,
         sp.interest AS interest_rate
     FROM
         Daily_Account_Balance dab
     JOIN
         Customer_Account ca ON dab.account_id = ca.account_id
     JOIN
-        Saving_Plan sp ON ca.plan_id = sp.plan_id
+        Saving_Account sa ON ca.account_id = sa.account_id
+    JOIN
+        Saving_Plan sp ON sa.plan_id = sp.id
     WHERE
         ca.account_type = 'saving'
+        AND MONTH(dab.c_date) = MONTH(CURRENT_DATE)
+        AND YEAR(dab.c_date) = YEAR(CURRENT_DATE)
     GROUP BY
-        dab.customer_id, dab.account_id, dab.account_number;
+        dab.account_id;
 
     -- Handler for cursor end
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -68,7 +67,7 @@ BEGIN
 
     -- Loop through each account
     account_loop: LOOP
-        FETCH account_cursor INTO customer_id, account_id, avg_balance, interest_rate;
+        FETCH account_cursor INTO account_id, avg_balance, interest_rate;
         IF done THEN
             LEAVE account_loop;
         END IF;
@@ -79,16 +78,16 @@ BEGIN
         -- Start transaction
         START TRANSACTION;
 
-        -- Update the account balance
-        UPDATE Customer_Account ca
+        -- Update the account balance in Customer_Account
+        UPDATE Customer_Account
         SET balance = balance + interest_amount
-        WHERE ca.account_id = account_id;
+        WHERE Customer_Account.account_id = account_Id;
 
         -- Check if the update was successful
         IF ROW_COUNT() > 0 THEN
-            -- Insert the interest calculation into Account_Transaction table
+            -- Insert the interest calculation into the Account_Transaction table
             INSERT INTO Account_Transaction (
-                accnt,
+                account_id,
                 amount,
                 trans_timestamp,
                 reason,
@@ -117,8 +116,9 @@ END $$
 
 DELIMITER ;
 
-
-
+-- SELECT * FROM daily_account_balance;
+-- SELECT * FROM customer_account JOIN saving_account ON customer_account.account_id = saving_account.account_id;
+-- SELECT * FROM account_transaction ORDER BY trans_timestamp DESC;
 -- -- Event to calculate interest for savings accounts at the start of each month.(old)
 -- CREATE EVENT CalculateInterest
 -- ON SCHEDULE EVERY 1 MONTH

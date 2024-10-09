@@ -1,3 +1,4 @@
+
 -- DROP FUNCTION IF EXISTS AccountExists;
 
 DELIMITER $$
