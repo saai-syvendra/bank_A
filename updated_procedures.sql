@@ -657,6 +657,219 @@ BEGIN
 
 END $$
 
+CREATE PROCEDURE CreateBranchLoan (
+    IN p_customer_id INT,
+    IN p_loan_plan_id INT,
+    IN p_req_loan_amount NUMERIC(10, 2),
+    IN p_connected_account INT,
+    IN p_reason	 VARCHAR(100)
+)
+BEGIN
+    DECLARE v_plan_max_amount NUMERIC(10, 2);
+    DECLARE v_new_loan_id INT;
+    DECLARE v_error_msg VARCHAR(200);
+    DECLARE v_branch_code INT;
+    
+    -- Error handler to capture error message
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            v_error_msg = MESSAGE_TEXT;
+
+        -- Rollback the transaction
+        ROLLBACK;
+
+        -- Signal an error with a custom message
+        SIGNAL SQLSTATE '45000' 
+		SET MESSAGE_TEXT = v_error_msg;
+    END;
+    
+    -- Start a transaction
+    START TRANSACTION;
+
+    -- Check if the requested loan amount is less than the maximum allowed amount in the loan plan
+    SELECT max_amount INTO v_plan_max_amount
+    FROM Loan_Plan
+    WHERE id = p_loan_plan_id;
+
+    IF p_req_loan_amount > v_plan_max_amount THEN
+        -- Rollback the transaction if loan amount exceeds plan limit
+        SET v_error_msg = CONCAT('Requested loan amount exceeds the maximum allowed amount of ', v_plan_max_amount ,' in the plan.');
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = v_error_msg;
+    END IF;
+    
+    -- Get branch code
+    SELECT branch_code INTO v_branch_code
+    FROM Customer_Account
+    WHERE account_id = p_connected_account;
+    
+    -- If all checks pass, insert the loan application
+    INSERT INTO Loan (plan_id, connected_account, loan_type, loan_amount, start_date)
+    VALUES (p_loan_plan_id, p_connected_account, 'branch', p_req_loan_amount, CURDATE());
+    
+    SET v_new_loan_id = LAST_INSERT_ID();
+    
+    INSERT INTO Branch_Loan (loan_id, request_date, reason) 
+    VALUE (v_new_loan_id, CURDATE(), p_reason);
+    
+    COMMIT;
+
+END $$
+
+CREATE PROCEDURE ApproveLoan (
+	IN p_loan_id INT
+)
+BEGIN
+	DECLARE v_loan_exists BOOLEAN;
+    DECLARE v_connected_account INT;
+    DECLARE v_loan_amount NUMERIC(10,2);
+    DECLARE v_error_message VARCHAR(255);
+    
+    -- Error handler to capture error message
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            v_error_message = MESSAGE_TEXT;
+
+        -- Rollback the transaction
+        ROLLBACK;
+
+        -- Signal an error with a custom message
+        SIGNAL SQLSTATE '45000' 
+		SET MESSAGE_TEXT = v_error_message;
+    END;
+    
+    START TRANSACTION;
+    
+    SELECT COUNT(*) > 0 INTO v_loan_exists
+    FROM Branch_Loan
+    WHERE loan_id = p_loan_id AND NOT state = 'approved';
+    
+    IF NOT v_loan_exists THEN
+		ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Loan does not exist/already approved';
+    END IF;
+    
+    SELECT connected_account, loan_amount
+    INTO v_connected_account, v_loan_amount
+    FROM Loan
+    WHERE id = p_loan_id;
+    
+    UPDATE Branch_Loan
+	SET state = "approved"
+	WHERE loan_id = p_loan_id;
+    
+    UPDATE Loan
+    SET start_date = CURDATE()
+    WHERE id = p_loan_id;
+    
+    CALL DepositMoney (v_connected_account, v_loan_amount, CONCAT('Loan Deposit for Loan: #', p_loan_id), 'server', @transaction_id);
+    
+    CALL CreateLoanInstallments(p_loan_id);
+    
+    COMMIT;
+    
+END$$
+
+CREATE PROCEDURE PayInstallment(
+	IN p_loan_id			INT,
+	IN p_installment_no 	INT,
+    IN p_payment_accnt_id	INT
+) BEGIN
+	DECLARE transaction_id INT;
+    DECLARE v_state          		ENUM('pending','paid','late');
+    DECLARE v_installment_amount 	NUMERIC(10,2);
+    DECLARE v_due_date				DATE;
+    DECLARE v_months				INT;
+    DECLARE v_error_message VARCHAR(255);
+    
+    -- Error handler to capture error message
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            v_error_message = MESSAGE_TEXT;
+
+        -- Rollback the transaction
+        ROLLBACK;
+
+        -- Signal an error with a custom message
+        SIGNAL SQLSTATE '45000' 
+		SET MESSAGE_TEXT = v_error_message;
+    END;
+    
+    START TRANSACTION;
+    
+    SELECT installment_amount, due_date, state
+    INTO v_installment_amount, v_due_date, v_state
+    FROM Loan_Installment
+    WHERE loan_id = p_loan_id AND installment_no=p_installment_no;
+    
+    IF NOT v_state = 'pending' THEN
+		ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Loan Installment has already been paid';
+    END IF;
+    
+    SELECT months INTO v_months
+    FROM Loan l
+    LEFT JOIN Loan_Plan lp ON l.plan_id = lp.id
+    WHERE l.id = p_loan_id;
+    
+    CALL DeductMoney(p_payment_accnt_id, v_installment_amount, CONCAT('Payment for Loan #', p_loan_id, ' - Installment ', p_installment_no , '/', v_months), 'server', transaction_id);
+    
+    IF v_due_date < CURDATE() THEN
+		SET v_state = 'late';
+	ELSE
+		SET v_state = 'paid';
+	END IF;
+    
+    UPDATE Loan_Installment
+    SET state = v_state, paid_date=CURDATE()
+    WHERE loan_id=p_loan_id AND installment_no=p_installment_no;
+    
+    COMMIT;
+
+END$$
+
+CREATE PROCEDURE GetLateLoanInstallments(
+    IN p_branch_code INT,
+    IN p_min_amount NUMERIC(10,2),  
+    IN p_max_amount NUMERIC(10,2),
+    IN p_customer_id INT,
+    IN p_start_date DATE,
+    IN p_end_date DATE
+)
+BEGIN
+    -- Query to select late loan installments based on the filters
+    SELECT 
+        li.loan_id,
+        li.installment_no,
+        li.installment_amount,
+        li.due_date,
+        li.paid_date,
+        ca.customer_id,
+        lp.months
+    FROM 
+        Loan_Installment li
+    LEFT JOIN 
+        Loan l ON li.loan_id = l.id
+	LEFT JOIN
+		Loan_Plan lp ON l.plan_id=lp.id
+	LEFT JOIN
+		Customer_Account ca ON l.connected_account=ca.account_id
+    WHERE 
+        li.state = 'late'
+        AND ca.branch_code = p_branch_code
+        AND (p_min_amount IS NULL OR li.installment_amount >= p_min_amount)
+        AND (p_max_amount IS NULL OR li.installment_amount <= p_max_amount)
+        AND (p_customer_id IS NULL OR ca.customer_id = p_customer_id)
+        AND (p_start_date IS NULL OR li.due_date >= p_start_date)
+        AND (p_end_date IS NULL OR li.due_date <= p_end_date);
+END$$
+
 CREATE PROCEDURE UpdateCustomer(
     IN p_user_id INT,
     IN p_address VARCHAR(255),
@@ -883,7 +1096,6 @@ BEGIN
     
 END $$
 
--- Procedure to reset the withdrawal count to 0
 CREATE PROCEDURE ResetWithdrawalCount()
 BEGIN
   -- Reset withdrawal count to 0 for all accounts
