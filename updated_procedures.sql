@@ -161,7 +161,7 @@ BEGIN
     END IF;
 
     -- Call the DeductMoney procedure to deduct the amount from the account
-    CALL DeductMoney(p_account_id, p_withdraw_amount, CONCAT('ATM Withdrawal at ', CURRENT_TIMESTAMP, ' from account ', account_num), 'atm-cdm', p_transaction_id);
+    CALL DeductMoney(p_account_id, p_withdraw_amount, CONCAT('ATM Withdrawal'), 'atm-cdm', p_transaction_id);
 
     -- Check if DeductMoney succeeded
     IF p_transaction_id IS NULL THEN
