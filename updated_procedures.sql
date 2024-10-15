@@ -161,7 +161,7 @@ BEGIN
     END IF;
 
     -- Call the DeductMoney procedure to deduct the amount from the account
-    CALL DeductMoney(p_account_id, p_withdraw_amount, CONCAT('ATM Withdrawal at ', CURRENT_TIMESTAMP, ' from account ', account_num), 'atm-cdm', p_transaction_id);
+    CALL DeductMoney(p_account_id, p_withdraw_amount, CONCAT('ATM Withdrawal'), 'atm-cdm', p_transaction_id);
 
     -- Check if DeductMoney succeeded
     IF p_transaction_id IS NULL THEN
@@ -779,7 +779,8 @@ CREATE PROCEDURE PayInstallment(
 	IN p_installment_no 	INT,
     IN p_payment_accnt_id	INT
 ) BEGIN
-	DECLARE transaction_id INT;
+	DECLARE v_installment_exist		BOOLEAN;
+	DECLARE transaction_id 			INT;
     DECLARE v_state          		ENUM('pending','paid','late');
     DECLARE v_installment_amount 	NUMERIC(10,2);
     DECLARE v_due_date				DATE;
@@ -801,6 +802,16 @@ CREATE PROCEDURE PayInstallment(
     END;
     
     START TRANSACTION;
+    
+    SELECT COUNT(*) > 0 INTO v_installment_exist
+    FROM Loan_Installment
+    WHERE loan_id = p_loan_id;
+    
+    IF NOT v_installment_exist THEN
+		ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Loan Installment not found';
+    END IF;
     
     SELECT installment_amount, due_date, state
     INTO v_installment_amount, v_due_date, v_state

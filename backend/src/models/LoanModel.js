@@ -25,7 +25,7 @@ const createOnlineLoan = async (
 ) => {
   await pool.query(
     `
-      CALL CreateOnlineLoan(?, ?, ?, ?, ?, ?);
+      CALL CreateOnlineLoan(?, ?, ?, ?, ?);
     `,
     [customer_id, plan_id, fd_id, loan_amount, connected_account]
   );
