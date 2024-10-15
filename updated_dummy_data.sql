@@ -58,12 +58,12 @@ INSERT INTO Saving_Account (account_id, plan_id) VALUES
 
 INSERT INTO Account_Transaction (account_id, amount, trans_timestamp, reason, trans_type, trans_method) VALUES
 (1, 1000.00, CURRENT_TIMESTAMP, 'Saving Interest', 'credit', 'server'),
-(1, 200.00, CURRENT_TIMESTAMP, 'ATM withdrawal', 'debit', 'atm-cdm'),
-(1, 200.00, CURRENT_TIMESTAMP, 'CDM deposit', 'credit', 'atm-cdm'),
-(2, 500.00, CURRENT_TIMESTAMP, 'Deposit from client', 'credit', 'via_employee'),
-(3, 1500.00, CURRENT_TIMESTAMP, 'Payment for invoice', 'credit', 'online-transfer'),
-(4, 100.00, CURRENT_TIMESTAMP, 'Cash deposit', 'credit', 'via_employee'),
-(5, 250.00, CURRENT_TIMESTAMP, 'Loan disbursement', 'credit', 'server');
+(1, 200.00, CURRENT_TIMESTAMP+2, 'ATM withdrawal', 'debit', 'atm-cdm'),
+(1, 200.00, CURRENT_TIMESTAMP+7, 'CDM deposit', 'credit', 'atm-cdm'),
+(2, 500.00, CURRENT_TIMESTAMP+9, 'Deposit from client', 'credit', 'via_employee'),
+(3, 1500.00, CURRENT_TIMESTAMP+10, 'Payment for invoice', 'credit', 'online-transfer'),
+(4, 100.00, CURRENT_TIMESTAMP+15, 'Cash deposit', 'credit', 'via_employee'),
+(5, 250.00, CURRENT_TIMESTAMP+19, 'Loan disbursement', 'credit', 'server');
 
 INSERT INTO Online_Transfer (transaction_id, to_account_id) VALUES
 (5, 5); -- Online transfer from account_id 3 to account_id 5
@@ -82,20 +82,20 @@ INSERT INTO Branch_Loan (loan_id, request_date, state, reason) VALUES
 INSERT INTO Online_Loan (loan_id, fd_id) VALUES
 (2, 2);
 
+CALL CreateLoanInstallments(2);
+
 CALL CreateBranchLoan(10004,2,70500,2,"Home renovations");
 CALL CreateOnlineLoan(10005,1,2,9500,3);
-CALL CreateLoanInstallments(2);
--- INSERT INTO Loan_Installment (loan_id, installment_no, installment_amount, due_date, state, paid_date) VALUES
--- (1, 1, 12500.00, '2023-09-17', 'paid', '2023-09-15'),
--- (1, 2, 12500.00, '2023-10-17', 'paid', '2023-10-17'),
--- (1, 3, 12500.00, '2023-11-17', 'paid', '2023-11-17'),
--- (1, 4, 12500.00, '2023-12-17', 'late', '2023-12-17'),
--- (1, 5, 12500.00, '2024-01-17', 'paid', '2024-01-17'),
--- (1, 6, 12500.00, '2024-02-17', 'paid', '2024-02-17'),
--- (2, 1, 197.92, '2023-10-02', 'paid', '2023-10-02'),
--- (2, 2, 197.92, '2023-11-02', 'late', '2023-11-12'),
--- (2, 3, 197.92, '2023-12-02', 'late', '2023-12-08'),
--- (2, 4, 197.92, '2024-01-02', 'paid', '2024-01-01'),
--- (2, 5, 197.92, '2024-02-02', 'paid', '2024-01-30'),
--- (2, 6, 197.92, '2024-03-02', 'late', '2024-03-12');
+CALL ApproveLoan(3);
+CALL PayInstallment(2, 1, 1);
+CALL PayInstallment(2, 2, 3);
 
+CALL CreateCustomer('mary.poppins@abc.def', '123, Rand Street, That Place', 0718945625, 'individual', 198845678945, 'Mary', 'Poppins', '1992-05-17', null, null);
+
+CALL CreateAccount(1, 10008, 125250,'saving', 3);
+
+CALL CreateFd(2, 6, 35000);
+
+CALL TransferMoney (6, 1, 1254, 'Books money', @id);
+
+CALL WithdrawMoney(6, 7500, @id);
