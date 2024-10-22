@@ -1,10 +1,10 @@
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import AccountModel from "../models/AccountModel.js";
 import CustomerModel from "../models/CustomerModel.js";
 import TransactionModel from "../models/TransactionModel.js";
 
 const getCDMinformation = async (req, res) => {
-  const jwtSecret = process.env.JWT_SECRET;
+  // const jwtSecret = process.env.JWT_SECRET;
   const { accountNo } = req.query;
   try {
     const account = await AccountModel.getAccountByAccountNo(accountNo);
@@ -21,19 +21,19 @@ const getCDMinformation = async (req, res) => {
       name: customerName,
     };
 
-    const token = jwt.sign(
-      {
-        role: "machine",
-      },
-      jwtSecret,
-      {
-        expiresIn: "10m",
-      }
-    );
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 10 * 60 * 1000, // 10 minutes
-    });
+    // const token = jwt.sign(
+    //   {
+    //     role: "machine",
+    //   },
+    //   jwtSecret,
+    //   {
+    //     expiresIn: "10m",
+    //   }
+    // );
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   maxAge: 10 * 60 * 1000, // 10 minutes
+    // });
     return res.json(atmInfo);
   } catch (error) {
     console.log(error);
