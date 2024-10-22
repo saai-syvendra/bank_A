@@ -16,31 +16,31 @@ export const validateAccountRequest = [
         .isIn(["saving", "checking"])
         .withMessage("Invalid account type"),
 
-    body("balance")
-        .isFloat({ min: 0 })
-        .withMessage("Balance must be a positive number"),
+    // body("balance")
+    //     .isFloat({ min: 0 })
+    //     .withMessage("Balance must be a positive number"),
 
     // Custom validation for planIUd
-    body("planId").custom((value, { req }) => {
-        const accountType = req.body.accountType;
+    // body("planId").custom((value, { req }) => {
+    //     const accountType = req.body.accountType;
 
-        if (accountType === "checking") {
-            if (value !== null) {
-                throw new Error(
-                    "planId should be null for 'checking' accounts"
-                );
-            }
-        } else if (accountType === "saving") {
-            if (typeof value !== "number") {
-                throw new Error(
-                    "planId must be numeric and at least 1 for 'saving' accounts"
-                );
-            }
-        }
+    //     if (accountType === "checking") {
+    //         if (value !== null) {
+    //             throw new Error(
+    //                 "planId should be null for 'checking' accounts"
+    //             );
+    //         }
+    //     } else if (accountType === "saving") {
+    //         if (typeof value !== "number") {
+    //             throw new Error(
+    //                 "planId must be numeric and at least 1 for 'saving' accounts"
+    //             );
+    //         }
+    //     }
 
-        // If all conditions pass, return true to signal validation success
-        return true;
-    }),
+    //     // If all conditions pass, return true to signal validation success
+    //     return true;
+    // }),
 
     handleValidationErrors,
 ];

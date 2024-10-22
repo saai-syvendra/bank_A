@@ -36,6 +36,7 @@ const getCustomerDetail = async (req, res) => {
 const getCustomerNames = async (req, res) => {
   try {
     const customerDetail = await CustomerModel.getAllCustomers();
+    const { customerType } = req.query;
 
     const customers = [];
 
@@ -46,9 +47,12 @@ const getCustomerNames = async (req, res) => {
       if (customer["c_type"] === "individual") {
         c["name"] = customer["first_name"] + " " + customer["last_name"];
       } else if (customer["c_type"] === "organisation") {
-        c["name"] = customer["org_name"];
+        c["name"] = customer["name"];
       }
-      customers.push(c);
+
+      if (!customerType || customer["c_type"] === customerType) {
+        customers.push(c);
+      }
     }
     return res.json({ customers });
   } catch (error) {

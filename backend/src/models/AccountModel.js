@@ -98,7 +98,6 @@ const getCustomerAccounts = async (customerId, accountType) => {
 };
 
 const createAccount = async (
-  plan_id,
   branch_code,
   customer_id,
   balance,
@@ -111,9 +110,9 @@ const createAccount = async (
 
     await connection.query(
       `
-        CALL CreateAccount(?, ?, ?, ?, ?);
+        CALL CreateAccount(?, ?, ?, ?);
       `,
-      [branch_code, customer_id, balance, account_type, plan_id]
+      [branch_code, customer_id, balance, account_type]
     );
 
     await connection.commit();

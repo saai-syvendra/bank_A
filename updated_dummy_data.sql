@@ -92,7 +92,7 @@ CALL PayInstallment(2, 2, 3);
 
 CALL CreateCustomer('mary.poppins@abc.def', '123, Rand Street, That Place', 0718945625, 'individual', 198845678945, 'Mary', 'Poppins', '1992-05-17', null, null);
 
-CALL CreateAccount(1, 10008, 125250,'saving', 3);
+CALL CreateAccount(1, 10008, 125250,'saving');
 
 CALL CreateFd(2, 6, 35000);
 
