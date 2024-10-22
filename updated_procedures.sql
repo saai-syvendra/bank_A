@@ -305,13 +305,14 @@ CREATE PROCEDURE CreateAccount(
 	IN p_branch_code	INT,
     IN p_customer_id	INT,
     IN p_balance		NUMERIC(12,2),
-    IN p_account_type	ENUM('saving','checking'),
-    IN p_plan_id		INT
+    IN p_account_type	ENUM('saving','checking')
 )
 BEGIN
 	DECLARE v_exists BOOLEAN;
     DECLARE v_account_id INT;
     DECLARE v_error_message VARCHAR(255);
+    DECLARE v_plan_id	INT;
+    DECLARE v_plan_min_balance NUMERIC(12,2);
     
     -- Error handler to capture error message
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -330,23 +331,10 @@ BEGIN
     -- Start a transaction
     START TRANSACTION;
     
-	IF p_balance <= 0 THEN
+	IF p_balance < 0 THEN
         ROLLBACK;
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Account balance must be positive.';
-    END IF;
-    
-    -- Check if saving plan exists
-    IF p_account_type = 'saving' THEN
-		SELECT COUNT(*) > 0 INTO v_exists
-		FROM Saving_Plan
-		WHERE id = p_plan_id;
-		
-		IF NOT v_exists THEN
-			ROLLBACK;
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'Saving plan does not exist.';
-		END IF;
     END IF;
     
     -- Check if customer exists
@@ -359,6 +347,28 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Customer does not exist.';
     END IF;
+    
+    IF p_account_type = 'saving' THEN
+		SELECT CASE
+			WHEN TIMESTAMPDIFF(YEAR, dob, CURDATE()) <= 12 THEN 1 -- Child
+			WHEN TIMESTAMPDIFF(YEAR, dob, CURDATE()) <= 19 THEN 2 -- Teen
+			WHEN TIMESTAMPDIFF(YEAR, dob, CURDATE()) <= 50 THEN 3 -- Adult
+			ELSE 4 												  -- Senior
+		END INTO v_plan_id
+		FROM individual_customer
+		WHERE customer_id = p_customer_id;
+
+		SELECT minimum_balance INTO v_plan_min_balance
+        FROM Saving_Plan
+        WHERE id = v_plan_id;
+        
+        IF v_plan_min_balance > p_balance THEN
+			SET v_error_message = CONCAT('Amount less than required minimum balance ', v_plan_min_balance ,' based on saving plan.');
+			ROLLBACK;
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = v_error_message;
+		END IF;
+	END IF;
     
     INSERT INTO Customer_Account (branch_code, customer_id, balance, account_type)
     VALUE (p_branch_code, p_customer_id, p_balance, p_account_type);
@@ -373,8 +383,9 @@ BEGIN
     
     IF p_account_type = 'saving' THEN
 		INSERT INTO Saving_Account (account_id, plan_id)
-        VALUE (v_account_id, p_plan_id);
+		VALUES (v_account_id, v_plan_id);
 	END IF;
+
     
     COMMIT;
     

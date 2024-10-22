@@ -14,7 +14,7 @@ STARTS '2024-09-28 23:59:59'
 DO
 BEGIN
     -- Insert account balances for all 'saving' accounts into Daily_Account_Balance table
-    INSERT INTO Daily_Account_Balance (account_id,balance,c_date)
+    INSERT INTO Daily_Account_Balance (account_id, balance, date)
     SELECT
         ca.account_id,
         ca.balance,
@@ -54,8 +54,8 @@ BEGIN
         Saving_Plan sp ON sa.plan_id = sp.id
     WHERE
         ca.account_type = 'saving'
-        AND MONTH(dab.c_date) = MONTH(CURRENT_DATE)
-        AND YEAR(dab.c_date) = YEAR(CURRENT_DATE)
+        AND MONTH(dab.date) = MONTH(CURRENT_DATE)
+        AND YEAR(dab.date) = YEAR(CURRENT_DATE)
     GROUP BY
         dab.account_id;
 

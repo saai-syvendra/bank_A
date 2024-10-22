@@ -21,9 +21,10 @@ export const callCreateCustomer = async (cType, customerDetails) => {
   }
 };
 
-export const callGetCustomerNames = async () => {
+export const callGetCustomerNames = async (cType="") => {
   try {
-    const response = await fetch(`${CUSTOMER_API_URL}/all-names`, {
+    const params = new URLSearchParams({ customerType: cType });
+    const response = await fetch(`${CUSTOMER_API_URL}/all-names?${params.toString()}`, {
       method: "GET",
       credentials: "include",
     });
