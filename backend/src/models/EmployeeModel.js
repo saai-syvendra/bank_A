@@ -1,46 +1,70 @@
 import { pool } from "../middleware/constants.js";
-import CustomerModel from "../models/CustomerModel.js";
 
 const getEmployeeBranch = async (employeeId) => {
-    const [row] = await pool.query(
-        `
-          SELECT branch_code 
-          FROM Employee 
-          WHERE emp_id = ?;
-      `,
-        [employeeId]
-    );
-    const branch = row[0];
-    if (!branch) throw new Error("Invalid employeeId");
+  const [row] = await pool.query(
+    `
+      SELECT branch_code 
+      FROM Employee 
+      WHERE emp_id = ?;
+    `,
+    [employeeId]
+  );
+  const branch = row[0];
+  if (!branch) throw new Error("Invalid employeeId");
 
-    return branch.branch_code;
+  return branch.branch_code;
 };
 
 const getEmployee = async (id) => {
-    const [row] = await pool.query(
-        `
-          SELECT * 
-          FROM Employee 
-          WHERE emp_id = ?;
-      `,
-        [id]
-    );
-    const employee = row[0];
+  let row;
 
-    if (!employee) throw new Error("Invalid employeeId");
+  [row] = await pool.query(
+    `
+      SELECT * 
+      FROM Employee 
+      WHERE emp_id = ?;
+    `,
+    [id]
+  );
+  const employee = row[0];
 
-    return employee;
+  [row] = await pool.query(
+    `
+      SELECT email, address, mobile
+      FROM User_Account
+      WHERE user_id = ?;
+    `,
+    [id]
+  );
+
+  const userDeatils = row[0];
+
+  [row] = await pool.query(
+    `
+      SELECT position
+      FROM Employee_Position
+      WHERE id = ?;
+    `,
+    [employee["position_id"]]
+  );
+
+  const position = row[0];
+
+  if (!employee) throw new Error("Invalid employeeId");
+
+  return { ...employee, ...userDeatils, ...position };
 };
 
-const updateEmployee = async (id, data) => {
-    await pool.query(
-        `
-          UPDATE Employee 
-          SET ? 
-          WHERE emp_id = ?;
+// MAKE A PROCEDURE!!
+const updateEmployee = async (id, employeeDetails) => {
+  const { first_name, last_name, mobile, address, experience } =
+    employeeDetails;
+  await pool.query(
+    `
+      CALL UpdateEmployee(?, ?, ?, ?, ?, ?);
       `,
-        [data, id]
-    );
+    [id, first_name, last_name, mobile, address, experience]
+  );
 };
 
 export default { getEmployeeBranch, getEmployee, updateEmployee };

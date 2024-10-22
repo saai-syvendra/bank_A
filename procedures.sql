@@ -469,6 +469,7 @@ BEGIN
     DECLARE v_plan_max_amount NUMERIC(10, 2);
     DECLARE v_new_loan_id INT;
     DECLARE v_error_msg VARCHAR(200);
+    DECLARE v_branch_code INT;
     
     -- Start a transaction
     START TRANSACTION;
@@ -510,9 +511,14 @@ BEGIN
         SET MESSAGE_TEXT = v_error_msg;
     END IF;
     
+    -- Get branch code
+    SELECT branch_code INTO v_branch_code
+    FROM Customer_Account
+    WHERE account_id = p_connected_account;
+    
     -- If all checks pass, insert the loan application
-    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id, approved_date, reason)
-    VALUES (p_loan_plan_id, p_customer_id, p_connected_account, CURDATE(), p_req_loan_amount, 'online', p_fd_id, CURDATE(), p_reason);
+    INSERT INTO Loan (plan_id, customer_id, connected_account, request_date, loan_amount, state, fd_id, branch_code, approved_date, reason)
+    VALUES (p_loan_plan_id, p_customer_id, p_connected_account, CURDATE(), p_req_loan_amount, 'online', p_fd_id, v_branch_code, CURDATE(), p_reason);
     
     SET v_new_loan_id = LAST_INSERT_ID();
     
@@ -758,6 +764,7 @@ BEGIN
     COMMIT;
 
 END$$
+
 
 -- Loan Reports
 
@@ -1038,3 +1045,39 @@ DELIMITER ;
 -- Usage example for monthly report
 -- CALL GetTransactionOverallReport('2023-01-01 00:00:00', '2024-12-31 23:59:59', NULL, NULL, NULL, 'monthly');
 
+
+CREATE PROCEDURE GetLateLoanInstallments(
+    IN p_branch_code INT,
+    IN p_min_amount NUMERIC(10,2),  
+    IN p_max_amount NUMERIC(10,2),
+    IN p_customer_id INT,
+    IN p_start_date DATE,
+    IN p_end_date DATE
+)
+BEGIN
+    -- Query to select late loan installments based on the filters
+    SELECT 
+        li.loan_id,
+        li.installment_no,
+        li.installment_amount,
+        li.due_date,
+        li.paid_date,
+        l.customer_id,
+        lp.months
+    FROM 
+        Loan_Installment li
+    LEFT JOIN 
+        Loan l ON li.loan_id = l.loan_id
+	LEFT JOIN
+		Loan_Plan lp ON l.plan_id=lp.plan_id
+    WHERE 
+        li.state = 'late'
+        AND l.branch_code = p_branch_code
+        AND (p_min_amount IS NULL OR li.installment_amount >= p_min_amount)
+        AND (p_max_amount IS NULL OR li.installment_amount <= p_max_amount)
+        AND (p_customer_id IS NULL OR l.customer_id = p_customer_id)
+        AND (p_start_date IS NULL OR li.due_date >= p_start_date)
+        AND (p_end_date IS NULL OR li.due_date <= p_end_date);
+END$$
+
+DELIMITER ;

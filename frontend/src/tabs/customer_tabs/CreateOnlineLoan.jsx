@@ -163,10 +163,10 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
                         <SelectContent>
                           {plans.map((plan) => (
                             <SelectItem
-                              key={plan.plan_id}
-                              value={plan.plan_id.toString()}
+                              key={plan.id}
+                              value={plan.id.toString()}
                             >
-                              {`${plan.plan_name} - ${
+                              {`${plan.name} - ${
                                 plan.interest
                               }% , Max Amount: Rs. ${parseFloat(
                                 plan.max_amount
@@ -197,11 +197,8 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
                         </FormControl>
                         <SelectContent>
                           {fds.map((fd) => (
-                            <SelectItem
-                              key={fd.fd_id}
-                              value={fd.fd_id.toString()}
-                            >
-                              {`FD #${fd.fd_id} - Amount: Rs. ${parseFloat(
+                            <SelectItem key={fd.id} value={fd.id.toString()}>
+                              {`FD #${fd.id} - Amount: Rs. ${parseFloat(
                                 fd.amount
                               ).toLocaleString()}`}
                             </SelectItem>
@@ -252,20 +249,6 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
                       <FormLabel>Loan Amount</FormLabel>
                       <FormControl>
                         <Input {...field} type="number" min={0} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="reason"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Reason</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} className="bg-white" rows={2} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

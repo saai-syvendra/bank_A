@@ -4,17 +4,14 @@ import AccountModel from "../models/AccountModel.js";
 import EmployeeModel from "../models/EmployeeModel.js";
 
 const createLoan = async (req, res) => {
-  const { id: employeeId } = req.user;
   const { planId, customerId, connectedAccount, loanAmount, reason } = req.body;
 
-  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
   try {
     await LoanModel.createLoan(
       planId,
       customerId,
       connectedAccount,
       loanAmount,
-      branchCode,
       reason
     );
     res.status(201).json({ message: "Loan created successfully!" });
@@ -25,15 +22,14 @@ const createLoan = async (req, res) => {
 
 const createOnlineLoan = async (req, res) => {
   const { id: customerId } = req.user;
-  const { planId, fdId, connectedAccount, loanAmount, reason } = req.body;
+  const { planId, fdId, connectedAccount, loanAmount } = req.body;
   try {
     await LoanModel.createOnlineLoan(
       planId,
       customerId,
       fdId,
       connectedAccount,
-      loanAmount,
-      reason
+      loanAmount
     );
     res.status(201).send({ message: "Online loan created successfully!" });
   } catch (error) {
@@ -56,13 +52,10 @@ const getApprovalPendingLoans = async (req, res) => {
     const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
     const loans = await LoanModel.getApprovalPendingLoans();
     const loanData = [];
-
     for (const loan of loans) {
-      if (loan.branch_code === branchCode) {
-        const customer = await CustomerModel.getCustomer(loan.customer_id);
-        const account = await AccountModel.getAccountById(
-          loan.connected_account
-        );
+      const account = await AccountModel.getAccountById(loan.connected_account);
+      if (account.branch_code === branchCode) {
+        const customer = await CustomerModel.getCustomer(account.customer_id);
         const plan = await LoanModel.getPlan(loan.plan_id);
         let customer_name = "";
         if (customer["c_type"] === "individual") {
@@ -127,6 +120,49 @@ const payInstallment = async (req, res) => {
   }
 };
 
+const getLateLoanInstallments = async (req, res) => {
+  const { id: employeeId } = req.user;
+  const branch_code = await EmployeeModel.getEmployeeBranch(employeeId);
+  const { minAmount, maxAmount, customerId, startDate, endDate } = req.query;
+
+  // If any of the above is undefined, set it to null
+  const filters = {
+    branch_code: branch_code,
+    min_amount: minAmount || null,
+    max_amount: maxAmount || null,
+    customer_id: customerId || null,
+    start_date: startDate || null,
+    end_date: endDate || null,
+  };
+  try {
+    const installments = await LoanModel.getLateLoanInstallments(filters);
+    res.status(200).send(installments);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
+const getLoanCustomers = async (req, res) => {
+  const { id: employeeId } = req.user;
+  const branch_code = await EmployeeModel.getEmployeeBranch(employeeId);
+  try {
+    const customers = await LoanModel.getLoanCustomers(branch_code);
+    res.status(200).send(customers);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+const getLoansForThisAccount = async (req, res) => {
+  const { accountId } = req.query;
+  try {
+    const loans = await LoanModel.getLoansByAccountId(accountId);
+    return res.json({ loans }); // Wrap loans in an array, even if it's a single object
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export default {
   createLoan,
   createOnlineLoan,
@@ -136,4 +172,7 @@ export default {
   rejectLoan,
   getUpcomingInstallments,
   payInstallment,
+  getLateLoanInstallments,
+  getLoanCustomers,
+  getLoansForThisAccount,
 };

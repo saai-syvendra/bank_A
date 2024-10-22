@@ -3,12 +3,12 @@ import AccountModel from "../models/AccountModel.js";
 
 const employeeDepositForCustomerController = async (req, res) => {
   const { account_id, amount, reason } = req.body;
-
   try {
-    const result = await TransactionModel.employeeDepositForCustomer(
+    const result = await TransactionModel.cashDeposit(
       account_id,
       amount,
-      reason
+      reason,
+      "via_employee"
     );
     res.status(200).json({
       message: "Transaction committed successfully",
@@ -38,4 +38,7 @@ const makeOnlineTransfer = async (req, res) => {
   }
 };
 
-export default { employeeDepositForCustomerController, makeOnlineTransfer };
+export default {
+  employeeDepositForCustomerController,
+  makeOnlineTransfer,
+};

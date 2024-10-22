@@ -6,40 +6,40 @@ import { validateCreateCustomer } from "../middleware/validations.js";
 const router = express.Router();
 
 router.get(
-    "/",
-    authorizeRole("employee", "manager"),
-    CustomerController.getCustomer
+  "/",
+  authorizeRole("employee", "manager"),
+  CustomerController.getCustomer
 );
 
 router.get(
-    "/detail",
-    authorizeRole("customer"),
-    CustomerController.getCustomerDetail
-);
-
-// router.get(
-//     "/detail/from-accnt-num",
-//     authorizeRole("employee"),
-//     CustomerController.getCustomerDetailsFromAccountNum
-// );
-
-router.put(
-    "/update",
-    authorizeRole("customer"),
-    CustomerController.updateCustomerDetail
-);
-
-router.get(
-    "/all-names",
-    authorizeRole("employee", "manager"),
-    CustomerController.getCustomerNames
+  "/detail",
+  authorizeRole("customer"),
+  CustomerController.getCustomerDetail
 );
 
 router.post(
-    "/create",
-    authorizeRole("employee", "manager"),
-    validateCreateCustomer,
-    CustomerController.createCustomer
+  "/detail/from-accnt-num",
+  authorizeRole("employee", "manager"),
+  CustomerController.getCustomerDetailsFromAccountNo
+);
+
+router.put(
+  "/update",
+  authorizeRole("customer"),
+  CustomerController.updateCustomerDetail
+);
+
+router.get(
+  "/all-names",
+  authorizeRole("employee", "manager"),
+  CustomerController.getCustomerNames
+);
+
+router.post(
+  "/create",
+  authorizeRole("employee", "manager"),
+  validateCreateCustomer,
+  CustomerController.createCustomer
 );
 
 export default router;

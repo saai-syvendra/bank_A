@@ -8,10 +8,10 @@ const getCustomerFds = async (customerId) => {
 
     const [rows] = await connection.query(
       `
-              SELECT * 
-              FROM fd LEFT JOIN Customer_Account USING(account_id) 
-              WHERE customer_id = ?;
-          `,
+        SELECT * 
+        FROM fd LEFT JOIN Customer_Account USING(account_id) 
+        WHERE customer_id = ?;
+      `,
       [customerId]
     );
 
@@ -35,10 +35,10 @@ const getFdPlans = async () => {
 
     const [rows] = await connection.query(
       `
-                SELECT * 
-                FROM Fd_Plan
-                WHERE availability = "yes";
-            `
+        SELECT * 
+        FROM Fd_Plan
+        WHERE availability = 1;
+      `
     );
 
     await connection.commit();
@@ -60,8 +60,8 @@ const createFd = async (plan_id, account_id, amount) => {
 
     await connection.query(
       `
-                CALL CreateFd(?, ?, ?);
-            `,
+        CALL CreateFd(?, ?, ?);
+      `,
       [plan_id, account_id, amount]
     );
   } catch (error) {
@@ -72,4 +72,36 @@ const createFd = async (plan_id, account_id, amount) => {
   }
 };
 
-export default { getCustomerFds, getFdPlans, createFd };
+const getFixedDepositsByAccountId = async (accountId) => {
+  let connection;
+  try {
+    connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.beginTransaction(); // Begin a transaction
+
+    const [rows] = await connection.query(
+      `
+        SELECT fd.*,fd_plan.interest
+        FROM fd
+        JOIN Customer_Account ca USING(account_id)
+        JOIN fd_plan ON fd.plan_id=fd_plan.id
+        WHERE account_id = ?;
+      `,
+      [accountId] // Use accountId as a parameter
+    );
+
+    await connection.commit(); // Commit the transaction
+    return rows; // Return the results
+  } catch (error) {
+    if (connection) await connection.rollback(); // Rollback if there is an error
+    throw error;
+  } finally {
+    if (connection) connection.release(); // Release the connection back to the pool
+  }
+};
+
+export default {
+  getCustomerFds,
+  getFdPlans,
+  createFd,
+  getFixedDepositsByAccountId,
+};

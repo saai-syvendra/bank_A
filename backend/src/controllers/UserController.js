@@ -40,7 +40,7 @@ const login = async (req, res) => {
     const jwtSecret = process.env.JWT_SECRET;
     const user = await UserModel.verifyUser(username, password);
     await generateAndEmailOtp(username, "Login verification");
-    const token = jwt.sign({ username: user["username"] }, jwtSecret, {
+    const token = jwt.sign({ username: user["email"] }, jwtSecret, {
       expiresIn: "5m",
     });
     res.cookie("token", token, {
@@ -74,14 +74,13 @@ const loginOtp = async (req, res) => {
     await UserModel.verifyOtp(username, otp);
 
     const user = await UserModel.getUserByUsername(username);
-    const id =
-      user["user_role"] === "customer" ? user["customer_id"] : user["emp_id"];
+    const id = user["user_id"];
 
     const token = jwt.sign(
       {
-        role: user["user_role"],
+        role: user["role"],
         id,
-        username: user["username"],
+        username: user["email"],
       },
       jwtSecret,
       {
@@ -93,7 +92,7 @@ const loginOtp = async (req, res) => {
       maxAge: 15 * 60 * 1000, // 15 minutes
     });
     // console.log("Token: ", token);
-    return res.json({ message: "OTP Verified", role: user["user_role"] });
+    return res.json({ message: "OTP Verified", role: user["role"] });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error.message });

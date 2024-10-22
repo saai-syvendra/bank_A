@@ -7,7 +7,7 @@ const router = express.Router();
 // Employee making deposit on behalf of customer
 router.post(
   "/employee/make-deposit",
-  authorizeRole("employee"),
+  authorizeRole("employee", "manager"),
   TransactionController.employeeDepositForCustomerController
 );
 
@@ -18,12 +18,7 @@ router.post(
 //     TransactionController.withdrawFromATMController
 // );
 
-// router.post(
-//     "/cdm-deposit",
-//     authorizeRole("customer"),
-//     TransactionController.cdmDepositController
-//   );
-
+//Make online transfer
 router.post(
   "/online-transfer",
   authorizeRole("customer"),
