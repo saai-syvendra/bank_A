@@ -40,7 +40,7 @@ const CustomerDashboard = () => {
             your transactions.
           </p>
         </div>
-        <Tabs defaultValue="view-transactions">
+        <Tabs defaultValue="summary">
           <TabsList>
             <TabsTrigger value="summary">Summary</TabsTrigger>
             <TabsTrigger value="view-transactions">
