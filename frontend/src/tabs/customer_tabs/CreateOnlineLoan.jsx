@@ -254,20 +254,6 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="reason"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Reason</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} className="bg-white" rows={2} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
 
               {isLoading ? (
