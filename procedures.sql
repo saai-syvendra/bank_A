@@ -761,9 +761,9 @@ END$$
 
 -- Loan Reports
 
-DROP PROCEDURE IF EXISTS GetLoanReport;
-
 DELIMITER //
+
+DROP PROCEDURE IF EXISTS GetLoanReport;
 
 CREATE PROCEDURE GetLoanReport(
     IN start_date DATE,
@@ -776,43 +776,14 @@ CREATE PROCEDURE GetLoanReport(
     IN is_late_loan BOOL
 )
 BEGIN
-    -- Assign default values if not provided
-    IF start_date IS NULL THEN
-        SET start_date = '2024-01-01';
-    END IF;
-    
-    IF end_date IS NULL THEN
-        SET end_date = CURRENT_DATE;
-    END IF;
-    
-    IF min_ammount IS NULL THEN
-        SET min_ammount = 0.00;
-    END IF;
-    
+	IF min_ammount IS NULL THEN
+		SET min_ammount = 0;
+	END IF;
     IF max_ammount IS NULL THEN
-        SET max_ammount = 99999999.00;
-    END IF;
-    
-    IF state IS NULL THEN
-        SET state = 'approved';
-    END IF;
-    
-    IF branch IS NULL THEN
-        SET branch = NULL;
-    END IF;
-    
-    IF plan_id IS NULL THEN
-        SET plan_id = NULL;
-    END IF;
-    
-    IF is_late_loan IS NULL THEN
-        SET is_late_loan = FALSE;
-    END IF;
-
-    -- Fetch loan report based on loan_installments with late payments
+		SET max_ammount = 99999999.99;
+	END IF;    
     SELECT loan_view.*
     FROM loan_view
-    -- Inner join with loan_installments to filter out late loans
     INNER JOIN loan_installment
         ON loan_view.loan_id = loan_installment.loan_id
     WHERE loan_installment.state = 'late'
@@ -822,17 +793,15 @@ BEGIN
     AND (state IS NULL OR loan_view.state = state)
     AND (branch IS NULL OR branch_code = branch)
     AND (plan_id IS NULL OR loan_view.plan_id = plan_id)
-    -- Filter based on is_late_loan flag
-    AND (is_late_loan = TRUE AND loan_installment.state = 'late')
-    GROUP BY loan_view.loan_id;  -- Group by loan_id to avoid duplicates
+	AND (is_late_loan IS NULL OR (is_late_loan = TRUE AND loan_installment.state = 'late'))
+    GROUP BY loan_view.loan_id;
+END //
 
-END//
-DELIMITER ;
-
-
-DROP PROCEDURE IF EXISTS GetOverallLoanReport;
+DELIMITER;
 
 DELIMITER //
+
+DROP PROCEDURE IF EXISTS GetOverallLoanReport;
 
 CREATE PROCEDURE GetOverallLoanReport(
     IN start_date DATE,
@@ -862,9 +831,7 @@ BEGIN
             AVG(loan_amount) AS avg_loan_amount,
             MAX(loan_amount) AS max_loan_amount,
             MIN(loan_amount) AS min_loan_amount,
-            SUM(loan_amount) AS total_loan_amount,
-            COUNT(*) / 7 AS weekly_loan_amount_rate,
-            SUM(loan_amount) / 7 AS weekly_loan_amount_amount
+            SUM(loan_amount) AS total_loan_amount
         FROM loan_view
         WHERE (start_date IS NULL OR approved_date >= start_date)
           AND (end_date IS NULL OR approved_date <= end_date)
@@ -878,9 +845,7 @@ BEGIN
             AVG(loan_amount) AS avg_loan_amount,
             MAX(loan_amount) AS max_loan_amount,
             MIN(loan_amount) AS min_loan_amount,
-            SUM(loan_amount) AS total_loan_amount,
-            COUNT(*) / (DATEDIFF(LAST_DAY(end_date), start_date) / 30) AS monthly_loan_rate,
-            SUM(loan_amount) / (DATEDIFF(LAST_DAY(end_date), start_date) / 30) AS monthly_loan_amount
+            SUM(loan_amount) AS total_loan_amount
         FROM loan_view
         WHERE (start_date IS NULL OR approved_date >= start_date)
           AND (end_date IS NULL OR approved_date <= end_date)
@@ -927,9 +892,7 @@ BEGIN
             AVG(installment_amount) AS avg_installment_amount,
             MAX(installment_amount) AS max_installment_amount,
             MIN(installment_amount) AS min_installment_amount,
-            SUM(installment_amount) AS total_installment_amount,
-            COUNT(*)/7 AS weekly_loan_installment_rate,
-            SUM(installment_amount)/7 AS weekly_loan_installment_rate
+            SUM(installment_amount) AS total_installment_amount
         FROM loan_view
         INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
         WHERE (end_date IS NULL OR due_date <= end_date)
@@ -943,9 +906,7 @@ BEGIN
             AVG(installment_amount) AS avg_installment_amount,
             MAX(installment_amount) AS max_installment_amount,
             MIN(installment_amount) AS min_installment_amount,
-            SUM(installment_amount) AS total_installment_amount,
-            COUNT(*)/30 AS monthly_loan_installment_rate,
-            SUM(installment_amount)/30 AS monthly_loan_installment_rate
+            SUM(installment_amount) AS total_installment_amount
         FROM loan_view
         INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
         WHERE (end_date IS NULL OR due_date <= end_date)
@@ -956,16 +917,17 @@ BEGIN
     END IF;
 END //
 
-DELIMITER ;
+DELIMITER ;loan_installment
 
 -- Usage example
 -- CALL GetOverallLateLoanReport('2023-12-31', 'approved', 1001, 'monthly');
 
+
 -- Transaction Reports
 
-DROP PROCEDURE IF EXISTS GetTransactionReport;
-
 DELIMITER //
+
+DROP PROCEDURE IF EXISTS GetTransactionReport;
 
 CREATE PROCEDURE GetTransactionReport(
     IN start_date TIMESTAMP,
@@ -1019,9 +981,7 @@ BEGIN
             AVG(amount) AS avg_trans_amount, 
             MIN(amount) AS min_trans_amount, 
             MAX(amount) AS max_trans_amount, 
-            SUM(amount) AS total_trans_amount,
-            COUNT(*) / DATEDIFF(end_date, start_date) AS transactions_per_day,
-            SUM(amount) / DATEDIFF(end_date, start_date) AS transaction_amount_per_day
+            SUM(amount) AS total_trans_amount
         FROM transaction_view
         WHERE (start_date IS NULL OR trans_timestamp >= start_date)
           AND (end_date IS NULL OR trans_timestamp <= end_date)
@@ -1038,9 +998,7 @@ BEGIN
             AVG(amount) AS avg_trans_amount, 
             MIN(amount) AS min_trans_amount, 
             MAX(amount) AS max_trans_amount, 
-            SUM(amount) AS total_trans_amount,
-            COUNT(*)/7 AS weekly_loan_installment_rate,
-            SUM(amount)/7 AS weekly_loan_installment_rate
+            SUM(amount) AS total_trans_amount
         FROM transaction_view
         WHERE (start_date IS NULL OR trans_timestamp >= start_date)
           AND (end_date IS NULL OR trans_timestamp <= end_date)
@@ -1057,9 +1015,7 @@ BEGIN
             AVG(amount) AS avg_trans_amount, 
             MIN(amount) AS min_trans_amount, 
             MAX(amount) AS max_trans_amount, 
-            SUM(amount) AS total_trans_amount,
-            COUNT(*)/7 AS weekly_loan_installment_rate,
-            SUM(amount)/7 AS weekly_loan_installment_rate
+            SUM(amount) AS total_trans_amount
         FROM transaction_view
         WHERE (start_date IS NULL OR trans_timestamp >= start_date)
           AND (end_date IS NULL OR trans_timestamp <= end_date)
@@ -1068,7 +1024,6 @@ BEGIN
           AND (branch_code IS NULL OR transaction_view.branch_code = branch_code)
         GROUP BY transaction_month
         ORDER BY transaction_month DESC;
-
     END IF;
 END //
 
@@ -1082,3 +1037,4 @@ DELIMITER ;
 
 -- Usage example for monthly report
 -- CALL GetTransactionOverallReport('2023-01-01 00:00:00', '2024-12-31 23:59:59', NULL, NULL, NULL, 'monthly');
+
