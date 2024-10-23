@@ -1125,7 +1125,7 @@ BEGIN
   SET withdrawal_count = 0;
 END $$
 
-DROP PROCEDURE IF EXISTS GetLoanReport;
+-- DROP PROCEDURE IF EXISTS GetLoanReport$$
 
 CREATE PROCEDURE GetLoanReport(
     IN start_date DATE,
@@ -1155,7 +1155,7 @@ BEGIN
 	AND (is_late_loan IS NULL OR (is_late_loan = TRUE AND loan_id NOT IN (SELECT DISTINCT loan_id FROM loan_installment WHERE state = 'late')));
 END $$
 
-DROP PROCEDURE IF EXISTS GetOverallLoanReport;
+-- DROP PROCEDURE IF EXISTS GetOverallLoanReport$$
 
 CREATE PROCEDURE GetOverallLoanReport(
     IN start_date DATE,
@@ -1210,7 +1210,7 @@ BEGIN
     END IF;
 END $$
 
-DROP PROCEDURE IF EXISTS GetOverallLateLoanReport;
+-- DROP PROCEDURE IF EXISTS GetOverallLateLoanReport$$
 
 CREATE PROCEDURE GetOverallLateLoanReport(
     IN end_date DATE,
@@ -1263,7 +1263,7 @@ BEGIN
     END IF;
 END $$
 
-DROP PROCEDURE IF EXISTS GetTransactionReport;
+-- DROP PROCEDURE IF EXISTS GetTransactionReport$$
 
 CREATE PROCEDURE GetTransactionReport(
     IN start_date TIMESTAMP,
@@ -1295,7 +1295,7 @@ END $$
 -- Usage example
 -- CALL GetTransactionReport('2023-01-01 00:00:00', '2024-12-31 23:59:59', NULL, NULL, 'credit', NULL, NULL);
 
-DROP PROCEDURE IF EXISTS GetTransactionOverallReport;
+-- DROP PROCEDURE IF EXISTS GetTransactionOverallReport$$
 
 CREATE PROCEDURE GetTransactionOverallReport(
     IN start_date TIMESTAMP,

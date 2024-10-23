@@ -1,6 +1,6 @@
 use bank_database;
 
-DROP VIEW IF EXISTS online_loan_view;
+-- DROP VIEW IF EXISTS online_loan_view;
 
 CREATE VIEW online_loan_view AS 
 SELECT 
@@ -17,7 +17,7 @@ INNER JOIN loan_plan ON loan.plan_id = loan_plan.id
 INNER JOIN customer_account ON loan.connected_account = customer_account.account_id
 WHERE loan.id NOT IN (SELECT loan_id FROM branch_loan);
 
-DROP VIEW IF EXISTS branch_loan_view;
+-- DROP VIEW IF EXISTS branch_loan_view;
 
 CREATE VIEW branch_loan_view AS 
 SELECT 
@@ -34,7 +34,7 @@ INNER JOIN loan_plan ON loan.plan_id = loan_plan.id
 INNER JOIN branch_loan ON loan.id = branch_loan.loan_id
 INNER JOIN customer_account ON loan.connected_account = customer_account.account_id;
 
-DROP VIEW IF EXISTS transaction_view;
+-- DROP VIEW IF EXISTS transaction_view;
 
 CREATE VIEW transaction_view AS 
 SELECT 
