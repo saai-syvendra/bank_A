@@ -42,17 +42,16 @@ const GetOverallLoanReportController = async (req, res) => {
 };
 
 const GetOverallLateLoanReportController = async (req, res) => {
-    const { end_date, state, branch_code, report_frequency } = req.body;
+    const { end_date, branch_code, report_frequency } = req.body;
     try {
         console.log(req.body);
         // Assign default values for null or undefined parameters
         const endDate = end_date || null;
-        const loanState = state || null;
         const branchCode = branch_code || null;
         const reportFrequency = report_frequency || null;
 
-        console.log(endDate, loanState, branchCode, reportFrequency);
-        const result = await ReportModel.GetOverallLateLoanReport(endDate, loanState, branchCode, reportFrequency);
+        console.log(endDate, branchCode, reportFrequency);
+        const result = await ReportModel.GetOverallLateLoanReport(endDate, branchCode, reportFrequency);
         return res.json(result);
     } catch (error) {
         return res.status(500).json({ error: error.message });
