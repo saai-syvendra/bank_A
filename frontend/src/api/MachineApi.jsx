@@ -46,3 +46,27 @@ export const callGetCDMInformation = async (accountNo) => {
     throw new Error(error.message);
   }
 };
+
+export const callMakATMWithdrawal = async (data) => {
+  try {
+    const response = await fetch(`${MACHINE_API_URL}/atm-withdrawal`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = await response.json();
+    console.log(responseData);
+    if (!response.ok) {
+      throw new Error(responseData.error);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+}
