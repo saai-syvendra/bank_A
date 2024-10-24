@@ -226,7 +226,7 @@ const UpdateDetailForm = ({
                     <FormItem>
                       <FormLabel>Position</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} disabled/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
