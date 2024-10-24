@@ -34,12 +34,19 @@ const formSchema = z.object({
   fromAccountId: z.coerce
     .number()
     .min(1, "Please select an account to transfer from"),
+  fromAccountNo: z.coerce.number(), // Add fromAccountNumber to compare with toAccountNo
   toAccountNo: z.coerce
     .number()
     .min(100000000000, "Please select an account to transfer to"),
   amount: z.coerce.number().min(0, "Transfer amount must be greater than 0"),
   reason: z.string().min(1, "Please provide a reason for the transfer"),
-});
+}).refine(
+  (data) => data.fromAccountNo !== data.toAccountNo, // Compare actual account numbers
+  {
+    message: "From account and To account must be different",
+    path: ["toAccountNo"], // Shows error message under 'To Account'
+  }
+);
 
 const FundTransfer = ({ triggerToRefetch }) => {
   const [accounts, setAccounts] = useState([]);
@@ -59,7 +66,7 @@ const FundTransfer = ({ triggerToRefetch }) => {
   const fetchAccounts = async () => {
     try {
       const fetchedAccounts = await callGetThisCustomerAccounts();
-      console.log("Accounts", fetchedAccounts);
+      //console.log("Accounts", fetchedAccounts);
       setAccounts(fetchedAccounts);
     } catch (error) {
       toast.error("Failed to fetch customer accounts");
@@ -81,6 +88,11 @@ const FundTransfer = ({ triggerToRefetch }) => {
     setIsLoading(true);
     try {
       const data = form.getValues();
+      // const transferData = {
+      //   ...data,
+      //   fromAccountNumber: selectedAccount.account_number,
+      // };
+      console.log(data);
       await callMakeOnlineTransfer(data);
       toast.success("Online transfer successful");
       fetchAccounts();
@@ -120,7 +132,14 @@ const FundTransfer = ({ triggerToRefetch }) => {
                     <FormItem>
                       <FormLabel>From Account</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          const selectedAccount = accounts.find(
+                            (account) => account.account_id.toString() === value
+                          );
+                          form.setValue("fromAccountId", value);
+                          form.setValue("fromAccountNo", selectedAccount.account_number);
+            
+                        }}
                         value={field.value}
                       >
                         <FormControl>
