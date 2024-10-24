@@ -38,6 +38,7 @@ const EmployeeCashDepositForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCustomerLoading, setIsCustomerLoading] = useState(false);
   const [accountNo, setAccountNo] = useState("");
+  const [shouldReset, setShouldReset] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(depositFormSchema),
@@ -50,12 +51,12 @@ const EmployeeCashDepositForm = () => {
     },
   });
 
-  const fetchCustomerDetails = async (accountNo) => {
+  const fetchCustomerDetails = async () => {
     setIsCustomerLoading(true);
     try {
+      const accountNo = form.getValues("accountNo");
       const data = await callGetCustomerDetailsFromAccountNo(accountNo);
       form.setValue("name", data.name);
-      // console.log(data); // Log the data being fetched
       // Fetch accountID
       const accountID = await callGetAccountIDfromAccountNo(accountNo);
       form.setValue("accountID", accountID);
@@ -67,15 +68,27 @@ const EmployeeCashDepositForm = () => {
   };
 
   useEffect(() => {
-    if (accountNo.length > 0) {
-      fetchCustomerDetails(accountNo);
+    if (shouldReset) {
+      form.reset({
+        accountNo: accountNo,
+        accountID: "",
+        name: "",
+        amount: 0,
+        reason: "",
+      });
+      setShouldReset(false);
     }
-  }, [accountNo]);
+  }, [shouldReset, accountNo, form]);
 
   useEffect(() => {
-    const subscription = form.watch((value) => setAccountNo(value.accountNo));
+    const subscription = form.watch((value) => {
+      if (value.accountNo !== accountNo) {
+        setAccountNo(value.accountNo);
+        setShouldReset(true);
+      }
+    });
     return () => subscription.unsubscribe();
-  }, [form]);
+  }, [accountNo, form]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -124,6 +137,14 @@ const EmployeeCashDepositForm = () => {
                 </FormItem>
               )}
             />
+
+            <Button
+              type="button"
+              onClick={fetchCustomerDetails}
+              disabled={isCustomerLoading}
+            >
+              {isCustomerLoading ? "Loading..." : "Fetch Customer Details"}
+            </Button>
 
             <FormField
               control={form.control}
