@@ -80,7 +80,7 @@ export default function ATM() {
         amount: parseFloat(data.amount),
       });
       toast.success("Withdraw successful");
-      
+
       setStep(3);
       // Simulate counting money
       for (let i = 0; i <= 100; i++) {
@@ -97,11 +97,17 @@ export default function ATM() {
       accountForm.reset();
       withdrawalForm.reset();
       setStep(1); // Reset to account form step
-      
     } finally {
       setIsLoading(false);
       setProgress(0);
     }
+  };
+
+  const handleBackClick = () => {
+    setAccountInfo(null);
+    accountForm.reset();
+    withdrawalForm.reset();
+    setStep(1);
   };
 
   return (
@@ -179,22 +185,19 @@ export default function ATM() {
                   </FormItem>
                 )}
               />
-              {/* <FormField
-                control={depositForm.control}
-                name="reason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reason for Deposit</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter reason" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-              <Button className="w-full" type="submit" disabled={isLoading}>
-                {isLoading ? "Processing..." : "Make Withdrawal"}
-              </Button>
+              <div className="flex justify-between space-x-2">
+                <Button
+                  className="w-1/2"
+                  type="button"
+                  onClick={handleBackClick}
+                  disabled={isLoading}
+                >
+                  Back
+                </Button>
+                <Button type="submit" disabled={isLoading} className="w-1/2">
+                  {isLoading ? "Processing..." : "Make Withdrawal"}
+                </Button>
+              </div>
             </form>
           </Form>
         )}
