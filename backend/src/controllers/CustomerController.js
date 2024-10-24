@@ -107,26 +107,26 @@ const updateCustomerDetail = async (req, res) => {
 const getCustomerDetailsFromAccountNo = async (req, res) => {
   const { accountNo } = req.body;
   let customerID;
-
+  let customerName;
   try {
     customerID = await CustomerModel.getCustomerIDFromAccountNo(accountNo);
   } catch (error) {
     console.error(error);
     return res.status(400).json({ message: error.message });
   }
-
   try {
     const customer = await CustomerModel.getCustomer(customerID);
+    if (customer["c_type"] === "individual") {
+      customerName = customer["first_name"] + " " + customer["last_name"];
+    } else if (customer["c_type"] === "organisation") {
+      customerName = customer["name"];
+    }
     const customerDetail = {
-      firstName: customer["first_name"],
-      lastName: customer["last_name"],
+      name: customerName,
       mobile: customer["mobile"],
       address: customer["address"],
       email: customer["email"],
-      dob: customer["dob"],
-      nic: customer["nic"],
     };
-
     res.status(200).json(customerDetail);
   } catch (error) {
     console.error(error);

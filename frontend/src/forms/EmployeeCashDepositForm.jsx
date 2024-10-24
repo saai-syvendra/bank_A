@@ -24,8 +24,7 @@ import { callGetAccountIDfromAccountNo } from "../api/AccountApi"; // Add this i
 const depositFormSchema = z.object({
   accountNo: z.string().min(1, "Account number is required"),
   accountID: z.number().min(1, "Account ID is required"),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  name: z.string().min(1, "Name is required"),
   amount: z.coerce
     .number()
     .min(0.01, "Amount is required")
@@ -45,8 +44,7 @@ const EmployeeCashDepositForm = () => {
     defaultValues: {
       accountNo: "",
       accountID: "",
-      firstName: "",
-      lastName: "",
+      name: "",
       amount: 0,
       reason: "",
     },
@@ -56,9 +54,8 @@ const EmployeeCashDepositForm = () => {
     setIsCustomerLoading(true);
     try {
       const data = await callGetCustomerDetailsFromAccountNo(accountNo);
-      form.setValue("firstName", data.firstName);
-      form.setValue("lastName", data.lastName);
-
+      form.setValue("name", data.name);
+      // console.log(data); // Log the data being fetched
       // Fetch accountID
       const accountID = await callGetAccountIDfromAccountNo(accountNo);
       form.setValue("accountID", accountID);
@@ -128,49 +125,19 @@ const EmployeeCashDepositForm = () => {
               )}
             />
 
-            {/* <FormField
+            <FormField
               control={form.control}
-              name="accountID"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Account ID</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input {...field} disabled={true} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
-            /> */}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={true} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={true} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            />
 
             <FormField
               control={form.control}

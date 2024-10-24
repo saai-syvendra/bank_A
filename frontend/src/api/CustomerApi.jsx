@@ -119,7 +119,6 @@ export const callGetCustomerDetailsFromAccountNo = async (accountNo) => {
     if (!response.ok) {
       throw new Error(data.message);
     }
-
     return data;
   } catch (error) {
     console.error(error);
