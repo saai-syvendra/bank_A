@@ -79,7 +79,6 @@ export default function ATM() {
         account_id: accountInfo.accountId,
         amount: parseFloat(data.amount),
       });
-      toast.success("Withdraw successful");
 
       setStep(3);
       // Simulate counting money
@@ -87,7 +86,7 @@ export default function ATM() {
         setProgress(i);
         await new Promise((resolve) => setTimeout(resolve, 15));
       }
-
+      toast.success("Withdraw successful");
       accountForm.reset();
       withdrawalForm.reset();
       setStep(1);
