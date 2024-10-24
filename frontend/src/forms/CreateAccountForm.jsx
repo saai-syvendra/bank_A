@@ -80,7 +80,7 @@ export default function CreateAccountForm({ triggerFetchCustomers = false, indiv
   }, [triggerFetchCustomers]);
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Create {individualCustomer ? "Individual" : "Organization"} Account</CardTitle>
         <p className="text-gray-400 text-sm text-secondary-foreground">

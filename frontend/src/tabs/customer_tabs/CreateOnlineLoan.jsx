@@ -36,10 +36,6 @@ const formSchema = z.object({
   fdId: z.coerce.number().min(1, "Please select a fixed deposit"),
   connectedAccount: z.coerce.number().min(1, "Please select an account"),
   loanAmount: z.coerce.number().min(0, "Loan amount must be greater than 0"),
-  reason: z
-    .string()
-    .min(1, "Reason required")
-    .max(100, "Reason must be less than 100 characters"),
 });
 
 const CreateOnlineLoan = ({ triggerToRefetch }) => {
@@ -56,7 +52,6 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
       fdId: "",
       connectedAccount: "",
       loanAmount: 0,
-      reason: "",
     },
   });
 

@@ -51,7 +51,7 @@ INNER JOIN customer_account
 LEFT JOIN online_transfer 
     ON account_transaction.transaction_id = online_transfer.transaction_id;
 
-DROP VIEW IF EXISTS loan_view;
+-- DROP VIEW IF EXISTS loan_view;
 
 CREATE VIEW loan_view AS 
 (SELECT 

@@ -117,9 +117,9 @@ export default function Summary() {
                     </TableHeader>
                     <TableBody>
                       {account.loans.map((loan) => (
-                        <TableRow key={loan.loan_id}>
-                          <TableCell>{loan.loan_id}</TableCell>
-                          <TableCell>{loan.plan_name}</TableCell>
+                        <TableRow key={loan.id}>
+                          <TableCell>{loan.id}</TableCell>
+                          <TableCell>{loan.name}</TableCell>
                           <TableCell>
                             Rs. {parseFloat(loan.loan_amount).toFixed(2)}
                           </TableCell>
@@ -158,8 +158,8 @@ export default function Summary() {
                     </TableHeader>
                     <TableBody>
                       {account.fixedDeposits.map((fd) => (
-                        <TableRow key={fd.fd_id}>
-                          <TableCell>{fd.fd_id}</TableCell>
+                        <TableRow key={fd.id}>
+                          <TableCell>{fd.id}</TableCell>
                           <TableCell>
                             Rs. {parseFloat(fd.amount).toFixed(2)}
                           </TableCell>

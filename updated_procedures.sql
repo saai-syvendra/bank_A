@@ -288,7 +288,7 @@ BEGIN
     -- Insert the transaction into the Account_Transaction table (only for the from account)
     INSERT INTO Account_Transaction (account_id, amount, trans_timestamp, reason, trans_type, trans_method)
     VALUES (p_from_account_id, p_transfer_amount, CURRENT_TIMESTAMP,
-            CONCAT('Transfer to account ', p_to_account_id, ': ', p_reason, ' from account ', p_from_account_id), 'debit', 'online-transfer');
+            CONCAT('Transfer to account ', p_to_account_id, ': ', p_reason), 'debit', 'online-transfer');
 
     -- Capture the last inserted transaction_id
     SET p_transaction_id = LAST_INSERT_ID();
@@ -991,7 +991,6 @@ BEGIN
 
 END $$
 
-
 CREATE PROCEDURE GetTransactionsFiltered(
     IN p_cust_id INT,                        -- Customer ID (can be NULL)
     IN p_branch_code INT,                    -- Branch code (can be NULL)
@@ -1080,8 +1079,8 @@ BEGIN
             ca_to.account_number,
             at.amount,
             at.trans_timestamp,
-            at.reason,
-            'debit' AS trans_type,
+            CONCAT('Transfer from account ', at.account_id, ': ', SUBSTRING_INDEX(at.reason, ':', -1)) AS reason,
+            'credit' AS trans_type,
             'online-transfer' AS trans_method
         FROM 
             Account_Transaction at
