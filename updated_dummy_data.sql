@@ -95,7 +95,7 @@ INSERT INTO Account_Transaction (account_id, amount, trans_timestamp, reason, tr
 (2, 200.00, '2024-08-05 13:25:00', 'CDM Deposit', 'credit', 'atm-cdm'),
 (2, 350.00, '2024-08-10 11:15:00', 'Groceries', 'debit', 'via_employee'),
 (2, 600.00, '2024-08-20 09:45:00', 'Account Adjustment', 'credit', 'server'),
-(2, 1000.00, '2024-09-01 12:00:00', 'Investment Return', 'debit', 'online-transfer'),
+(2, 1000.00, '2024-09-01 12:00:00', 'Investment Return', 'debit', 'atm-cdm'),
 (3, 250.00, '2024-09-03 14:20:00', 'ATM Withdrawal', 'debit', 'atm-cdm'),
 (3, 500.00, '2024-09-07 08:15:00', 'Cash Deposit', 'credit', 'via_employee'),
 (3, 150.00, '2024-09-10 16:40:00', 'Credit Card Payment', 'debit', 'via_employee'),
@@ -107,16 +107,11 @@ INSERT INTO Account_Transaction (account_id, amount, trans_timestamp, reason, tr
 (1, 500.00, '2024-10-12 14:45:00', 'Bonus Credit', 'credit', 'server');
 
 INSERT INTO Online_Transfer (transaction_id, to_account_id) VALUES
-(1, 2),  -- From account 1 to account 2
-(6, 3),  -- From account 2 to account 3
+(7, 3),  -- From account 2 to account 3
 (9, 4),  -- From account 2 to account 4
-(11, 5), -- From account 3 to account 5
-(15, 6), -- From account 3 to account 6
-(25, 1), -- From account 5 to account 1
-(26, 3), -- From account 6 to account 3
-(36, 1), -- From account 2 to account 1
-(41, 3), -- From account 2 to account 3
-(46, 5); -- From account 4 to account 5
+(13, 6), -- From account 3 to account 6
+(23, 1), -- From account 5 to account 1
+(42, 3); -- From account 2 to account 3
 
 INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
 (1, 1, '2024-05-01', 10000),
