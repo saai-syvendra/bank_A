@@ -126,8 +126,7 @@ export default function Summary() {
                           <TableCell>{loan.interest}%</TableCell>
                           <TableCell>
                             {new Date(loan.start_date).toLocaleDateString()}
-                          </TableCell>{" "}
-                          {/* Original value retained */}
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -160,13 +159,10 @@ export default function Summary() {
                       {account.fixedDeposits.map((fd) => (
                         <TableRow key={fd.id}>
                           <TableCell>{fd.id}</TableCell>
-                        <TableRow key={fd.id}>
-                          <TableCell>{fd.id}</TableCell>
                           <TableCell>
                             Rs. {parseFloat(fd.amount).toFixed(2)}
                           </TableCell>
-                          <TableCell>{fd.interest}%</TableCell>{" "}
-                          {/* Original value retained */}
+                          <TableCell>{fd.interest}%</TableCell>
                           <TableCell>
                             {new Date(fd.maturity_date).toLocaleDateString()}
                           </TableCell>
