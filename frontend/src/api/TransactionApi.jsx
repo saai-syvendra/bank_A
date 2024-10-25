@@ -30,6 +30,7 @@ export const callEmployeeDepositForCustomer = async (data) => {
 };
 
 export const callMakeOnlineTransfer = async (data) => {
+  //console.log(data);
   try {
     const response = await fetch(`${TRANSACTION_API_URL}/online-transfer`, {
       method: "POST",

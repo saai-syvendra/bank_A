@@ -9,7 +9,7 @@ const getCustomerFds = async (customerId) => {
     const [rows] = await connection.query(
       `
         SELECT * 
-        FROM fd LEFT JOIN Customer_Account USING(account_id) 
+        FROM FD LEFT JOIN Customer_Account USING(account_id) 
         WHERE customer_id = ?;
       `,
       [customerId]
@@ -36,7 +36,7 @@ const getFdPlans = async () => {
     const [rows] = await connection.query(
       `
         SELECT * 
-        FROM Fd_Plan
+        FROM FD_Plan
         WHERE availability = 1;
       `
     );
@@ -80,10 +80,10 @@ const getFixedDepositsByAccountId = async (accountId) => {
 
     const [rows] = await connection.query(
       `
-        SELECT fd.*,fd_plan.interest
-        FROM fd
+        SELECT FD.*,FD_Plan.interest
+        FROM FD
         JOIN Customer_Account ca USING(account_id)
-        JOIN fd_plan ON fd.plan_id=fd_plan.id
+        JOIN FD_Plan ON FD.plan_id=FD_Plan.id
         WHERE account_id = ?;
       `,
       [accountId] // Use accountId as a parameter

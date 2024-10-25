@@ -20,8 +20,12 @@ const employeeDepositForCustomerController = async (req, res) => {
 };
 
 const makeOnlineTransfer = async (req, res) => {
-  const { fromAccountId, toAccountNo, amount, reason } = req.body;
+  //console.log(req.body);
+  const { fromAccountId, toAccountNo, amount, reason,fromAccountNo } = req.body;
   try {
+    if (fromAccountNo === toAccountNo) {
+      throw new Error("Cannot transfer money to the same account");
+    }
     const account = await AccountModel.getAccountByAccountNo(toAccountNo);
     const result = await TransactionModel.makeOnlineTransfer(
       fromAccountId,

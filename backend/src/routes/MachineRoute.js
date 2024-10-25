@@ -13,4 +13,11 @@ router.post(
   MachineController.makeCDMdeposit
 );
 
+router.post(
+  "/atm-withdrawal",
+  // authenticateJWT,
+  // authorizeRole("machine"),
+  MachineController.makeATMWithdrawal
+)
+
 export default router;

@@ -98,4 +98,4 @@ CALL CreateFd(2, 6, 35000);
 
 CALL TransferMoney (6, 1, 1254, 'Books money', @id);
 
-CALL WithdrawMoney(6, 7500, @id);
+CALL WithdrawMoney(6, 7500, 'atm-cdm', @id);

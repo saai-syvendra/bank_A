@@ -11,7 +11,7 @@ createRoot(document.getElementById("root")).render(
   <OTPProvider>
     <BrowserRouter>
       <AppRoutes />
-      <Toaster visibleToasts={1} position="bottom-right" richColors />
+      <Toaster visibleToasts={3} position="bottom-right" richColors closeButton/>
     </BrowserRouter>
   </OTPProvider>
   //</StrictMode>

@@ -24,8 +24,7 @@ import { callGetAccountIDfromAccountNo } from "../api/AccountApi"; // Add this i
 const depositFormSchema = z.object({
   accountNo: z.string().min(1, "Account number is required"),
   accountID: z.number().min(1, "Account ID is required"),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  name: z.string().min(1, "Name is required"),
   amount: z.coerce
     .number()
     .min(0.01, "Amount is required")
@@ -39,26 +38,25 @@ const EmployeeCashDepositForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCustomerLoading, setIsCustomerLoading] = useState(false);
   const [accountNo, setAccountNo] = useState("");
+  const [shouldReset, setShouldReset] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(depositFormSchema),
     defaultValues: {
       accountNo: "",
       accountID: "",
-      firstName: "",
-      lastName: "",
+      name: "",
       amount: 0,
       reason: "",
     },
   });
 
-  const fetchCustomerDetails = async (accountNo) => {
+  const fetchCustomerDetails = async () => {
     setIsCustomerLoading(true);
     try {
+      const accountNo = form.getValues("accountNo");
       const data = await callGetCustomerDetailsFromAccountNo(accountNo);
-      form.setValue("firstName", data.firstName);
-      form.setValue("lastName", data.lastName);
-
+      form.setValue("name", data.name);
       // Fetch accountID
       const accountID = await callGetAccountIDfromAccountNo(accountNo);
       form.setValue("accountID", accountID);
@@ -70,15 +68,27 @@ const EmployeeCashDepositForm = () => {
   };
 
   useEffect(() => {
-    if (accountNo.length > 0) {
-      fetchCustomerDetails(accountNo);
+    if (shouldReset) {
+      form.reset({
+        accountNo: accountNo,
+        accountID: "",
+        name: "",
+        amount: 0,
+        reason: "",
+      });
+      setShouldReset(false);
     }
-  }, [accountNo]);
+  }, [shouldReset, accountNo, form]);
 
   useEffect(() => {
-    const subscription = form.watch((value) => setAccountNo(value.accountNo));
+    const subscription = form.watch((value) => {
+      if (value.accountNo !== accountNo) {
+        setAccountNo(value.accountNo);
+        setShouldReset(true);
+      }
+    });
     return () => subscription.unsubscribe();
-  }, [form]);
+  }, [accountNo, form]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -128,12 +138,20 @@ const EmployeeCashDepositForm = () => {
               )}
             />
 
+            <Button
+              type="button"
+              onClick={fetchCustomerDetails}
+              disabled={isCustomerLoading}
+            >
+              {isCustomerLoading ? "Loading..." : "Fetch Customer Details"}
+            </Button>
+
             <FormField
               control={form.control}
-              name="accountID"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Account ID</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input {...field} disabled={true} />
                   </FormControl>
@@ -141,36 +159,6 @@ const EmployeeCashDepositForm = () => {
                 </FormItem>
               )}
             />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={true} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={true} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             <FormField
               control={form.control}

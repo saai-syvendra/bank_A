@@ -160,6 +160,8 @@ export default function Summary() {
                       {account.fixedDeposits.map((fd) => (
                         <TableRow key={fd.id}>
                           <TableCell>{fd.id}</TableCell>
+                        <TableRow key={fd.id}>
+                          <TableCell>{fd.id}</TableCell>
                           <TableCell>
                             Rs. {parseFloat(fd.amount).toFixed(2)}
                           </TableCell>

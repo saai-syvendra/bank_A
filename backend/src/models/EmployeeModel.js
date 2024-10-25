@@ -41,7 +41,7 @@ const getEmployee = async (id) => {
 
   [row] = await pool.query(
     `
-      SELECT position
+      SELECT emp_position
       FROM Employee_Position
       WHERE id = ?;
     `,
