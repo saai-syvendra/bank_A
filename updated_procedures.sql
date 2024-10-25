@@ -1402,7 +1402,7 @@ BEGIN
       AND amount BETWEEN p_min_amount AND p_max_amount
       AND (p_transaction_type IS NULL OR trans_type = p_transaction_type)
       AND (p_transaction_method IS NULL OR trans_method = p_transaction_method)
-      AND (p_branch_code IS NULL OR transaction_view.branch = p_branch_code)
+      AND (p_branch_code IS NULL OR transaction_view.branch_code = p_branch_code)
     ORDER BY trans_timestamp DESC;
 END $$
 
