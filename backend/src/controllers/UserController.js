@@ -75,24 +75,32 @@ const loginOtp = async (req, res) => {
 
     const user = await UserModel.getUserByUsername(username);
     const id = user["user_id"];
+    const role = user["role"];
+    let expiresIn = "15m";
+    let maxAge = 15 * 60 * 1000;
+
+    if (role === "manager" || role === "emnployee") {
+      expiresIn = "1d";
+      maxAge = 24 * 60 * 60 * 1000;
+    }
 
     const token = jwt.sign(
       {
-        role: user["role"],
+        role,
         id,
         username: user["email"],
       },
       jwtSecret,
       {
-        expiresIn: "15m",
+        expiresIn,
       }
     );
     res.cookie("token", token, {
       httpOnly: true,
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge, // 15 minutes
     });
     // console.log("Token: ", token);
-    return res.json({ message: "OTP Verified", role: user["role"] });
+    return res.json({ message: "OTP Verified", role });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error.message });
