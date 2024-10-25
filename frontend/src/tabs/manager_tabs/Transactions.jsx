@@ -13,9 +13,17 @@ import {
 } from "@/components/ui/select";
 import { callGetFilteredTransReports } from '../../api/TransactionApi'; 
 import Transactioncharts from "./Transactioncharts";
+import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 const transactionTypes = ['all', 'credit', 'debit'];
 const transactionMethods = ['all', 'atm-cdm', 'online-transfer', 'server', 'via_employee'];
+
+const methodColors = {
+  'atm-cdm': 'bg-green-500',
+  'online-transfer': 'bg-blue-500',
+  'server': 'bg-gray-500',
+  'via_employee': 'bg-yellow-500'
+};
 
 export default function BranchTransactionsPage() {
   const [transactions, setTransactions] = useState([]);
@@ -26,6 +34,7 @@ export default function BranchTransactionsPage() {
   const [transactionMethod, setTransactionMethod] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
   const fetchTransactions = async () => {
     setLoading(true);
@@ -60,6 +69,38 @@ export default function BranchTransactionsPage() {
     setTransactionMethod('all');
     setStartDate('');
     setEndDate('');
+  };
+
+  const sortData = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+
+    const sortedData = [...transactions].sort((a, b) => {
+      if (key === 'amount') {
+        return direction === 'ascending' 
+          ? parseFloat(a.amount) - parseFloat(b.amount)
+          : parseFloat(b.amount) - parseFloat(a.amount);
+      }
+      if (key === 'trans_timestamp') {
+        return direction === 'ascending'
+          ? new Date(a.trans_timestamp) - new Date(b.trans_timestamp)
+          : new Date(b.trans_timestamp) - new Date(a.trans_timestamp);
+      }
+      return 0;
+    });
+
+    setTransactions(sortedData);
+  };
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === 'ascending') return <ChevronUp className="inline-block ml-1 size-4" />
+      if (sortConfig.direction === 'descending') return <ChevronDown className="inline-block ml-1 size-4" />
+    }
+    return <ChevronsUpDown className="inline-block ml-1 size-4" />
   };
 
   return (
@@ -155,29 +196,38 @@ export default function BranchTransactionsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Amount</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Method</TableHead>
+                <TableHead 
+                  className="cursor-pointer"
+                  onClick={() => sortData('amount')}
+                >
+                  Amount {getSortIcon('amount')}
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer"
+                  onClick={() => sortData('trans_timestamp')}
+                >
+                  Date {getSortIcon('trans_timestamp')}
+                </TableHead>
                 <TableHead>Description</TableHead>
+                <TableHead>Method</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {transactions.map((transaction, index) => (
                 <TableRow key={index}>
-                  <TableCell>Rs.{parseFloat(transaction.amount).toLocaleString()}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      transaction.trans_type === 'credit' ? 'bg-green-100 text-green-800' :
-                      transaction.trans_type === 'debit' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {transaction.trans_type.charAt(0).toUpperCase() + transaction.trans_type.slice(1)}
-                    </span>
+                  <TableCell className={transaction.trans_type === 'credit' ? 'text-red-600' : 'text-green-600'}>
+                    {transaction.trans_type === 'credit' ? '-' : ''}
+                    Rs.{parseFloat(transaction.amount).toLocaleString()}
                   </TableCell>
                   <TableCell>{format(new Date(transaction.trans_timestamp), 'PP')}</TableCell>
-                  <TableCell>{transaction.trans_method}</TableCell>
                   <TableCell>{transaction.reason}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs text-white ${
+                      methodColors[transaction.trans_method] || 'bg-gray-500'
+                    }`}>
+                      {transaction.trans_method.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                    </span>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
