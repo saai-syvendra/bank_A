@@ -1,5 +1,6 @@
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 const LOAN_API_URL = `${VITE_API_URL}/loan`;
+const REPORT_API_URL = `${VITE_API_URL}/report`;
 
 export const callCreateLoan = async (loan) => {
   try {
@@ -233,5 +234,151 @@ export const callGetLoansByAccountId = async (accountId) => {
     throw new Error(error.message);
   }
 };
+export const callGetFilteredLoans = async ({
+  startDate,
+  endDate,
+  minAmount,
+  maxAmount,
+  loan_state,
+  loan_plan,
+  showLateOnly
+}) => {
+  try {
+    
+    const planMap = {
+      "all": null,
+      "short loan": 1,
+      "housing loan": 2,
+    };
+    const requestBody = {
+      start_date: startDate || null,
+      end_date: endDate || null,
+      min_ammount: minAmount || null,
+      max_ammount: maxAmount || null,
+      state: loan_state !== 'all' ? loan_state : null,
+      plan_id: planMap[loan_plan] || null,
+      is_late_loan: showLateOnly || null,
+    };
+
+    const response = await fetch(`${REPORT_API_URL}/loanreports`, {
+      method: "POST", 
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",  
+      body: JSON.stringify(requestBody), 
+    });
+
+    const data = await response.json();
+    console.log('API response:', data);
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch loans');
+    }
+
+    return data;  
+  } catch (error) {
+    console.error('Error fetching filtered loans:', error.message);
+    throw new Error(error.message);
+  }
+};
+
+export const callGetFilteredLoanreports = async ({
+  startDate,
+  endDate,
+  minAmount,
+  maxAmount,
+  loanState,
+  loanPlan,
+  showLateOnly,
+  time
+}) => {
+  try {
+    
+    const requestBody = {
+      start_date: startDate || null,
+      end_date: endDate || null,
+      min_ammount: minAmount || null,
+      max_ammount: maxAmount || null,
+      state: loanState !== 'all' ? loanState : null,
+      plan_id: loanPlan !== 'all' ? loanPlan : null,
+      is_late_loan: showLateOnly || null,
+      report_frequency: time || 'monthly' 
+    };
+
+    
+    const response = await fetch(`${REPORT_API_URL}/overall-loan`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include",
+      body: JSON.stringify(requestBody),  
+    });
+
+    
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch loan report data');
+    }
+
+    return data;  
+  } catch (error) {
+    console.error('Error fetching filtered loan reports:', error.message);
+    throw new Error(error.message);
+  }
+};
+
+
+export const callGetLateLoanreports = async ({
+  startDate,
+  endDate,
+  minAmount,
+  maxAmount,
+  loanState,
+  loanPlan,
+  showLateOnly,
+  time
+}) => {
+  try {
+    
+    const requestBody = {
+      start_date: startDate || null,
+      end_date: endDate || null,
+      min_ammount: minAmount || null,
+      max_ammount: maxAmount || null,
+      state: loanState !== 'all' ? loanState : null,
+      plan_id: loanPlan !== 'all' ? loanPlan : null,
+      is_late_loan: showLateOnly || null,
+      report_frequency: time || 'monthly' 
+    };
+
+    
+    const response = await fetch(`${REPORT_API_URL}/overall-late-loan`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include",
+      body: JSON.stringify(requestBody),  
+    });
+
+  
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch loan report data');
+    }
+
+    return data; 
+  } catch (error) {
+    console.error('Error fetching filtered loan reports:', error.message);
+    throw new Error(error.message);
+  }
+};
+
+
+
 
 

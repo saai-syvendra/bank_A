@@ -1,9 +1,12 @@
 import ReportModel from "../models/ReportModel.js";
+import EmployeeModel from "../models/EmployeeModel.js";
 
 const GetLoanReportController = async (req, res) => {
     const { start_date, end_date, min_ammount, max_ammount, state, branch_code, plan_id, is_late_loan } = req.body;
     try {
         console.log(req.body);
+        const { id: employeeId } = req.user;
+        const branch_code = await EmployeeModel.getEmployeeBranch(employeeId);
         // Assign default values for null or undefined parameters
         const startDate = start_date || null;
         const endDate = end_date || null;
@@ -26,6 +29,9 @@ const GetOverallLoanReportController = async (req, res) => {
     const { start_date, end_date, state, branch_code, report_frequency } = req.body;
     try {
         console.log(req.body);
+        const { id: employeeId } = req.user;
+        const branch_code = await EmployeeModel.getEmployeeBranch(employeeId);
+        
         // Assign default values for null or undefined parameters
         const startDate = start_date || null;
         const endDate = end_date || null;
@@ -62,6 +68,8 @@ const GetTransactionReportController = async (req, res) => {
     const { start_date, end_date, max_amount, min_amount, transaction_type, transaction_method, branch_code } = req.body;
     try {
         console.log(req.body);
+        const { id: employeeId } = req.user;
+        const b_c = await EmployeeModel.getEmployeeBranch(employeeId);
         // Assign default values for null or undefined parameters
         const startDate = start_date || null;
         const endDate = end_date || null;
@@ -69,7 +77,7 @@ const GetTransactionReportController = async (req, res) => {
         const minAmount = min_amount || null;
         const transactionType = transaction_type || null;
         const transactionMethod = transaction_method || null;
-        const branchCode = branch_code || null;
+        const branchCode = b_c || null;
 
         console.log(startDate, endDate, maxAmount, minAmount, transactionType, transactionMethod, branchCode);
         const result = await ReportModel.GetTransactionReport(startDate, endDate, maxAmount, minAmount, transactionType, transactionMethod, branchCode);
@@ -84,11 +92,13 @@ const GetTransactionOverallReportController = async (req, res) => {
     try {
         console.log(req.body);
         // Assign default values for null or undefined parameters
+        const { id: employeeId } = req.user;
+        const b_c = await EmployeeModel.getEmployeeBranch(employeeId);
         const startDate = start_date || null;
         const endDate = end_date || null;
         const transactionType = transaction_type || null;
         const transactionMethod = transaction_method || null;
-        const branchCode = branch_code || null;
+        const branchCode = b_c || null;
         const reportPeriod = report_period || null;
 
         console.log(startDate, endDate, transactionType, transactionMethod, branchCode, reportPeriod);

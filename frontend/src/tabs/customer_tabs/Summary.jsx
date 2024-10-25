@@ -117,7 +117,7 @@ export default function Summary() {
                     </TableHeader>
                     <TableBody>
                       {account.loans.map((loan) => (
-                        <TableRow key={loan.id}>
+                        <TableRow key={loan.loan_id}>
                           <TableCell>{loan.id}</TableCell>
                           <TableCell>{loan.name}</TableCell>
                           <TableCell>
@@ -125,9 +125,8 @@ export default function Summary() {
                           </TableCell>
                           <TableCell>{loan.interest}%</TableCell>
                           <TableCell>
-                            {new Date(loan.approved_date).toLocaleDateString()}
-                          </TableCell>{" "}
-                          {/* Original value retained */}
+                            {new Date(loan.start_date).toLocaleDateString()}
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -163,8 +162,7 @@ export default function Summary() {
                           <TableCell>
                             Rs. {parseFloat(fd.amount).toFixed(2)}
                           </TableCell>
-                          <TableCell>{fd.interest}%</TableCell>{" "}
-                          {/* Original value retained */}
+                          <TableCell>{fd.interest}%</TableCell>
                           <TableCell>
                             {new Date(fd.maturity_date).toLocaleDateString()}
                           </TableCell>
