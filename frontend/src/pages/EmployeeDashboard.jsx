@@ -6,6 +6,7 @@ import {
   TabsContent,
 } from "../components/ui/tabs";
 import ViewBranchTransactions from "../tabs/employee_tabs/ViewBranchTransactions";
+import Transactions from "../tabs/manager_tabs/Transactions"
 import CreateAccount from "../tabs/employee_tabs/CreateAccount";
 import LogoutButton from "../components/LogoutButton";
 import useAuthorization from "../auth/useAuthorization";
@@ -46,7 +47,6 @@ const EmployeeDashboard = ({ role }) => {
             <TabsTrigger value="create-account">Create Account</TabsTrigger>
             <TabsTrigger value="create-customer">Create Customer</TabsTrigger>
             <TabsTrigger value="create-loan">Create Loan</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
             <TabsTrigger value="cash-deposit">Cash Deposit</TabsTrigger>
             <TabsTrigger value="update-details">Update Details</TabsTrigger>
             {!isEmployee && (
@@ -54,6 +54,9 @@ const EmployeeDashboard = ({ role }) => {
                 <TabsTrigger value="approve-loan">Approve Loan</TabsTrigger>
                 <TabsTrigger value="late-loan">
                   Late Loan Installments
+                </TabsTrigger>
+                <TabsTrigger value="transactions">
+                  Transactions
                 </TabsTrigger>
               </>
             )}
@@ -66,9 +69,6 @@ const EmployeeDashboard = ({ role }) => {
           </TabsContent>
           <TabsContent value="create-loan">
             <CreateLoan triggerFetchCustomers={true} />
-          </TabsContent>
-          <TabsContent value="transactions">
-            <ViewBranchTransactions />
           </TabsContent>
           <TabsContent value="cash-deposit">
             <EmployeeCashDepositForm />
@@ -88,6 +88,9 @@ const EmployeeDashboard = ({ role }) => {
               </TabsContent>
               <TabsContent value="late-loan">
                 <LateLoanInstallments />
+              </TabsContent>
+              <TabsContent value="transactions">
+                <Transactions/>
               </TabsContent>
             </>
           )}

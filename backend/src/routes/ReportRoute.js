@@ -9,7 +9,7 @@ import {
 
 const router = express.Router();
 
-router.post("/loan", GetLoanReportController);
+router.post("/loanreports", GetLoanReportController);
 router.post("/overall-loan", GetOverallLoanReportController);
 router.post("/overall-late-loan", GetOverallLateLoanReportController);
 router.post("/transaction", GetTransactionReportController);
