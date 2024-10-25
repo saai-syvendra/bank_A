@@ -1136,7 +1136,7 @@ BEGIN
   SET withdrawal_count = 0;
 END $$
 
--- DROP PROCEDURE IF EXISTS GetLoanReport$$
+-- DROP PROCEDURE IF EXISTS GetLoanReport;
 
 CREATE PROCEDURE GetLoanReport(
     IN start_date DATE,
@@ -1166,45 +1166,17 @@ BEGIN
 	AND (is_late_loan IS NULL OR (is_late_loan = TRUE AND loan_id NOT IN (SELECT DISTINCT loan_id FROM loan_installment WHERE state = 'late')));
 END $$
 
--- DROP PROCEDURE IF EXISTS GetOverallLoanReport$$
+-- DROP PROCEDURE IF EXISTS GetOverallLoanReport;
 
 CREATE PROCEDURE GetOverallLoanReport(
     IN start_date DATE,
     IN end_date DATE,
     IN state ENUM('pending','approved','online'),
     IN branch_code INT,
-    IN report_frequency ENUM('daily', 'weekly', 'monthly')
+    IN report_frequency ENUM('monthly', 'quarterly', 'half_year', 'annual')
 )
 BEGIN
-    IF report_frequency = 'daily' THEN
-        SELECT DATE(approved_date) AS approved_date,
-            COUNT(*) AS loan_count,
-            AVG(loan_amount) AS avg_loan_amount,
-            MAX(loan_amount) AS max_loan_amount,
-            MIN(loan_amount) AS min_loan_amount,
-            SUM(loan_amount) AS total_loan_amount
-        FROM loan_view
-        WHERE (start_date IS NULL OR approved_date >= start_date)
-          AND (end_date IS NULL OR approved_date <= end_date)
-          AND (state IS NULL OR loan_view.state = state)
-          AND (branch_code IS NULL OR loan_view.branch_code = branch_code)
-        GROUP BY DATE(approved_date)
-        ORDER BY approved_date DESC;
-    ELSEIF report_frequency = 'weekly' THEN
-        SELECT YEARWEEK(approved_date) AS approved_week,
-            COUNT(*) AS loan_count,
-            AVG(loan_amount) AS avg_loan_amount,
-            MAX(loan_amount) AS max_loan_amount,
-            MIN(loan_amount) AS min_loan_amount,
-            SUM(loan_amount) AS total_loan_amount
-        FROM loan_view
-        WHERE (start_date IS NULL OR approved_date >= start_date)
-          AND (end_date IS NULL OR approved_date <= end_date)
-          AND (state IS NULL OR loan_view.state = state)
-          AND (branch_code IS NULL OR loan_view.branch_code = branch_code)
-        GROUP BY YEARWEEK(approved_date)
-        ORDER BY approved_week DESC;
-    ELSEIF report_frequency = 'monthly' THEN
+    IF report_frequency = 'monthly' THEN
         SELECT DATE_FORMAT(approved_date, '%Y-%m') AS approved_month,
             COUNT(*) AS loan_count,
             AVG(loan_amount) AS avg_loan_amount,
@@ -1218,46 +1190,60 @@ BEGIN
           AND (branch_code IS NULL OR loan_view.branch_code = branch_code)
         GROUP BY DATE_FORMAT(approved_date, '%Y-%m')
         ORDER BY approved_month DESC;
+    ELSEIF report_frequency = 'quarterly' THEN
+        SELECT CONCAT(YEAR(approved_date), '-Q', QUARTER(approved_date)) AS approved_quarter,
+            COUNT(*) AS loan_count,
+            AVG(loan_amount) AS avg_loan_amount,
+            MAX(loan_amount) AS max_loan_amount,
+            MIN(loan_amount) AS min_loan_amount,
+            SUM(loan_amount) AS total_loan_amount
+        FROM loan_view
+        WHERE (start_date IS NULL OR approved_date >= start_date)
+          AND (end_date IS NULL OR approved_date <= end_date)
+          AND (state IS NULL OR loan_view.state = state)
+          AND (branch_code IS NULL OR loan_view.branch_code = branch_code)
+        GROUP BY CONCAT(YEAR(approved_date), '-Q', QUARTER(approved_date))
+        ORDER BY approved_quarter DESC;
+    ELSEIF report_frequency = 'half_year' THEN
+        SELECT CONCAT(YEAR(approved_date), '-H', IF(MONTH(approved_date) <= 6, 1, 2)) AS approved_half_year,
+            COUNT(*) AS loan_count,
+            AVG(loan_amount) AS avg_loan_amount,
+            MAX(loan_amount) AS max_loan_amount,
+            MIN(loan_amount) AS min_loan_amount,
+            SUM(loan_amount) AS total_loan_amount
+        FROM loan_view
+        WHERE (start_date IS NULL OR approved_date >= start_date)
+          AND (end_date IS NULL OR approved_date <= end_date)
+          AND (state IS NULL OR loan_view.state = state)
+          AND (branch_code IS NULL OR loan_view.branch_code = branch_code)
+        GROUP BY CONCAT(YEAR(approved_date), '-H', IF(MONTH(approved_date) <= 6, 1, 2))
+        ORDER BY approved_half_year DESC;
+    ELSEIF report_frequency = 'annual' THEN
+        SELECT YEAR(approved_date) AS approved_year,
+            COUNT(*) AS loan_count,
+            AVG(loan_amount) AS avg_loan_amount,
+            MAX(loan_amount) AS max_loan_amount,
+            MIN(loan_amount) AS min_loan_amount,
+            SUM(loan_amount) AS total_loan_amount
+        FROM loan_view
+        WHERE (start_date IS NULL OR approved_date >= start_date)
+          AND (end_date IS NULL OR approved_date <= end_date)
+          AND (state IS NULL OR loan_view.state = state)
+          AND (branch_code IS NULL OR loan_view.branch_code = branch_code)
+        GROUP BY YEAR(approved_date)
+        ORDER BY approved_year DESC;
     END IF;
 END $$
 
--- DROP PROCEDURE IF EXISTS GetOverallLateLoanReport$$
+-- DROP PROCEDURE IF EXISTS GetOverallLateLoanReport;
 
 CREATE PROCEDURE GetOverallLateLoanReport(
     IN end_date DATE,
     IN branch_code INT,
-    IN report_frequency ENUM('daily', 'weekly', 'monthly')
+    IN report_frequency ENUM('monthly', 'quarterly', 'half_year', 'annual')
 )
 BEGIN
-    IF report_frequency = 'daily' THEN
-        SELECT DATE(due_date) AS due_date,
-            COUNT(*) AS installment_count,
-            AVG(installment_amount) AS avg_installment_amount,
-            MAX(installment_amount) AS max_installment_amount,
-            MIN(installment_amount) AS min_installment_amount,
-            SUM(installment_amount) AS total_installment_amount
-        FROM loan_view
-        INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
-        WHERE (end_date IS NULL OR due_date <= end_date)
-          AND (branch_code IS NULL OR branch_code = branch_code)
-          AND loan_installment.state = 'late'
-        GROUP BY DATE(due_date)
-        ORDER BY due_date DESC;
-    ELSEIF report_frequency = 'weekly' THEN
-        SELECT YEARWEEK(due_date) AS due_week,
-            COUNT(*) AS installment_count,
-            AVG(installment_amount) AS avg_installment_amount,
-            MAX(installment_amount) AS max_installment_amount,
-            MIN(installment_amount) AS min_installment_amount,
-            SUM(installment_amount) AS total_installment_amount
-        FROM loan_view
-        INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
-        WHERE (end_date IS NULL OR due_date <= end_date)
-          AND (branch_code IS NULL OR branch_code = branch_code)
-          AND loan_installment.state = 'late'
-        GROUP BY YEARWEEK(due_date)
-        ORDER BY due_week DESC;
-    ELSEIF report_frequency = 'monthly' THEN
+    IF report_frequency = 'monthly' THEN
         SELECT DATE_FORMAT(due_date, '%Y-%m') AS due_month,
             COUNT(*) AS installment_count,
             AVG(installment_amount) AS avg_installment_amount,
@@ -1271,10 +1257,127 @@ BEGIN
           AND loan_installment.state = 'late'
         GROUP BY DATE_FORMAT(due_date, '%Y-%m')
         ORDER BY due_month DESC;
+    ELSEIF report_frequency = 'quarterly' THEN
+        SELECT CONCAT(YEAR(due_date), '-Q', QUARTER(due_date)) AS due_quarter,
+            COUNT(*) AS installment_count,
+            AVG(installment_amount) AS avg_installment_amount,
+            MAX(installment_amount) AS max_installment_amount,
+            MIN(installment_amount) AS min_installment_amount,
+            SUM(installment_amount) AS total_installment_amount
+        FROM loan_view
+        INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
+        WHERE (end_date IS NULL OR due_date <= end_date)
+          AND (branch_code IS NULL OR branch_code = branch_code)
+          AND loan_installment.state = 'late'
+        GROUP BY CONCAT(YEAR(due_date), '-Q', QUARTER(due_date))
+        ORDER BY due_quarter DESC;
+    ELSEIF report_frequency = 'half_year' THEN
+        SELECT CONCAT(YEAR(due_date), '-H', IF(MONTH(due_date) <= 6, 1, 2)) AS due_half_year,
+            COUNT(*) AS installment_count,
+            AVG(installment_amount) AS avg_installment_amount,
+            MAX(installment_amount) AS max_installment_amount,
+            MIN(installment_amount) AS min_installment_amount,
+            SUM(installment_amount) AS total_installment_amount
+        FROM loan_view
+        INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
+        WHERE (end_date IS NULL OR due_date <= end_date)
+          AND (branch_code IS NULL OR branch_code = branch_code)
+          AND loan_installment.state = 'late'
+        GROUP BY CONCAT(YEAR(due_date), '-H', IF(MONTH(due_date) <= 6, 1, 2))
+        ORDER BY due_half_year DESC;
+    ELSEIF report_frequency = 'annual' THEN
+        SELECT YEAR(due_date) AS due_year,
+            COUNT(*) AS installment_count,
+            AVG(installment_amount) AS avg_installment_amount,
+            MAX(installment_amount) AS max_installment_amount,
+            MIN(installment_amount) AS min_installment_amount,
+            SUM(installment_amount) AS total_installment_amount
+        FROM loan_view
+        INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
+        WHERE (end_date IS NULL OR due_date <= end_date)
+          AND (branch_code IS NULL OR branch_code = branch_code)
+          AND loan_installment.state = 'late'
+        GROUP BY YEAR(due_date)
+        ORDER BY due_year DESC;
     END IF;
 END $$
 
--- DROP PROCEDURE IF EXISTS GetTransactionReport$$
+-- DROP PROCEDURE IF EXISTS GetTransactionOverallReport;
+
+CREATE PROCEDURE GetTransactionOverallReport(
+    IN start_date TIMESTAMP,
+    IN end_date TIMESTAMP,
+    IN transaction_type ENUM('credit','debit'),
+    IN transaction_method ENUM('atm-cdm','online-transfer','server','via_employee'),
+    IN branch_code INT,
+    IN report_period ENUM('monthly', 'quarterly', 'half_year', 'annual')
+)
+BEGIN
+    IF report_period = 'monthly' THEN
+        SELECT 
+            DATE_FORMAT(trans_timestamp, '%Y-%m') AS transaction_month,  
+            COUNT(*) AS transaction_count,
+            SUM(amount) AS total_amount,
+            AVG(amount) AS avg_amount,
+            MAX(amount) AS max_amount,
+            MIN(amount) AS min_amount
+        FROM account_transaction
+        WHERE (start_date IS NULL OR trans_timestamp >= start_date)
+        AND (end_date IS NULL OR trans_timestamp <= end_date)
+        AND (transaction_type IS NULL OR trans_type = transaction_type)
+        AND (transaction_method IS NULL OR trans_method = transaction_method)
+        AND (branch_code IS NULL OR branch_code = branch_code)
+        GROUP BY DATE_FORMAT(trans_timestamp, '%Y-%m')
+        ORDER BY transaction_month DESC;
+    ELSEIF report_period = 'quarterly' THEN
+        SELECT CONCAT(YEAR(trans_timestamp), '-Q', QUARTER(trans_timestamp)) AS transaction_quarter,  
+            COUNT(*) AS transaction_count,
+            SUM(amount) AS total_amount,
+            AVG(amount) AS avg_amount,
+            MAX(amount) AS max_amount,
+            MIN(amount) AS min_amount
+        FROM account_transaction
+        WHERE (start_date IS NULL OR trans_timestamp >= start_date)
+        AND (end_date IS NULL OR trans_timestamp <= end_date)
+        AND (transaction_type IS NULL OR trans_type = transaction_type)
+        AND (transaction_method IS NULL OR trans_method = transaction_method)
+        AND (branch_code IS NULL OR branch_code = branch_code)
+        GROUP BY CONCAT(YEAR(trans_timestamp), '-Q', QUARTER(trans_timestamp))
+        ORDER BY transaction_quarter DESC;
+    ELSEIF report_period = 'half_year' THEN
+        SELECT CONCAT(YEAR(trans_timestamp), '-H', IF(MONTH(trans_timestamp) <= 6, 1, 2)) AS transaction_half_year,  
+            COUNT(*) AS transaction_count,
+            SUM(amount) AS total_amount,
+            AVG(amount) AS avg_amount,
+            MAX(amount) AS max_amount,
+            MIN(amount) AS min_amount
+        FROM account_transaction
+        WHERE (start_date IS NULL OR trans_timestamp >= start_date)
+        AND (end_date IS NULL OR trans_timestamp <= end_date)
+        AND (transaction_type IS NULL OR trans_type = transaction_type)
+        AND (transaction_method IS NULL OR trans_method = transaction_method)
+        AND (branch_code IS NULL OR branch_code = branch_code)
+        GROUP BY CONCAT(YEAR(trans_timestamp), '-H', IF(MONTH(trans_timestamp) <= 6, 1, 2))
+        ORDER BY transaction_half_year DESC;
+    ELSEIF report_period = 'annual' THEN
+        SELECT YEAR(trans_timestamp) AS transaction_year,  
+            COUNT(*) AS transaction_count,
+            SUM(amount) AS total_amount,
+            AVG(amount) AS avg_amount,
+            MAX(amount) AS max_amount,
+            MIN(amount) AS min_amount
+        FROM account_transaction
+        WHERE (start_date IS NULL OR trans_timestamp >= start_date)
+        AND (end_date IS NULL OR trans_timestamp <= end_date)
+        AND (transaction_type IS NULL OR trans_type = transaction_type)
+        AND (transaction_method IS NULL OR trans_method = transaction_method)
+        AND (branch_code IS NULL OR branch_code = branch_code)
+        GROUP BY YEAR(trans_timestamp)
+        ORDER BY transaction_year DESC;
+    END IF;
+END $$
+
+-- DROP PROCEDURE IF EXISTS GetTransactionReport;
 
 CREATE PROCEDURE GetTransactionReport(
     IN start_date TIMESTAMP,
@@ -1301,73 +1404,6 @@ BEGIN
       AND (transaction_method IS NULL OR trans_method = transaction_method)
       AND (branch_code IS NULL OR transaction_view.branch_code = branch_code)
     ORDER BY trans_timestamp DESC;
-END $$
-
--- Usage example
--- CALL GetTransactionReport('2023-01-01 00:00:00', '2024-12-31 23:59:59', NULL, NULL, 'credit', NULL, NULL);
-
--- DROP PROCEDURE IF EXISTS GetTransactionOverallReport$$
-
-CREATE PROCEDURE GetTransactionOverallReport(
-    IN start_date TIMESTAMP,
-    IN end_date TIMESTAMP,
-    IN transaction_type ENUM('credit','debit'),
-    IN transaction_method ENUM('atm-cdm','online-transfer','server','via_employee'),
-    IN branch_code INT,
-    IN report_period ENUM('daily', 'weekly', 'monthly')
-)
-BEGIN
-    IF report_period = 'daily' THEN
-        SELECT 
-            DATE(trans_timestamp) AS transaction_date,
-            COUNT(*) AS transaction_count, 
-            AVG(amount) AS avg_trans_amount, 
-            MIN(amount) AS min_trans_amount, 
-            MAX(amount) AS max_trans_amount, 
-            SUM(amount) AS total_trans_amount
-        FROM transaction_view
-        WHERE (start_date IS NULL OR trans_timestamp >= start_date)
-          AND (end_date IS NULL OR trans_timestamp <= end_date)
-          AND (transaction_type IS NULL OR trans_type = transaction_type)
-          AND (transaction_method IS NULL OR trans_method = transaction_method)
-          AND (branch_code IS NULL OR transaction_view.branch_code = branch_code)
-        GROUP BY transaction_date
-        ORDER BY transaction_date DESC;
-
-    ELSEIF report_period = 'weekly' THEN
-        SELECT 
-            YEARWEEK(trans_timestamp, 1) AS transaction_week,  -- Get week number and year
-            COUNT(*) AS transaction_count, 
-            AVG(amount) AS avg_trans_amount, 
-            MIN(amount) AS min_trans_amount, 
-            MAX(amount) AS max_trans_amount, 
-            SUM(amount) AS total_trans_amount
-        FROM transaction_view
-        WHERE (start_date IS NULL OR trans_timestamp >= start_date)
-          AND (end_date IS NULL OR trans_timestamp <= end_date)
-          AND (transaction_type IS NULL OR trans_type = transaction_type)
-          AND (transaction_method IS NULL OR trans_method = transaction_method)
-          AND (branch_code IS NULL OR transaction_view.branch_code = branch_code)
-        GROUP BY transaction_week
-        ORDER BY transaction_week DESC;
-
-    ELSEIF report_period = 'monthly' THEN
-        SELECT 
-            DATE_FORMAT(trans_timestamp, '%Y-%m') AS transaction_month,  -- Format as YYYY-MM
-            COUNT(*) AS transaction_count, 
-            AVG(amount) AS avg_trans_amount, 
-            MIN(amount) AS min_trans_amount, 
-            MAX(amount) AS max_trans_amount, 
-            SUM(amount) AS total_trans_amount
-        FROM transaction_view
-        WHERE (start_date IS NULL OR trans_timestamp >= start_date)
-          AND (end_date IS NULL OR trans_timestamp <= end_date)
-          AND (transaction_type IS NULL OR trans_type = transaction_type)
-          AND (transaction_method IS NULL OR trans_method = transaction_method)
-          AND (branch_code IS NULL OR transaction_view.branch_code = branch_code)
-        GROUP BY transaction_month
-        ORDER BY transaction_month DESC;
-    END IF;
 END $$
 
 DELIMITER ;
