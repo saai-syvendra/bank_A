@@ -255,7 +255,7 @@ const getLoanCustomers = async (branch_code) => {
       `
         SELECT DISTINCT ca.customer_id
         FROM Loan l
-        LEFT JOIN customer_account ca ON l.connected_account = ca.account_id
+        LEFT JOIN Customer_Account ca ON l.connected_account = ca.account_id
         WHERE ca.branch_code = ?;
       `,
       [branch_code]
@@ -279,10 +279,10 @@ const getLoansByAccountId = async (accountId) => {
 
     const [rows] = await connection.query(
       `
-        SELECT loan.*, loan_plan.interest, loan_plan.name
-        FROM loan 
-        JOIN loan_plan ON loan.plan_id = loan_plan.id
-        WHERE loan.connected_account = ?;
+        SELECT Loan.*, Loan_Plan.interest, Loan_Plan.name
+        FROM Loan 
+        JOIN Loan_Plan ON Loan.plan_id = Loan_Plan.id
+        WHERE Loan.connected_account = ?;
       `,
       [accountId] // Use accountId as a parameter
     );
