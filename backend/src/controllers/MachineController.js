@@ -13,7 +13,7 @@ const getCDMinformation = async (req, res) => {
     if (customer.c_type === "individual") {
       customerName = `${customer.first_name} ${customer.last_name}`;
     } else if (customer.c_type === "organisation") {
-      customerName = customer.org_name;
+      customerName = customer.name;
     }
     const cdmInfo = {
       accountNo: account.account_number,
