@@ -16,6 +16,7 @@ const getEmployeeDetail = async (req, res) => {
       dob: employee["dob"],
       nic: employee["nic"],
     };
+    console.log(employeeDetail);
     res.status(200).json(employeeDetail);
   } catch (error) {
     res.status(400).json({ message: error.message });

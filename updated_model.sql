@@ -51,7 +51,7 @@ CREATE TABLE Branch (
 
 CREATE TABLE Employee_Position (
   id    		INT AUTO_INCREMENT,
-  position      VARCHAR(50) NOT NULL,
+  emp_position      VARCHAR(50) NOT NULL,
   PRIMARY KEY (id)
 );
 
