@@ -7,7 +7,7 @@ import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } f
 import { callGetTransactionReports } from "../../api/TransactionApi" 
 
 export default function TransactionDetailsChart() {
-  const [timeRange, setTimeRange] = useState("weekly")
+  const [timeRange, setTimeRange] = useState("monthly")
   const [transactionType, setTransactionType] = useState("all")
   const [transactionData, setTransactionData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -34,33 +34,44 @@ export default function TransactionDetailsChart() {
         const formattedData = data.map(item => {
           let formattedDate;
 
-          if (timeRange === "weekly") {
-            const year = String(item.transaction_week).slice(0, 4);
-            const week = String(item.transaction_week).slice(4);
-            formattedDate = `Week ${week}, ${year}`;
+          if (timeRange === "quarterly") {
+            const [year, quarter] = item.transaction_quarter.split("-Q");
+            formattedDate = `Q${quarter} ${year}`;
+          } else if (timeRange === "half_year") {
+            const [year, half] = item.transaction_half_year.split("-H");
+            formattedDate = half === "1" ? `First Half ${year}` : `Second Half ${year}`;
           } else if (timeRange === "monthly") {
             const [year, month] = item.transaction_month.split("-");
             const date = new Date(year, month - 1); // month is 0-indexed in JS
             formattedDate = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long" }).format(date);
+          } else if (timeRange === "annual") {
+            formattedDate = item.transaction_year;
           }
 
           return {
             date: formattedDate,
-            avg_transaction_amount: Number(item.avg_trans_amount) || 0,
-            max_transaction_amount: Number(item.max_trans_amount) || 0,
-            min_transaction_amount: Number(item.min_trans_amount) || 0,
-            total_transaction_amount: Number(item.total_trans_amount) || 0,
+            avg_transaction_amount: Number(item.avg_amount) || 0,
+            max_transaction_amount: Number(item.max_amount) || 0,
+            min_transaction_amount: Number(item.min_amount) || 0,
+            total_transaction_amount: Number(item.total_amount) || 0,
             transaction_count: Number(item.transaction_count) || 0
           }
         });
 
+        // Sorting logic for different time ranges
         formattedData.sort((a, b) => {
-          if (timeRange === "weekly") {
-            return parseInt(a.date.match(/\d+/)[0]) - parseInt(b.date.match(/\d+/)[0]);
+          if (timeRange === "quarterly") {
+            const [yearA, quarterA] = a.date.match(/\d+/g);
+            const [yearB, quarterB] = b.date.match(/\d+/g);
+            return yearA - yearB || quarterA - quarterB;
+          } else if (timeRange === "half_year") {
+            const [yearA, halfA] = a.date.match(/\d+/g);
+            const [yearB, halfB] = b.date.match(/\d+/g);
+            return yearA - yearB || halfA - halfB;
           } else if (timeRange === "monthly") {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            return dateA - dateB;
+            return new Date(a.date) - new Date(b.date);
+          } else if (timeRange === "annual") {
+            return a.date - b.date;
           }
           return 0;
         });
@@ -122,8 +133,10 @@ export default function TransactionDetailsChart() {
               <SelectValue placeholder="Select time range" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="weekly">Weekly</SelectItem>
               <SelectItem value="monthly">Monthly</SelectItem>
+              <SelectItem value="quarterly">Quarterly</SelectItem>
+              <SelectItem value="half_year">Half Year</SelectItem>
+              <SelectItem value="annual">Annual</SelectItem>
             </SelectContent>
           </Select>
           <Select onValueChange={(value) => setTransactionType(value)} value={transactionType}>
