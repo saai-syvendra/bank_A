@@ -121,6 +121,7 @@ END$$
 CREATE PROCEDURE WithdrawMoney(
     IN p_account_id INT,
     IN p_withdraw_amount NUMERIC(12,2),
+    IN p_method ENUM('atm-cdm'),
     OUT p_transaction_id INT
 )
 BEGIN
@@ -128,6 +129,20 @@ BEGIN
     DECLARE v_withdrawal_count INT;
     DECLARE v_account_type ENUM('saving','checking');
     DECLARE error_message VARCHAR(255);
+
+    -- Error handler to capture error message
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            error_message = MESSAGE_TEXT;
+
+        -- Rollback the transaction
+        ROLLBACK;
+
+        -- Signal an error with a custom message
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = error_message;
+    END;
 
     -- Start a transaction
     START TRANSACTION;
@@ -161,15 +176,12 @@ BEGIN
     END IF;
 
     -- Call the DeductMoney procedure to deduct the amount from the account
-    CALL DeductMoney(p_account_id, p_withdraw_amount, CONCAT('ATM Withdrawal'), 'atm-cdm', p_transaction_id);
+    CALL DeductMoney(p_account_id, p_withdraw_amount, CONCAT('ATM Withdrawal'), p_method, p_transaction_id);
 
     -- Check if DeductMoney succeeded
     IF p_transaction_id IS NULL THEN
-        -- DeductMoney failed, set error message
-        SET error_message = CONCAT('Withdrawal from account number ', account_num, ' failed.');
         ROLLBACK;
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = error_message;
+        SIGNAL SQLSTATE '45000';
     ELSE
         -- DeductMoney succeeded, commit the transaction
         COMMIT;

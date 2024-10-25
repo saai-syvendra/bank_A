@@ -13,9 +13,9 @@ const getCDMinformation = async (req, res) => {
     if (customer.c_type === "individual") {
       customerName = `${customer.first_name} ${customer.last_name}`;
     } else if (customer.c_type === "organisation") {
-      customerName = customer.org_name;
+      customerName = customer.name;
     }
-    const atmInfo = {
+    const cdmInfo = {
       accountNo: account.account_number,
       accountId: account.account_id,
       name: customerName,
@@ -34,7 +34,7 @@ const getCDMinformation = async (req, res) => {
     //   httpOnly: true,
     //   maxAge: 10 * 60 * 1000, // 10 minutes
     // });
-    return res.json(atmInfo);
+    return res.json(cdmInfo);
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error.message });
@@ -60,7 +60,26 @@ const makeCDMdeposit = async (req, res) => {
   }
 };
 
+const makeATMWithdrawal = async (req, res) => {
+  const { account_id, amount } = req.body;
+
+  try {
+    const result = await TransactionModel.cashWithdrawal(
+      account_id,
+      amount,
+      "atm-cdm"
+    );
+    res.status(200).json({
+      message: "Transaction committed successfully",
+      transaction_id: result.transaction_id,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export default {
   getCDMinformation,
   makeCDMdeposit,
+  makeATMWithdrawal,
 };
