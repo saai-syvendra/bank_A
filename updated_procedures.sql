@@ -1104,7 +1104,7 @@ BEGIN
             ot.to_account_id = acc_id
         -- Apply the same filters for Online_Transfer transactions
         AND (p_start_date IS NULL OR at.trans_timestamp >= p_start_date)
-        AND (p_transaction_type IS NULL OR CASE WHEN at.trans_type = 'credit' THEN 'debit' ELSE at.trans_type END = p_transaction_type)
+        AND (p_transaction_type IS NULL OR p_transaction_type = 'credit')
         AND (
             (p_min_amount IS NULL AND p_max_amount IS NULL)
             OR (p_min_amount IS NOT NULL AND p_max_amount IS NULL AND at.amount >= p_min_amount)
