@@ -25,9 +25,11 @@ import {
 import { DatePicker } from "@/components/ui/custom-date-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 
 export default function ViewTransactions() {
   const [transactions, setTransactions] = useState([]);
+  const [originalTransactions, setOriginalTransactions] = useState([])
   const [isLoading, setIsLoading] = useState(true);
   const [accounts, setAccounts] = useState([]);
   const defaultFilters = {
@@ -40,6 +42,7 @@ export default function ViewTransactions() {
   };
   const [filters, setFilters] = useState(defaultFilters);
   const [tempFilters, setTempFilters] = useState({ ...filters });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
   const fetchTransactions = useCallback(async () => {
     const apiFilters = { ...filters };
@@ -66,8 +69,10 @@ export default function ViewTransactions() {
       });
       console.log("Fetched Transactions", sortedTransactions);
       setTransactions(sortedTransactions);
+      setOriginalTransactions(sortedTransactions);
     } catch (error) {
       setTransactions([]);
+      setOriginalTransactions([]);
       toast.error(error.message || "Failed to fetch transactions");
     } finally {
       setIsLoading(false);
@@ -103,7 +108,55 @@ export default function ViewTransactions() {
   const cancelFilters = () => {
     setFilters(defaultFilters);
     setTempFilters(defaultFilters);
+    setSortConfig({ key: null, direction: 'original' })
   };
+
+  const sortData = (key) => {
+    let direction = 'ascending'
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === 'ascending') {
+        direction = 'descending'
+      } else if (sortConfig.direction === 'descending') {
+        direction = 'original'
+      }
+    }
+    setSortConfig({ key, direction })
+
+    let sortedData
+    if (direction === 'original') {
+      sortedData = [...originalTransactions]
+    } else {
+      sortedData = [...transactions].sort((a, b) => {
+        if (key === 'transaction_id') {
+          return direction === 'ascending' 
+            ? a.transaction_id - b.transaction_id
+            : b.transaction_id - a.transaction_id
+        }
+        if (key === 'amount') {
+          return direction === 'ascending'
+            ? parseFloat(a.amount) - parseFloat(b.amount)
+            : parseFloat(b.amount) - parseFloat(a.amount)
+        }
+        if (key === 'trans_timestamp') {
+          return direction === 'ascending'
+            ? new Date(a.trans_timestamp) - new Date(b.trans_timestamp)
+            : new Date(b.trans_timestamp) - new Date(a.trans_timestamp)
+        }
+        return 0
+      })
+    }
+
+    setTransactions(sortedData)
+  }
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === 'ascending') return <ChevronUp className="inline-block ml-1 size-4" />
+      if (sortConfig.direction === 'descending') return <ChevronDown className="inline-block ml-1 size-4" />
+      // return <ChevronsUpDown className="inline-block ml-1" />
+    }
+    return <ChevronsUpDown className="inline-block ml-1 size-4" />
+  }
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -115,6 +168,36 @@ export default function ViewTransactions() {
         <CardHeader>
           <h2 className="text-2xl font-bold">Account Transactions</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
+          <div>
+              <Select
+                id="accountId"
+                value={tempFilters.accountId}
+                onValueChange={(value) =>
+                  handleFilterChange("accountId", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Account No" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {accounts.map((account) => (
+                    <SelectItem
+                      key={account.account_id}
+                      value={account.account_id}
+                    >
+                      {account.account_number}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <label
+                htmlFor="accountId"
+                className="flex justify-center text-xs font-medium text-gray-700 mb-1"
+              >
+                Account Number
+              </label>
+            </div>
             <div>
               <Select
                 id="transactionType"
@@ -163,36 +246,6 @@ export default function ViewTransactions() {
                 className="flex justify-center text-xs font-medium text-gray-700 mb-1"
               >
                 Transaction Method
-              </label>
-            </div>
-            <div>
-              <Select
-                id="accountId"
-                value={tempFilters.accountId}
-                onValueChange={(value) =>
-                  handleFilterChange("accountId", value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Account No" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  {accounts.map((account) => (
-                    <SelectItem
-                      key={account.account_id}
-                      value={account.account_id}
-                    >
-                      {account.account_number}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <label
-                htmlFor="accountId"
-                className="flex justify-center text-xs font-medium text-gray-700 mb-1"
-              >
-                Account Number
               </label>
             </div>
             <div>
@@ -257,10 +310,13 @@ export default function ViewTransactions() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
                 <TableHead>Account No</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead onClick={() => sortData('amount')} className="cursor-pointer">
+                  Amount {getSortIcon('amount')}
+                </TableHead>
+                <TableHead onClick={() => sortData('trans_timestamp')} className="cursor-pointer">
+                  Date {getSortIcon('trans_timestamp')}
+                </TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Method</TableHead>
@@ -269,7 +325,6 @@ export default function ViewTransactions() {
             <TableBody>
               {transactions.map((transaction) => (
                 <TableRow key={transaction.transaction_id}>
-                  <TableCell>{transaction.transaction_id}</TableCell>
                   <TableCell>{transaction.account_number}</TableCell>
                   <TableCell
                     className={`text-gray-800 font-semibold ${
