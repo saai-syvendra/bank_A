@@ -204,7 +204,17 @@ const getATMinformation = async (req, res) => {
     return res.status(500).send({ message: error.message });
   }
 };
-
+const getbranchCustomers = async (req, res) => {
+  const { id: employeeId } = req.user;
+  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
+  console.log("Branch Code:", branchCode);
+  try {
+    const summary = await AccountModel.getBranchAccounts(branchCode);
+    res.status(200).send(summary);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+}
 export default {
   getCustomerAccounts,
   getThisCustomerAccounts,
@@ -216,4 +226,5 @@ export default {
   getBranchAccounts,
   getAccountIDByAccountNo,
   getATMinformation,
+  getbranchCustomers,
 };

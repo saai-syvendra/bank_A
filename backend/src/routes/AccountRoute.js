@@ -66,4 +66,9 @@ router.post(
   AccountController.getAccountIDByAccountNo
 );
 
+router.get(
+  "/branch-customers",
+  authorizeRole("employee", "manager"),
+  AccountController.getbranchCustomers
+);
 export default router;
