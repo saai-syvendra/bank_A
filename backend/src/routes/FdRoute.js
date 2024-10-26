@@ -16,4 +16,10 @@ router.post("/create", authorizeRole("customer"), FdController.createFd);
 
 router.get("/account-fds", FdController.getFDsForThisAccount);
 
+router.get(
+  "/branch-fds",
+  authorizeRole("employee", "manager"),
+  FdController.getBranchFdSummary
+);
+
 export default router;
