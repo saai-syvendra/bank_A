@@ -1,7 +1,10 @@
-import React from "react"
+'use client'
+
+import React, { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Users, CreditCard, Landmark, PiggyBank } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Users, CreditCard, Landmark, PiggyBank, Search } from "lucide-react"
 
 export default function BranchOverview() {
   // Dummy data
@@ -29,6 +32,35 @@ export default function BranchOverview() {
     { fdId: "FD003", connectedAccountNo: "A003", startingDate: "2023-03-15", amount: 25000, planName: "Fixed 6 Months" },
   ]
 
+  const [accountSearch, setAccountSearch] = useState("")
+  const [customerSearch, setCustomerSearch] = useState("")
+  const [loanSearch, setLoanSearch] = useState("")
+  const [fdSearch, setFdSearch] = useState("")
+
+  const generateEmptyRows = (data, totalRows = 9) => {
+    const emptyRows = totalRows - data.length;
+    return emptyRows > 0 ? Array(emptyRows).fill({}) : [];
+  };
+
+  const filteredAccounts = accountsData.filter(account => 
+    account.accountNo.toLowerCase().includes(accountSearch.toLowerCase()) ||
+    account.customerId.toLowerCase().includes(accountSearch.toLowerCase())
+  )
+
+  const filteredCustomers = customersData.filter(customer => 
+    customer.customerId.toLowerCase().includes(customerSearch.toLowerCase()) ||
+    customer.name.toLowerCase().includes(customerSearch.toLowerCase())
+  )
+
+  const filteredLoans = loansData.filter(loan => 
+    loan.loanId.toLowerCase().includes(loanSearch.toLowerCase())
+  )
+
+  const filteredFds = fdData.filter(fd => 
+    fd.fdId.toLowerCase().includes(fdSearch.toLowerCase()) ||
+    fd.connectedAccountNo.toLowerCase().includes(fdSearch.toLowerCase())
+  )
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Branch Overview</h1>
@@ -39,29 +71,40 @@ export default function BranchOverview() {
             <CardTitle className="text-lg font-medium">Accounts</CardTitle>
             <CreditCard className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Account No</TableHead>
-                  <TableHead>Customer ID</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Starting Date</TableHead>
-                  <TableHead>Balance</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {accountsData.map((account) => (
-                  <TableRow key={account.accountNo}>
-                    <TableCell>{account.accountNo}</TableCell>
-                    <TableCell>{account.customerId}</TableCell>
-                    <TableCell>{account.accountType}</TableCell>
-                    <TableCell>{account.startingDate}</TableCell>
-                    <TableCell>₹{account.balance.toFixed(2)}</TableCell>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Search by Account No or Customer ID"
+                value={accountSearch}
+                onChange={(e) => setAccountSearch(e.target.value)}
+                className="flex-1"
+              />
+            </div>
+            <div className="h-[350px] overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Account No</TableHead>
+                    <TableHead>Customer ID</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Starting Date</TableHead>
+                    <TableHead>Balance</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {[...filteredAccounts, ...generateEmptyRows(filteredAccounts)].map((account, index) => (
+                    <TableRow key={account.accountNo || `empty-${index}`} className={account.accountNo ? '' : 'border-none'}>
+                      <TableCell>{account.accountNo || ''}</TableCell>
+                      <TableCell>{account.customerId || ''}</TableCell>
+                      <TableCell>{account.accountType || ''}</TableCell>
+                      <TableCell>{account.startingDate || ''}</TableCell>
+                      <TableCell>{account.balance ? `₹${account.balance.toFixed(2)}` : ''}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
@@ -70,25 +113,36 @@ export default function BranchOverview() {
             <CardTitle className="text-lg font-medium">Customers</CardTitle>
             <Users className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer ID</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Customer Type</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {customersData.map((customer) => (
-                  <TableRow key={customer.customerId}>
-                    <TableCell>{customer.customerId}</TableCell>
-                    <TableCell>{customer.name}</TableCell>
-                    <TableCell>{customer.customerType}</TableCell>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Search by Customer ID or Name"
+                value={customerSearch}
+                onChange={(e) => setCustomerSearch(e.target.value)}
+                className="flex-1"
+              />
+            </div>
+            <div className="h-[350px] overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Customer Type</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {[...filteredCustomers, ...generateEmptyRows(filteredCustomers)].map((customer, index) => (
+                    <TableRow key={customer.customerId || `empty-${index}`} className={customer.customerId ? '' : 'border-none'}>
+                      <TableCell>{customer.customerId || ''}</TableCell>
+                      <TableCell>{customer.name || ''}</TableCell>
+                      <TableCell>{customer.customerType || ''}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
@@ -97,31 +151,42 @@ export default function BranchOverview() {
             <CardTitle className="text-lg font-medium">Loans</CardTitle>
             <Landmark className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Loan ID</TableHead>
-                  <TableHead>Loan Type</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>Plan Name</TableHead>
-                  <TableHead>Installments Paid</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loansData.map((loan) => (
-                  <TableRow key={loan.loanId}>
-                    <TableCell>{loan.loanId}</TableCell>
-                    <TableCell>{loan.loanType}</TableCell>
-                    <TableCell>₹{loan.loanAmount.toFixed(2)}</TableCell>
-                    <TableCell>{loan.startDate}</TableCell>
-                    <TableCell>{loan.planName}</TableCell>
-                    <TableCell>{loan.installmentsPaid}</TableCell>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Search by Loan ID"
+                value={loanSearch}
+                onChange={(e) => setLoanSearch(e.target.value)}
+                className="flex-1"
+              />
+            </div>
+            <div className="h-[350px] overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Loan ID</TableHead>
+                    <TableHead>Loan Type</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>Plan Name</TableHead>
+                    <TableHead>Installments Paid</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {[...filteredLoans, ...generateEmptyRows(filteredLoans)].map((loan, index) => (
+                    <TableRow key={loan.loanId || `empty-${index}`} className={loan.loanId ? '' : 'border-none'}>
+                      <TableCell>{loan.loanId || ''}</TableCell>
+                      <TableCell>{loan.loanType || ''}</TableCell>
+                      <TableCell>{loan.loanAmount ? `₹${loan.loanAmount.toFixed(2)}` : ''}</TableCell>
+                      <TableCell>{loan.startDate || ''}</TableCell>
+                      <TableCell>{loan.planName || ''}</TableCell>
+                      <TableCell>{loan.installmentsPaid || ''}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
@@ -130,32 +195,48 @@ export default function BranchOverview() {
             <CardTitle className="text-lg font-medium">Fixed Deposits</CardTitle>
             <PiggyBank className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>FD ID</TableHead>
-                  <TableHead>Connected Account</TableHead>
-                  <TableHead>Starting Date</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Plan Name</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {fdData.map((fd) => (
-                  <TableRow key={fd.fdId}>
-                    <TableCell>{fd.fdId}</TableCell>
-                    <TableCell>{fd.connectedAccountNo}</TableCell>
-                    <TableCell>{fd.startingDate}</TableCell>
-                    <TableCell>₹{fd.amount.toFixed(2)}</TableCell>
-                    <TableCell>{fd.planName}</TableCell>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Search by FD ID or Connected Account"
+                value={fdSearch}
+                onChange={(e) => setFdSearch(e.target.value)}
+                className="flex-1"
+              />
+            </div>
+            <div className="h-[350px] overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>FD ID</TableHead>
+                    <TableHead>Connected Account</TableHead>
+                    <TableHead>Starting Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Plan Name</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {[...filteredFds, ...generateEmptyRows(filteredFds)].map((fd, index) => (
+                    <TableRow key={fd.fdId || `empty-${index}`} className={fd.fdId ? '' : 'border-none'}>
+                      <TableCell>{fd.fdId || ''}</TableCell>
+                      <TableCell>{fd.connectedAccountNo || ''}</TableCell>
+                      <TableCell>{fd.startingDate || ''}</TableCell>
+                      <TableCell>{fd.amount ? `₹${fd.amount.toFixed(2)}` : ''}</TableCell>
+                      <TableCell>{fd.planName || ''}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
+      <style jsx global>{`
+        .border-none td {
+          border: none;
+        }
+      `}</style>
     </div>
   )
 }
