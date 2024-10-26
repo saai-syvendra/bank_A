@@ -3,7 +3,7 @@ import {
   callPayInstallment,
 } from "../../api/LoanApi";
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -32,8 +32,6 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { callGetThisCustomerAccounts } from "../../api/AccountApi";
-import { useOTP } from "../../auth/OtpContext";
-import { OTPDialog } from "@/components/OtpDialog";
 import { formatAccountDetails } from "../../helper/stringFormatting";
 
 const LoanPayment = () => {
@@ -43,7 +41,6 @@ const LoanPayment = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [accounts, setAccounts] = useState([]);
-  const { sendOtp, isVerifying } = useOTP();
 
   const fetchUpcomingInstallments = async () => {
     try {
@@ -75,23 +72,6 @@ const LoanPayment = () => {
     setSelectedAccount(value);
   };
 
-  const onSave = async () => {
-    if (!selectedAccount) {
-      toast.error("Please select an account to make payment");
-      return;
-    } else if (!selectedInstallment) {
-      toast.error("Please select an installment to make payment");
-      return;
-    }
-    setIsPaymentModalOpen(false);
-    try {
-      console.log("Sending OTP");
-      await sendOtp();
-    } catch (error) {
-      toast.error("Failed to initiate OTP verification");
-    }
-  };
-
   const submitPayment = async () => {
     try {
       await callPayInstallment(
@@ -104,10 +84,12 @@ const LoanPayment = () => {
       );
     } catch (error) {
       toast.error(error.message || "Failed to process payment");
+    } finally{
+      setIsPaymentModalOpen(false);
+      fetchUpcomingInstallments();
+      fetchAccounts();
     }
-
-    fetchUpcomingInstallments();
-    fetchAccounts();
+    
   };
 
   useEffect(() => {
@@ -117,8 +99,13 @@ const LoanPayment = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Loan Payments</h1>
       <Card className="mb-4">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Loan Payment</CardTitle>
+          <p className="text-gray-400 text-sm text-secondary-foreground">
+            Select and pay relevant laon installment
+          </p>
+        </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
@@ -183,12 +170,12 @@ const LoanPayment = () => {
             </Select>
           </div>
           <DialogFooter>
-            <Button onClick={onSave}>Confirm Payment</Button>
+            <Button onClick={submitPayment}>Confirm Payment</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <OTPDialog onVerificationSuccess={submitPayment} />
+      {/* <OTPDialog onVerificationSuccess={submitPayment} /> */}
     </div>
   );
 };

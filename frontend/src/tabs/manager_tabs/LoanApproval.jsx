@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import LoanCard from "../../components/LoanCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { callGetApprovalPendingLoans } from "../../api/LoanApi";
 
 export default function LoanApprovalList() {
@@ -38,9 +39,14 @@ export default function LoanApprovalList() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Loans Pending Approval</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <Card className="w-full max-w-3xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Loans Pending Approval</CardTitle>
+          <p className="text-gray-400 text-sm text-secondary-foreground">
+            Approve or reject pending branch loans
+          </p>
+        </CardHeader>
+        <CardContent>
         {loans.length === 0 ? (
           <p>No loans pending approval.</p>
         ) : (
@@ -52,7 +58,7 @@ export default function LoanApprovalList() {
             />
           ))
         )}
-      </div>
-    </div>
+        </CardContent>
+      </Card>
   );
 }
