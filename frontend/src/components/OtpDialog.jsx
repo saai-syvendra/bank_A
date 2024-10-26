@@ -27,7 +27,6 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import LoadingButton from "@/components/LoadingButton";
 import { toast } from "sonner";
 
 const otpSchema = z.object({
@@ -60,8 +59,8 @@ export const OTPDialog = ({ onVerificationSuccess }) => {
     <AlertDialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Verify OTP</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-2xl font-bold text-blue-900">Verify OTP</AlertDialogTitle>
+          <AlertDialogDescription className="text-teal-600">
             Please enter the OTP sent to your registered email.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -90,9 +89,9 @@ export const OTPDialog = ({ onVerificationSuccess }) => {
               )}
             />
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
-              <AlertDialogAction type="submit" disabled={isVerifying}>
-                {isVerifying ? <LoadingButton /> : "Verify OTP"}
+              <AlertDialogCancel onClick={onClose} className="hover:bg-blue-50">Cancel</AlertDialogCancel>
+              <AlertDialogAction type="submit" disabled={isVerifying} className="bg-blue-900 hover:bg-teal-950">
+                Verfiy OTP
               </AlertDialogAction>
             </AlertDialogFooter>
           </form>

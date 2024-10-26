@@ -128,10 +128,10 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
     <>
       <Card className="w-full max-w-3xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold text-blue-900">
             Create Loan Request
           </CardTitle>
-          <p className="text-gray-400 text-sm text-secondary-foreground">
+          <p className="text-teal-600 text-sm text-secondary-foreground">
             Fill out the form to submit a loan request
           </p>
         </CardHeader>
@@ -254,7 +254,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
               {isLoading ? (
                 <LoadingButton className="w-full" />
               ) : (
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950">
                   Create Online Loan
                 </Button>
               )}

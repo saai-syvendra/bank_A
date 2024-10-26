@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarRail,
-  SidebarFooter
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -17,8 +17,7 @@ import {
   Banknote,
   ArrowLeftRight,
   UserCog,
-  DollarSign,
-  LogOut,
+  DollarSign
 } from "lucide-react";
 import ViewTransactions from "../tabs/customer_tabs/ViewTransactions";
 import LogoutButton from "../components/LogoutButton";
@@ -71,53 +70,76 @@ const CustomerDashboard = () => {
   };
 
   return (
-    <div className="flex bg-gray-100">
+    <div className="relative flex min-h-screen bg-gradient-to-b from-cyan-100 to-blue-200">
       <SidebarProvider>
         <Sidebar className="w-64">
           <SidebarHeader>
-            <h1 className="text-xl font-bold p-4 text-stone-950">Customer Dashboard</h1>
+            <h1 className="text-xl font-bold p-4 text-blue-900">
+              Customer Dashboard
+            </h1>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("summary")}>
-                  <LayoutDashboard className="mr-2" />
+                <SidebarMenuButton
+                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  onClick={() => setActiveTab("summary")}
+                >
+                  <LayoutDashboard className="mr-2 text-teal-600" />
                   Summary
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("view-transactions")}>
-                  <FileText className="mr-2" />
+                <SidebarMenuButton
+                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  onClick={() => setActiveTab("view-transactions")}
+                >
+                  <FileText className="mr-2 text-teal-600" />
                   View Transactions
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("create-loan")}>
-                  <CreditCard className="mr-2" />
+                <SidebarMenuButton
+                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  onClick={() => setActiveTab("create-loan")}
+                >
+                  <CreditCard className="mr-2 text-teal-600" />
                   Create Loan
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("create-fd")}>
-                  <Banknote className="mr-2" />
+                <SidebarMenuButton
+                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  onClick={() => setActiveTab("create-fd")}
+                >
+                  <Banknote className="mr-2 text-teal-600" />
                   Create FD
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("fund-transfer")}>
-                  <ArrowLeftRight className="mr-2" />
+                <SidebarMenuButton
+                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  onClick={() => setActiveTab("fund-transfer")}
+                >
+                  <ArrowLeftRight className="mr-2 text-teal-600" />
                   Fund Transfer
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("loan-payment")}>
-                  <DollarSign className="mr-2" />
+                <SidebarMenuButton
+                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  onClick={() => setActiveTab("loan-payment")}
+                >
+                  <DollarSign className="mr-2 text-teal-600" />
                   Loan Payment
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("update-details")}>
-                  <UserCog className="mr-2" />
+                <SidebarMenuButton
+                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  onClick={() => setActiveTab("update-details")}
+                >
+                  <UserCog className="mr-2 text-teal-600" />
                   Update Details
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -128,9 +150,7 @@ const CustomerDashboard = () => {
           </SidebarFooter>
           <SidebarRail />
         </Sidebar>
-        <div className="flex-1 p-6">
-          {renderContent()}
-        </div>
+        <div className="flex-1 p-6">{renderContent()}</div>
       </SidebarProvider>
     </div>
   );

@@ -121,8 +121,8 @@ export default function TransactionDetailsChart() {
   return (
     <Card className="w-full mb-4">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Transaction Details Chart</CardTitle>
-        <CardDescription>View average, minimum, and maximum transaction amounts</CardDescription>
+        <CardTitle className="text-2xl font-bold text-blue-900">Transaction Details Chart</CardTitle>
+        <CardDescription className="text-teal-600">View average, minimum, and maximum transaction amounts</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-4 flex space-x-4">

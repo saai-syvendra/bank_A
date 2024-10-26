@@ -109,13 +109,13 @@ export default function LoginOtp() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-cyan-100 to-blue-200">
       {otpSent ? (
         <OtpForm onSubmit={handleOtpSubmit} isLoading={isLoading} />
       ) : (
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">
+            <CardTitle className="text-2xl font-bold text-center text-blue-900">
               Login
             </CardTitle>
           </CardHeader>
@@ -155,7 +155,7 @@ export default function LoginOtp() {
                 {isLoading ? (
                   <LoadingButton className="w-full" />
                 ) : (
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950" disabled={isLoading}>
                     Submit
                   </Button>
                 )}

@@ -67,8 +67,8 @@ export default function CreateIndividualForm() {
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Create Person</CardTitle>
-        <p className="text-gray-400 text-sm text-secondary-foreground">
+        <CardTitle className="text-2xl font-bold text-blue-900">Create Individual</CardTitle>
+        <p className="text-teal-600 text-sm text-secondary-foreground">
           Fill out the form to create a new individual customer
         </p>
       </CardHeader>
@@ -181,7 +181,7 @@ export default function CreateIndividualForm() {
             {isLoading ? (
               <LoadingButton className="w-full"/>
             ) : (
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950">
                 Create Individual
               </Button>
             )}

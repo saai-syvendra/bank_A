@@ -166,7 +166,7 @@ export default function ViewBranchTransactions() {
     <div className="p-6">
       <Card className="mb-4">
         <CardHeader>
-          <h2 className="text-2xl font-bold">Branch Transactions</h2>
+          <h2 className="text-2xl font-bold text-blue-900">Branch Transactions</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
             <div>
               <Select
@@ -300,10 +300,10 @@ export default function ViewBranchTransactions() {
             </div>
           </div>
           <div className="flex justify-start space-x-2 mt-4 pt-3">
-            <Button variant="outline" onClick={cancelFilters}>
+            <Button variant="outline" onClick={cancelFilters} className="hover:bg-blue-50 hover:border-blue-900">
               Reset Filters
             </Button>
-            <Button onClick={applyFilters}>Apply Filters</Button>
+            <Button onClick={applyFilters} className=" bg-blue-900 hover:bg-teal-950">Apply Filters</Button>
           </div>
         </CardHeader>
         <CardContent>
