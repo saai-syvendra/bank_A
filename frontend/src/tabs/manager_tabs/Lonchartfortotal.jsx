@@ -108,8 +108,8 @@ export default function TotalLoanAmountChart() {
   return (
     <Card className="w-full mb-4">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Total Loan Amount Chart</CardTitle>
-        <CardDescription>View total loan amounts over time</CardDescription>
+        <CardTitle className="text-2xl font-bold text-blue-900">Total Loan Amount Chart</CardTitle>
+        <CardDescription className="text-teal-600">View total loan amounts over time</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-4">

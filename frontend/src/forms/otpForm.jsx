@@ -53,7 +53,7 @@ export default function OtpForm({ onSubmit, isLoading }) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">
+        <CardTitle className="text-2xl font-bold text-center text-blue-900">
           Verify OTP
         </CardTitle>
       </CardHeader>
@@ -99,7 +99,7 @@ export default function OtpForm({ onSubmit, isLoading }) {
         ) : (
           <Button
             type="submit"
-            className="w-full"
+            className="w-full bg-blue-900 hover:bg-teal-950"
             onClick={form.handleSubmit(handleSubmit)}
             disabled={isLoading}
           >

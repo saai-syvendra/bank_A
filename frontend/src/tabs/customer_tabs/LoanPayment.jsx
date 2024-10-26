@@ -101,8 +101,8 @@ const LoanPayment = () => {
     <div className="container mx-auto p-4">
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Loan Payment</CardTitle>
-          <p className="text-gray-400 text-sm text-secondary-foreground">
+          <CardTitle className="text-2xl font-bold text-blue-900">Loan Payment</CardTitle>
+          <p className="text-teal-600 text-sm text-secondary-foreground">
             Select and pay relevant laon installment
           </p>
         </CardHeader>
@@ -130,6 +130,7 @@ const LoanPayment = () => {
                     <Button
                       onClick={() => handlePayment(loan)}
                       disabled={loan.state !== "pending"}
+                      className="bg-blue-900 hover:bg-teal-950"
                     >
                       Pay
                     </Button>
