@@ -110,15 +110,15 @@ const CustomerDashboard = () => {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("update-details")}>
-                  <UserCog className="mr-2" />
-                  Update Details
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
                 <SidebarMenuButton onClick={() => setActiveTab("loan-payment")}>
                   <DollarSign className="mr-2" />
                   Loan Payment
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => setActiveTab("update-details")}>
+                  <UserCog className="mr-2" />
+                  Update Details
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
