@@ -103,7 +103,7 @@ export default function OtpForm({ onSubmit, isLoading }) {
             onClick={form.handleSubmit(handleSubmit)}
             disabled={isLoading}
           >
-            Deposit
+            Submit
           </Button>
         )}
       </CardFooter>

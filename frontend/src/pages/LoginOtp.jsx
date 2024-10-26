@@ -156,7 +156,7 @@ export default function LoginOtp() {
                   <LoadingButton className="w-full" />
                 ) : (
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    Update Details
+                    Submit
                   </Button>
                 )}
               </form>
