@@ -297,6 +297,50 @@ const getLoansByAccountId = async (accountId) => {
   }
 };
 
+const getBranchLoanSummary = async (branch_code) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [rows] = await connection.query(
+      `
+        SELECT 
+          l.id AS loan_id,
+          lp.name,
+          l.loan_amount,
+          l.start_date,
+          ca.account_number,
+          ca.customer_id,
+          COUNT(CASE WHEN li.state = 'paid' THEN 1 END) AS paid_installments,
+          lp.months AS total_installments
+        FROM 
+          Loan l
+        LEFT JOIN
+          Loan_Plan lp ON l.plan_id = lp.id
+        LEFT JOIN 
+            Customer_Account ca ON ca.account_id = l.connected_account
+        LEFT JOIN 
+            Loan_Installment li ON li.loan_id = l.id
+        WHERE ca.branch_code = ?
+        GROUP BY 
+            l.id, ca.account_number, ca.customer_id, l.loan_amount
+        HAVING 
+              paid_installments < total_installments;
+      `,
+      [branch_code]
+    );
+
+    await connection.commit();
+    return rows;
+  } catch (error) {
+    if (connection) await connection.rollback();
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
 export default {
   createLoan,
   createOnlineLoan,
@@ -310,4 +354,5 @@ export default {
   getLateLoanInstallments,
   getLoanCustomers,
   getLoansByAccountId,
+  getBranchLoanSummary,
 };

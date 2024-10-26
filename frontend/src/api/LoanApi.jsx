@@ -379,6 +379,23 @@ export const callGetLateLoanreports = async ({
 };
 
 
+export const callGetBranchLoanSummary = async () => {
+  try {
+    const response = await fetch(`${LOAN_API_URL}/branch-loans`, {
+      method: "GET",
+      credentials: "include",
+    });
 
+    const data = await response.json();
 
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch branch loan summary');
+    }
+
+    return data;  
+  } catch (error) {
+    console.error('Error fetching branch loan summary:', error.message);
+    throw new Error(error.message);
+  }
+};
 
