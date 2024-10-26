@@ -89,10 +89,10 @@ const UpdateDetailForm = ({
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">
+        <CardTitle className="text-2xl font-bold text-blue-900">
           Update {employee ? "Employee" : "Customer"} Details
         </CardTitle>
-        <p className="text-gray-400 text-sm text-secondary-foreground">
+        <p className="text-teal-600 text-sm text-secondary-foreground">
           Update relevant details below
         </p>
       </CardHeader>
@@ -238,7 +238,7 @@ const UpdateDetailForm = ({
             {isLoading ? (
               <LoadingButton className="w-full"/>
             ) : (
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950">
                 Update Details
               </Button>
             )}

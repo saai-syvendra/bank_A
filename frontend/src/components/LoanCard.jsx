@@ -70,7 +70,7 @@ export default function LoanCard({ loan, onStatusChange }) {
 
   return (
     <>
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-sm mb-5">
         <CardHeader>
           <CardTitle className="text-lg">
             Loan Amount: Rs. {loan.loan_amount}
@@ -111,6 +111,7 @@ export default function LoanCard({ loan, onStatusChange }) {
               setIsConfirmationOpen(true);
               setConfirmationDetail(confirmationDetailList.approval);
             }}
+            className="bg-blue-900 hover:bg-teal-950"
             disabled={isLoading}
           >
             {isLoading ? "Approving..." : "Approve"}

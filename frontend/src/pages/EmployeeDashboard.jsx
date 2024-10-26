@@ -53,13 +53,23 @@ const EmployeeDashboard = ({ role }) => {
   const renderContent = () => {
     switch (activeTab) {
       case "create-ind-account":
-        return <CreateAccountForm triggerFetchCustomers={true} individualCustomer={true}/>;
+        return (
+          <CreateAccountForm
+            triggerFetchCustomers={true}
+            individualCustomer={true}
+          />
+        );
       case "create-org-account":
-        return <CreateAccountForm triggerFetchCustomers={true} individualCustomer={false}/>;
+        return (
+          <CreateAccountForm
+            triggerFetchCustomers={true}
+            individualCustomer={false}
+          />
+        );
       case "create-ind-customer":
-        return <CreateIndividualForm/>;
+        return <CreateIndividualForm />;
       case "create-org-customer":
-        return <CreateOrganisationForm/>;
+        return <CreateOrganisationForm />;
       case "create-loan":
         return <CreateLoan triggerFetchCustomers={true} />;
       case "cash-deposit":
@@ -87,11 +97,11 @@ const EmployeeDashboard = ({ role }) => {
   };
 
   return (
-    <div className="flex bg-gray-100">
+    <div className="relative flex min-h-screen bg-gradient-to-b from-cyan-100 to-blue-200">
       <SidebarProvider>
-        <Sidebar className="w-64" collapsible="coll">
+        <Sidebar className="w-70" collapsible="coll">
           <SidebarHeader>
-            <h1 className="text-xl font-bold p-4 text-stone-950">
+            <h1 className="text-2xl font-bold p-4 text-blue-900">
               {isEmployee ? "Employee" : "Manager"} Dashboard
             </h1>
           </SidebarHeader>
@@ -103,17 +113,23 @@ const EmployeeDashboard = ({ role }) => {
                 </SidebarMenuButton>
               <SidebarMenuItem>
                 <SidebarMenuButton className="cursor-text">
-                  <Users className="mr-2" />
+                  <Users className="mr-2 text-teal-600" />
                   Create Account
                 </SidebarMenuButton>
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
-                    <SidebarMenuSubButton onClick={() => setActiveTab("create-ind-account")} className="cursor-pointer">
+                    <SidebarMenuSubButton
+                      onClick={() => setActiveTab("create-ind-account")}
+                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-8 rounded-lg"
+                    >
                       Create Individual Account
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                   <SidebarMenuSubItem>
-                    <SidebarMenuSubButton onClick={() => setActiveTab("create-org-account")} className="cursor-pointer">
+                    <SidebarMenuSubButton
+                      onClick={() => setActiveTab("create-org-account")}
+                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-8 rounded-lg"
+                    >
                       Create Organisation Account
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
@@ -121,57 +137,81 @@ const EmployeeDashboard = ({ role }) => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton className="cursor-text">
-                  <UserPlus className="mr-2" />
+                  <UserPlus className="mr-2  text-teal-600" />
                   Create Customer
                 </SidebarMenuButton>
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
-                    <SidebarMenuSubButton onClick={() => setActiveTab("create-ind-customer")} className="cursor-pointer">
+                    <SidebarMenuSubButton
+                      onClick={() => setActiveTab("create-ind-customer")}
+                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-8 rounded-lg"
+                    >
                       Create Individual Customer
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                   <SidebarMenuSubItem>
-                    <SidebarMenuSubButton onClick={() => setActiveTab("create-org-customer")} className="cursor-pointer">
+                    <SidebarMenuSubButton
+                      onClick={() => setActiveTab("create-org-customer")}
+                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-8 rounded-lg"
+                    >
                       Create Organisation Customer
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                 </SidebarMenuSub>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("create-loan")}>
-                  <CreditCard className="mr-2" />
+                <SidebarMenuButton
+                  onClick={() => setActiveTab("create-loan")}
+                  className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                >
+                  <CreditCard className="mr-2 text-teal-600" />
                   Create Loan
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("cash-deposit")}>
-                  <PiggyBank className="mr-2" />
+                <SidebarMenuButton
+                  onClick={() => setActiveTab("cash-deposit")}
+                  className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                >
+                  <PiggyBank className="mr-2  text-teal-600" />
                   Cash Deposit
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setActiveTab("update-details")}>
-                  <UserCog className="mr-2" />
+                <SidebarMenuButton
+                  onClick={() => setActiveTab("update-details")}
+                  className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                >
+                  <UserCog className="mr-2  text-teal-600" />
                   Update Details
                 </SidebarMenuButton>
               </SidebarMenuItem>
               {!isEmployee && (
                 <>
                   <SidebarMenuItem>
-                    <SidebarMenuButton onClick={() => setActiveTab("approve-loan")}>
-                      <CheckSquare className="mr-2" />
+                    <SidebarMenuButton
+                      onClick={() => setActiveTab("approve-loan")}
+                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                    >
+                      <CheckSquare className="mr-2  text-teal-600" />
                       Approve Loan
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton onClick={() => setActiveTab("late-loan")}>
-                      <AlertCircle className="mr-2" />
+                    <SidebarMenuButton
+                      onClick={() => setActiveTab("late-loan")}
+                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                    >
+                      <AlertCircle className="mr-2  text-teal-600" />
                       Late Loan Installments
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton onClick={() => setActiveTab("transactions")}>
-                      <BarChart3 className="mr-2" />
+                    <SidebarMenuButton
+                      onClick={() => setActiveTab("transactions")}
+                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                    >
+                      <BarChart3 className="mr-2  text-teal-600" />
                       Transactions
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -184,9 +224,7 @@ const EmployeeDashboard = ({ role }) => {
           </SidebarFooter>
           <SidebarRail />
         </Sidebar>
-        <div className="flex-1 p-6">
-          {renderContent()}
-        </div>
+        <div className="flex-1 p-6">{renderContent()}</div>
       </SidebarProvider>
     </div>
   );

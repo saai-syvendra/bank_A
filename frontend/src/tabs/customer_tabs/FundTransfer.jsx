@@ -115,8 +115,8 @@ const FundTransfer = ({ triggerToRefetch }) => {
     <>
       <Card className="w-full max-w-3xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Online Transfer</CardTitle>
-          <p className="text-gray-400 text-sm text-secondary-foreground">
+          <CardTitle className="text-2xl font-bold text-blue-900">Online Transfer</CardTitle>
+          <p className="text-teal-600 text-sm text-secondary-foreground">
             Fill out the details to make a transfer
           </p>
         </CardHeader>
@@ -209,7 +209,7 @@ const FundTransfer = ({ triggerToRefetch }) => {
               {isLoading || isVerifying ? (
                 <LoadingButton className="w-full" />
               ) : (
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950">
                   Make Transfer
                 </Button>
               )}

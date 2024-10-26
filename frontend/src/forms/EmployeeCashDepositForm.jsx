@@ -114,8 +114,8 @@ const EmployeeCashDepositForm = () => {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Cash Deposit</CardTitle>
-        <p className="text-gray-400 text-sm text-secondary-foreground">
+        <CardTitle className="text-2xl font-bold text-blue-900">Cash Deposit</CardTitle>
+        <p className="text-teal-600 text-sm text-secondary-foreground">
           Deposit cash for a customer
         </p>
       </CardHeader>
@@ -142,6 +142,7 @@ const EmployeeCashDepositForm = () => {
               type="button"
               onClick={fetchCustomerDetails}
               disabled={isCustomerLoading}
+              className="bg-blue-900 hover:bg-teal-950"
             >
               {isCustomerLoading ? "Loading..." : "Fetch Customer Details"}
             </Button>
@@ -191,7 +192,7 @@ const EmployeeCashDepositForm = () => {
             {isLoading ? (
               <LoadingButton className="w-full"/>
             ) : (
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950">
                 Deposit
               </Button>
             )}

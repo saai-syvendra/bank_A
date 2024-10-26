@@ -39,14 +39,14 @@ export default function LoanApprovalList() {
   }
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
+    <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Loans Pending Approval</CardTitle>
-          <p className="text-gray-400 text-sm text-secondary-foreground">
+          <CardTitle className="text-2xl font-bold text-blue-900">Loans Pending Approval</CardTitle>
+          <p className="text-teal-600 text-sm text-secondary-foreground">
             Approve or reject pending branch loans
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="grid grid-cols-2">
         {loans.length === 0 ? (
           <p>No loans pending approval.</p>
         ) : (
