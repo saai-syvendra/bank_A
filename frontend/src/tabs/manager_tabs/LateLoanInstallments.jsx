@@ -171,7 +171,6 @@ export default function LoanDetailsPage() {
               <TableHead>Loan ID</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead>State</TableHead>
               <TableHead>Plan</TableHead>
             </TableRow>
@@ -187,11 +186,6 @@ export default function LoanDetailsPage() {
                 <TableCell>Rs.{loan.loan_amount?.toLocaleString() || 'N/A'}</TableCell>
                 <TableCell>{loan.approved_date ? format(new Date(loan.approved_date), 'PP') : 'N/A'}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${loan.isLate ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                    {loan.isLate ? 'Late' : 'On Time'}
-                  </span>
-                </TableCell>
-                <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     loan.state ? loan.state.charAt(0).toUpperCase() + loan.state.slice(1) : 'N/A'
                    }`}>
@@ -204,6 +198,7 @@ export default function LoanDetailsPage() {
           </TableBody>
         </Table>
         <Loancharts/>
+        <LateLoanchart/>
       </div>
       
       {loans.length === 0 && !loading && (

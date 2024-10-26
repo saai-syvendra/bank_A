@@ -7,7 +7,7 @@ import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } f
 import { callGetLateLoanreports } from "../../api/LoanApi" 
 
 export default function LoanDetailsChart() {
-  const [timeRange, setTimeRange] = useState("weekly")
+  const [timeRange, setTimeRange] = useState("monthly")
   const [loanData, setLoanData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -31,17 +31,35 @@ export default function LoanDetailsChart() {
         const data = await callGetLateLoanreports(filters)
 
         // Process and format the data
-        const formattedData = data.map(item => ({
-          approved_date: timeRange === "weekly"
-            ? `Week ${String(item.approved_week).slice(4)}, ${String(item.approved_week).slice(0, 4)}` 
-            : new Date(item.approved_month + "-01").toLocaleString("en-US", { month: "long", year: "numeric" }), 
-          avg_loan_amount: Number(item.avg_loan_amount) || 0,
-          max_loan_amount: Number(item.max_loan_amount) || 0,
-          min_loan_amount: Number(item.min_loan_amount) || 0,
-          total_loan_amount: Number(item.total_loan_amount) || 0,
-          loan_count: Number(item.loan_count) || 0,
-          sort_date: timeRange === "weekly" ? parseInt(item.approved_week) : new Date(item.approved_month + "-01").getTime() 
-        }))
+        const formattedData = data.map(item => {
+          let formattedDate;
+
+          if (timeRange === "quarterly") {
+            const [year, quarter] = item.due_quarter.split("-Q")
+            formattedDate = `Q${quarter} ${year}`
+          } else if (timeRange === "half_year") {
+            const [year, half] = item.due_half_year.split("-H")
+            formattedDate = half === "1" ? `First Half ${year}` : `Second Half ${year}`
+          } else if (timeRange === "monthly") {
+            const [year, month] = item.due_month.split("-")
+            const date = new Date(year, month - 1) // month is 0-indexed in JS
+            formattedDate = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long" }).format(date)
+          } else if (timeRange === "annual") {
+            formattedDate = item.due_year
+          }
+
+          return {
+            approved_date: formattedDate,
+            avg_loan_amount: Number(item.avg_installment_amount) || 0,
+            max_loan_amount: Number(item.max_installment_amount) || 0,
+            min_loan_amount: Number(item.min_installment_amount) || 0,
+            total_loan_amount: Number(item.total_installment_amount) || 0,
+            loan_count: Number(item.installment_count) || 0,
+            sort_date: timeRange === "quarterly" || timeRange === "half_year" 
+              ? parseInt(item.due_quarter || item.due_half_year) 
+              : new Date(item.due_month || item.due_year + "-01").getTime()
+          }
+        })
 
         // Sort data by the `sort_date`
         const sortedData = formattedData.sort((a, b) => a.sort_date - b.sort_date)
@@ -59,7 +77,7 @@ export default function LoanDetailsChart() {
   }, [timeRange])
 
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 1 }).format(value)
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'LKR', notation: 'compact', maximumFractionDigits: 1 }).format(value)
   }
 
   const formatYAxis = (value) => {
@@ -103,8 +121,10 @@ export default function LoanDetailsChart() {
               <SelectValue placeholder="Select time range" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="weekly">Weekly</SelectItem>
               <SelectItem value="monthly">Monthly</SelectItem>
+              <SelectItem value="quarterly">Quarterly</SelectItem>
+              <SelectItem value="half_year">Half Year</SelectItem>
+              <SelectItem value="annual">Annual</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -115,7 +135,7 @@ export default function LoanDetailsChart() {
               <YAxis tickFormatter={formatYAxis} />
               <Tooltip 
                 formatter={(value, name) => [formatCurrency(Number(value)), name]}
-                labelFormatter={(label) => `Approved: ${label}`}
+                labelFormatter={(label) => `Due on: ${label}`}
               />
               <Legend />
               <Line type="monotone" dataKey="avg_loan_amount" stroke="hsl(var(--primary))" name="Average Loan Amount" />

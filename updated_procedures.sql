@@ -1163,7 +1163,7 @@ BEGIN
     AND (p_state IS NULL OR loan_view.state = p_state)
     AND (p_branch IS NULL OR branch_code = p_branch)
     AND (p_plan_id IS NULL OR loan_view.plan_id = p_plan_id)
-	AND (p_is_late_loan IS NULL OR (p_is_late_loan = TRUE AND loan_id NOT IN (SELECT DISTINCT loan_id FROM loan_installment WHERE state = 'late')));
+	AND (p_is_late_loan IS NULL OR (p_is_late_loan = TRUE AND loan_id IN (SELECT DISTINCT loan_id FROM loan_installment WHERE loan_installment.state = 'late')));
 END $$
 
 -- DROP PROCEDURE IF EXISTS GetOverallLoanReport;
