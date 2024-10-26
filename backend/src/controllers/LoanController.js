@@ -163,6 +163,17 @@ const getLoansForThisAccount = async (req, res) => {
   }
 };
 
+const getBranchLoanSummary = async (req, res) => {
+  const { id: employeeId } = req.user;
+  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
+  try {
+    const summary = await LoanModel.getBranchLoanSummary(branchCode);
+    res.status(200).send(summary);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+}
+
 export default {
   createLoan,
   createOnlineLoan,
@@ -175,4 +186,5 @@ export default {
   getLateLoanInstallments,
   getLoanCustomers,
   getLoansForThisAccount,
+  getBranchLoanSummary
 };

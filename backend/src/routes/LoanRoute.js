@@ -56,6 +56,12 @@ router.get(
   "/account-loans",
   authorizeRole("customer"),
   LoanController.getLoansForThisAccount
-)
+);
+
+router.get(
+  "/branch-loans",
+  authorizeRole("emplopyee", "manager"),
+  LoanController.getBranchLoanSummary
+);
 
 export default router;
