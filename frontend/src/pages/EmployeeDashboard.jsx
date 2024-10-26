@@ -38,6 +38,7 @@ import EmployeeCashDepositForm from "../forms/EmployeeCashDepositForm";
 import LateLoanInstallments from "../tabs/manager_tabs/LateLoanInstallments";
 import CreateIndividualForm from "../forms/CreateIndividualForm";
 import CreateOrganisationForm from "../forms/CreateOrganizationForm";
+import Employee_Summary from "../tabs/employee_tabs/Employee_Summary";
 
 const EmployeeDashboard = ({ role }) => {
   const loading = useAuthorization(["manager", "employee"]);
@@ -78,6 +79,8 @@ const EmployeeDashboard = ({ role }) => {
         return <LateLoanInstallments />;
       case "transactions":
         return <ViewBranchTransactions />;
+        case "summary":
+          return <Employee_Summary/>;
       default:
         return null;
     }
@@ -94,6 +97,10 @@ const EmployeeDashboard = ({ role }) => {
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
+                <SidebarMenuButton onClick={() => setActiveTab("summary")}>
+                  <CreditCard className="mr-2" />
+                  Summary
+                </SidebarMenuButton>
               <SidebarMenuItem>
                 <SidebarMenuButton className="cursor-text">
                   <Users className="mr-2" />
