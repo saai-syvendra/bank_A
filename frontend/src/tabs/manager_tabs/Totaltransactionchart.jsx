@@ -1,10 +1,12 @@
+"use client"
+
 import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from "recharts"
-import { callGetTransactionReports } from "../../api/TransactionApi" 
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from "recharts"
+import { callGetTransactionReports } from "../../api/TransactionApi"
 
-export default function TransactionDetailsChart() {
+export default function TotalTransactionAmountChart() {
   const [timeRange, setTimeRange] = useState("monthly")
   const [transactionType, setTransactionType] = useState("all")
   const [transactionData, setTransactionData] = useState([])
@@ -26,7 +28,6 @@ export default function TransactionDetailsChart() {
         }
 
         const data = await callGetTransactionReports(filters)
-        console.log(data);
         
         // Process and format the data
         const formattedData = data.map(item => {
@@ -48,9 +49,6 @@ export default function TransactionDetailsChart() {
 
           return {
             date: formattedDate,
-            avg_transaction_amount: Number(item.avg_amount) || 0,
-            max_transaction_amount: Number(item.max_amount) || 0,
-            min_transaction_amount: Number(item.min_amount) || 0,
             total_transaction_amount: Number(item.total_amount) || 0,
             transaction_count: Number(item.transaction_count) || 0
           }
@@ -121,8 +119,8 @@ export default function TransactionDetailsChart() {
   return (
     <Card className="w-full mb-4">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Transaction Details Chart</CardTitle>
-        <CardDescription>View average, minimum, and maximum transaction amounts</CardDescription>
+        <CardTitle className="text-2xl font-bold">Total Transaction Amount Chart</CardTitle>
+        <CardDescription>View total transaction amounts over time</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-4 flex space-x-4">
@@ -150,7 +148,7 @@ export default function TransactionDetailsChart() {
         </div>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={transactionData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <BarChart data={transactionData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <XAxis dataKey="date" />
               <YAxis tickFormatter={formatYAxis} />
               <Tooltip 
@@ -158,10 +156,8 @@ export default function TransactionDetailsChart() {
                 labelFormatter={(label) => `Date: ${label}`}
               />
               <Legend />
-              <Line type="monotone" dataKey="avg_transaction_amount" stroke="hsl(var(--primary))" name="Avg Transaction Amount" />
-              <Line type="monotone" dataKey="max_transaction_amount" stroke="green" name="Max Transaction Amount" />
-              <Line type="monotone" dataKey="min_transaction_amount" stroke="hsl(var(--destructive))" name="Min Transaction Amount"/>
-            </LineChart>
+              <Bar dataKey="total_transaction_amount" fill="hsl(var(--primary))" name="Total Transaction Amount" />
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </CardContent>

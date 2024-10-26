@@ -107,7 +107,7 @@ export default function LoanDetailsChart() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full mb-4">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Late Loan Chart</CardTitle>
         <CardDescription>View average, minimum, and maximum loan amounts</CardDescription>
@@ -136,9 +136,9 @@ export default function LoanDetailsChart() {
                 labelFormatter={(label) => `Due on: ${label}`}
               />
               <Legend />
-              <Line type="monotone" dataKey="avg_loan_amount" stroke="hsl(var(--primary))" name="Average Loan Amount" />
-              <Line type="monotone" dataKey="max_loan_amount" stroke="green" name="Maximum Loan Amount" />
-              <Line type="monotone" dataKey="min_loan_amount" stroke="hsl(var(--destructive))" name="Minimum Loan Amount" />
+              <Line type="monotone" dataKey="avg_loan_amount" stroke="hsl(var(--primary))" name="Avg Loan Amount" />
+              <Line type="monotone" dataKey="max_loan_amount" stroke="green" name="Max Loan Amount" />
+              <Line type="monotone" dataKey="min_loan_amount" stroke="hsl(var(--destructive))" name="Min Loan Amount" />
             </LineChart>
           </ResponsiveContainer>
         </div>
