@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import Transactioncharts from "./Transactioncharts";
+import TotalTransactionAmountChart from "./Totaltransactionchart";
 
 export default function ViewBranchTransactions() {
   const [transactions, setTransactions] = useState([]);
@@ -370,6 +371,7 @@ export default function ViewBranchTransactions() {
         </CardContent>
       </Card>
       <Transactioncharts/>
+      <TotalTransactionAmountChart/>
     </div>
   );
 }

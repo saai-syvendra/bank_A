@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from "recharts"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from "recharts"
 import { callGetFilteredLoanreports } from "../../api/LoanApi"
 
-export default function LoanDetailsChart() {
+export default function TotalLoanAmountChart() {
   const [timeRange, setTimeRange] = useState("monthly")
   const [loanData, setLoanData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -50,9 +50,6 @@ export default function LoanDetailsChart() {
 
           return {
             approved_date: formattedDate,
-            avg_loan_amount: Number(item.avg_loan_amount) || 0,
-            max_loan_amount: Number(item.max_loan_amount) || 0,
-            min_loan_amount: Number(item.min_loan_amount) || 0,
             total_loan_amount: Number(item.total_loan_amount) || 0,
             loan_count: Number(item.loan_count) || 0,
             sort_date: timeRange === "quarterly" || timeRange === "half_year" 
@@ -111,8 +108,8 @@ export default function LoanDetailsChart() {
   return (
     <Card className="w-full mb-4">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Loan Details Chart</CardTitle>
-        <CardDescription>View average, minimum, and maximum loan amounts</CardDescription>
+        <CardTitle className="text-2xl font-bold">Total Loan Amount Chart</CardTitle>
+        <CardDescription>View total loan amounts over time</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-4">
@@ -130,7 +127,7 @@ export default function LoanDetailsChart() {
         </div>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={loanData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <BarChart data={loanData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <XAxis dataKey="approved_date" />
               <YAxis tickFormatter={formatYAxis} />
               <Tooltip 
@@ -138,10 +135,8 @@ export default function LoanDetailsChart() {
                 labelFormatter={(label) => `Approved: ${label}`}
               />
               <Legend />
-              <Line type="monotone" dataKey="avg_loan_amount" stroke="hsl(var(--primary))" name="Avg Loan Amount" />
-              <Line type="monotone" dataKey="max_loan_amount" stroke="green" name="Max Loan Amount" />
-              <Line type="monotone" dataKey="min_loan_amount" stroke="hsl(var(--destructive))" name="Min Loan Amount" />
-            </LineChart>
+              <Bar dataKey="total_loan_amount" fill="hsl(var(--primary))" name="Total Loan Amount" />
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </CardContent>

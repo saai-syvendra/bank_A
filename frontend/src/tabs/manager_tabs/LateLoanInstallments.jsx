@@ -26,6 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Loancharts from "./Loancharts"
 import LateLoanchart from "./LateLoanchart"
+import Loanchartfortotal from "./Lonchartfortotal"
+import Lateloantotalchart from "./Lateloantotalchart"
 
 export default function LateLoanInstallments() {
   const [installments, setInstallments] = useState([]);
@@ -264,7 +266,9 @@ export default function LateLoanInstallments() {
         </CardContent>
       </Card>
       <Loancharts/>
+      <Loanchartfortotal/>
       <LateLoanchart/>
+      <Lateloantotalchart/>
     </div>
   );
 }
