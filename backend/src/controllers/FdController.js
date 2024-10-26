@@ -1,4 +1,5 @@
 import FdModel from "../models/FdModel.js";
+import EmployeeModel from "../models/EmployeeModel.js";
 
 const getThisCustomerFds = async (req, res) => {
   const { id: customerId } = req.user;
@@ -50,9 +51,21 @@ const getFDsForThisAccount = async (req, res) => {
   }
 };
 
+const getBranchFdSummary = async (req, res) => {
+  const {id: employeeId} = req.user;
+  const branchCode = EmployeeModel.getEmployeeBranch(employeeId);
+  try {
+    const fds = await FdModel.getBranchFdSummary(branchCode);
+    res.status(200).send(fds);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
 export default {
   getThisCustomerFds,
   getFdPlans,
   createFd,
   getFDsForThisAccount,
+  getBranchFdSummary
 };

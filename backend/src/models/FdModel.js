@@ -99,9 +99,47 @@ const getFixedDepositsByAccountId = async (accountId) => {
   }
 };
 
+const getBranchFdSummary = async (branchCode) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [rows] = await connection.query(
+      `
+        SELECT 
+          fd.id, 
+          ca.account_number, 
+          ca.customer_id, 
+          fd.starting_date, 
+          fd.amount, 
+          p.name 
+        FROM 
+          FD fd 
+        LEFT JOIN 
+          FD_Plan p ON fd.plan_id = p.id 
+        LEFT JOIN 
+          Customer_Account ca ON fd.account_id = ca.account_id
+        WHERE
+          maturity_date >= CURDATE();
+      `,
+      [branchCode] 
+    );
+
+    await connection.commit();
+    return rows;
+  } catch (error) {
+    if (connection) await connection.rollback(); 
+    throw error;
+  } finally {
+    if (connection) connection.release(); 
+  }
+}
+
 export default {
   getCustomerFds,
   getFdPlans,
   createFd,
   getFixedDepositsByAccountId,
+  getBranchFdSummary
 };
