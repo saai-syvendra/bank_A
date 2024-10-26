@@ -123,7 +123,7 @@ export default function TransactionDetailsChart() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Transaction Details Chart</CardTitle>
+        <CardTitle className="text-2xl font-bold">Transaction Details Chart</CardTitle>
         <CardDescription>View average, minimum, and maximum transaction amounts</CardDescription>
       </CardHeader>
       <CardContent>
