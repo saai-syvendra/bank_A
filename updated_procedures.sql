@@ -1159,7 +1159,8 @@ BEGIN
 	END IF;    
     SELECT DISTINCT loan_view.*
     FROM loan_view
-    WHERE	(p_start_date IS NULL OR approved_date >= p_start_date)
+    WHERE approved_date IS NOT NULL
+    AND (p_start_date IS NULL OR approved_date >= p_start_date)
     AND (p_end_date IS NULL OR approved_date <= p_end_date)
     AND loan_amount BETWEEN p_min_ammount AND p_max_ammount
     AND (p_state IS NULL OR loan_view.state = p_state)
@@ -1186,7 +1187,8 @@ BEGIN
             MIN(loan_amount) AS min_loan_amount,
             SUM(loan_amount) AS total_loan_amount
         FROM loan_view
-        WHERE (p_start_date IS NULL OR approved_date >= p_start_date)
+        WHERE approved_date IS NOT NULL
+		  AND (p_start_date IS NULL OR approved_date >= p_start_date)
           AND (p_end_date IS NULL OR approved_date <= p_end_date)
           AND (p_state IS NULL OR loan_view.state = p_state)
           AND (p_branch_code IS NULL OR loan_view.branch_code = p_branch_code)
@@ -1200,7 +1202,8 @@ BEGIN
             MIN(loan_amount) AS min_loan_amount,
             SUM(loan_amount) AS total_loan_amount
         FROM loan_view
-        WHERE (p_start_date IS NULL OR approved_date >= p_start_date)
+        WHERE approved_date IS NOT NULL
+          AND (p_start_date IS NULL OR approved_date >= p_start_date)
           AND (p_end_date IS NULL OR approved_date <= p_end_date)
           AND (p_state IS NULL OR loan_view.state = p_state)
           AND (p_branch_code IS NULL OR loan_view.branch_code = p_branch_code)
@@ -1214,7 +1217,8 @@ BEGIN
             MIN(loan_amount) AS min_loan_amount,
             SUM(loan_amount) AS total_loan_amount
         FROM loan_view
-        WHERE (p_start_date IS NULL OR approved_date >= p_start_date)
+        WHERE approved_date IS NOT NULL
+          AND (p_start_date IS NULL OR approved_date >= p_start_date)
           AND (p_end_date IS NULL OR approved_date <= p_end_date)
           AND (p_state IS NULL OR loan_view.state = p_state)
           AND (p_branch_code IS NULL OR loan_view.branch_code = p_branch_code)
@@ -1228,7 +1232,8 @@ BEGIN
             MIN(loan_amount) AS min_loan_amount,
             SUM(loan_amount) AS total_loan_amount
         FROM loan_view
-        WHERE (p_start_date IS NULL OR approved_date >= p_start_date)
+        WHERE approved_date IS NOT NULL
+          AND (p_start_date IS NULL OR approved_date >= p_start_date)
           AND (p_end_date IS NULL OR approved_date <= p_end_date)
           AND (p_state IS NULL OR loan_view.state = p_state)
           AND (p_branch_code IS NULL OR loan_view.branch_code = p_branch_code)
@@ -1254,7 +1259,8 @@ BEGIN
             SUM(installment_amount) AS total_installment_amount
         FROM loan_view
         INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
-        WHERE (p_end_date IS NULL OR due_date <= p_end_date)
+        WHERE approved_date IS NOT NULL
+          AND (p_end_date IS NULL OR due_date <= p_end_date)
           AND (p_branch_code IS NULL OR branch_code = p_branch_code)
           AND loan_installment.state = 'late'
         GROUP BY DATE_FORMAT(due_date, '%Y-%m')
@@ -1268,7 +1274,8 @@ BEGIN
             SUM(installment_amount) AS total_installment_amount
         FROM loan_view
         INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
-        WHERE (p_end_date IS NULL OR due_date <= p_end_date)
+        WHERE approved_date IS NOT NULL
+          AND (p_end_date IS NULL OR due_date <= p_end_date)
           AND (p_branch_code IS NULL OR branch_code = p_branch_code)
           AND loan_installment.state = 'late'
         GROUP BY CONCAT(YEAR(due_date), '-Q', QUARTER(due_date))
@@ -1282,7 +1289,8 @@ BEGIN
             SUM(installment_amount) AS total_installment_amount
         FROM loan_view
         INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
-        WHERE (p_end_date IS NULL OR due_date <= p_end_date)
+        WHERE approved_date IS NOT NULL
+          AND (p_end_date IS NULL OR due_date <= p_end_date)
           AND (p_branch_code IS NULL OR branch_code = p_branch_code)
           AND loan_installment.state = 'late'
         GROUP BY CONCAT(YEAR(due_date), '-H', IF(MONTH(due_date) <= 6, 1, 2))
@@ -1296,7 +1304,8 @@ BEGIN
             SUM(installment_amount) AS total_installment_amount
         FROM loan_view
         INNER JOIN loan_installment ON loan_view.loan_id = loan_installment.loan_id
-        WHERE (p_end_date IS NULL OR due_date <= p_end_date)
+        WHERE approved_date IS NOT NULL
+          AND (p_end_date IS NULL OR due_date <= p_end_date)
           AND (p_branch_code IS NULL OR branch_code = p_branch_code)
           AND loan_installment.state = 'late'
         GROUP BY YEAR(due_date)
