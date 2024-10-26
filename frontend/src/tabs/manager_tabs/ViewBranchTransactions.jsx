@@ -164,6 +164,8 @@ export default function ViewBranchTransactions() {
 
   return (
     <div className="p-6">
+      <Transactioncharts/>
+      <TotalTransactionAmountChart/>
       <Card className="mb-4">
         <CardHeader>
           <h2 className="text-2xl font-bold text-blue-900">Branch Transactions</h2>
@@ -330,7 +332,7 @@ export default function ViewBranchTransactions() {
             </TableHeader>
             <TableBody>
               {transactions.map((transaction) => (
-                <TableRow key={transaction.transaction_id}>
+                <TableRow key={transaction.transaction_id+transaction.transactionType}>
                   <TableCell>{transaction.account_number}</TableCell>
                   <TableCell
                     className={`text-gray-800 font-semibold ${
@@ -370,8 +372,6 @@ export default function ViewBranchTransactions() {
           </Table>
         </CardContent>
       </Card>
-      <Transactioncharts/>
-      <TotalTransactionAmountChart/>
     </div>
   );
 }

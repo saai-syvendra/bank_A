@@ -318,7 +318,7 @@ export default function ViewTransactions() {
             </TableHeader>
             <TableBody>
               {transactions.map((transaction) => (
-                <TableRow key={transaction.transaction_id}>
+                <TableRow key={transaction.transaction_id+transaction.transactionType}>
                   <TableCell>{transaction.account_number}</TableCell>
                   <TableCell
                     className={`text-gray-800 font-semibold ${
