@@ -25,9 +25,12 @@ import {
 import { DatePicker } from "@/components/ui/custom-date-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import Transactioncharts from "./Transactioncharts";
 
 export default function ViewBranchTransactions() {
   const [transactions, setTransactions] = useState([]);
+  const [originalTransactions, setOriginalTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [accounts, setAccounts] = useState([]);
   const defaultFilters = {
@@ -40,6 +43,10 @@ export default function ViewBranchTransactions() {
   };
   const [filters, setFilters] = useState(defaultFilters);
   const [tempFilters, setTempFilters] = useState({ ...filters });
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: "ascending",
+  });
 
   const fetchTransactions = useCallback(async () => {
     const apiFilters = { ...filters };
@@ -66,8 +73,10 @@ export default function ViewBranchTransactions() {
       });
       console.log("Fetched Transactions", sortedTransactions);
       setTransactions(sortedTransactions);
+      setOriginalTransactions(sortedTransactions);
     } catch (error) {
       setTransactions([]);
+      setOriginalTransactions([]);
       toast.error(error.message || "Failed to fetch transactions");
     } finally {
       setIsLoading(false);
@@ -103,6 +112,49 @@ export default function ViewBranchTransactions() {
   const cancelFilters = () => {
     setFilters(defaultFilters);
     setTempFilters(defaultFilters);
+  };
+
+  const sortData = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === "ascending") {
+        direction = "descending";
+      } else if (sortConfig.direction === "descending") {
+        direction = "original";
+      }
+    }
+    setSortConfig({ key, direction });
+
+    let sortedData;
+    if (direction === "original") {
+      sortedData = [...originalTransactions];
+    } else {
+      sortedData = [...originalTransactions].sort((a, b) => {
+        if (key === "amount") {
+          return direction === "ascending"
+            ? parseFloat(a.amount) - parseFloat(b.amount)
+            : parseFloat(b.amount) - parseFloat(a.amount);
+        }
+        if (key === "trans_timestamp") {
+          return direction === "ascending"
+            ? new Date(a.trans_timestamp) - new Date(b.trans_timestamp)
+            : new Date(b.trans_timestamp) - new Date(a.trans_timestamp);
+        }
+        return 0;
+      });
+    }
+
+    setTransactions(sortedData);
+  };
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === "ascending")
+        return <ChevronUp className="inline-block ml-1 size-4" />;
+      if (sortConfig.direction === "descending")
+        return <ChevronDown className="inline-block ml-1 size-4" />;
+    }
+    return <ChevronsUpDown className="inline-block ml-1 size-4" />;
   };
 
   if (isLoading) {
@@ -257,10 +309,19 @@ export default function ViewBranchTransactions() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
                 <TableHead>Account No</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead
+                  onClick={() => sortData("amount")}
+                  className="cursor-pointer"
+                >
+                  Amount {getSortIcon("amount")}
+                </TableHead>
+                <TableHead
+                  onClick={() => sortData("trans_timestamp")}
+                  className="cursor-pointer"
+                >
+                  Date {getSortIcon("trans_timestamp")}
+                </TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Method</TableHead>
@@ -269,7 +330,6 @@ export default function ViewBranchTransactions() {
             <TableBody>
               {transactions.map((transaction) => (
                 <TableRow key={transaction.transaction_id}>
-                  <TableCell>{transaction.transaction_id}</TableCell>
                   <TableCell>{transaction.account_number}</TableCell>
                   <TableCell
                     className={`text-gray-800 font-semibold ${
@@ -309,6 +369,7 @@ export default function ViewBranchTransactions() {
           </Table>
         </CardContent>
       </Card>
+      <Transactioncharts/>
     </div>
   );
 }

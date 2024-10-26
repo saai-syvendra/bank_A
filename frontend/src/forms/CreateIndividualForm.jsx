@@ -179,10 +179,10 @@ export default function CreateIndividualForm() {
             />
 
             {isLoading ? (
-              <LoadingButton />
+              <LoadingButton className="w-full"/>
             ) : (
               <Button type="submit" className="w-full">
-                Submit
+                Create Individual
               </Button>
             )}
           </form>

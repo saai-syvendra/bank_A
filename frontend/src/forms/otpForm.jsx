@@ -94,14 +94,18 @@ export default function OtpForm({ onSubmit, isLoading }) {
         </Form>
       </CardContent>
       <CardFooter>
-        <Button
-          type="submit"
-          className="w-full"
-          onClick={form.handleSubmit(handleSubmit)}
-          disabled={isLoading}
-        >
-          {isLoading ? <LoadingButton /> : "Verify OTP"}
-        </Button>
+        {isLoading ? (
+          <LoadingButton className="w-full" />
+        ) : (
+          <Button
+            type="submit"
+            className="w-full"
+            onClick={form.handleSubmit(handleSubmit)}
+            disabled={isLoading}
+          >
+            Submit
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

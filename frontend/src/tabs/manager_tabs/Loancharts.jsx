@@ -109,9 +109,9 @@ export default function LoanDetailsChart() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full mb-4">
       <CardHeader>
-        <CardTitle>Loan Details Chart</CardTitle>
+        <CardTitle className="text-2xl font-bold">Loan Details Chart</CardTitle>
         <CardDescription>View average, minimum, and maximum loan amounts</CardDescription>
       </CardHeader>
       <CardContent>

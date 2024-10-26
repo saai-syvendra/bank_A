@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -111,7 +109,7 @@ export default function LoanDetailsChart() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Late Loan Chart</CardTitle>
+        <CardTitle className="text-2xl font-bold">Late Loan Chart</CardTitle>
         <CardDescription>View average, minimum, and maximum loan amounts</CardDescription>
       </CardHeader>
       <CardContent>

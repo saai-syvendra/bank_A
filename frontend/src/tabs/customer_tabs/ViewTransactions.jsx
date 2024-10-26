@@ -29,7 +29,7 @@ import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 
 export default function ViewTransactions() {
   const [transactions, setTransactions] = useState([]);
-  const [originalTransactions, setOriginalTransactions] = useState([])
+  const [originalTransactions, setOriginalTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [accounts, setAccounts] = useState([]);
   const defaultFilters = {
@@ -126,12 +126,7 @@ export default function ViewTransactions() {
     if (direction === 'original') {
       sortedData = [...originalTransactions]
     } else {
-      sortedData = [...transactions].sort((a, b) => {
-        if (key === 'transaction_id') {
-          return direction === 'ascending' 
-            ? a.transaction_id - b.transaction_id
-            : b.transaction_id - a.transaction_id
-        }
+      sortedData = [...originalTransactions].sort((a, b) => {
         if (key === 'amount') {
           return direction === 'ascending'
             ? parseFloat(a.amount) - parseFloat(b.amount)
@@ -153,7 +148,6 @@ export default function ViewTransactions() {
     if (sortConfig.key === key) {
       if (sortConfig.direction === 'ascending') return <ChevronUp className="inline-block ml-1 size-4" />
       if (sortConfig.direction === 'descending') return <ChevronDown className="inline-block ml-1 size-4" />
-      // return <ChevronsUpDown className="inline-block ml-1" />
     }
     return <ChevronsUpDown className="inline-block ml-1 size-4" />
   }

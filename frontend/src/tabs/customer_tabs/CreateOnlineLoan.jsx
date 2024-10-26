@@ -252,10 +252,10 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
               </div>
 
               {isLoading ? (
-                <LoadingButton />
+                <LoadingButton className="w-full" />
               ) : (
                 <Button type="submit" className="w-full">
-                  Submit Loan Request
+                  Create Online Loan
                 </Button>
               )}
             </form>

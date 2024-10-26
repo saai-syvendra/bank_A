@@ -143,7 +143,7 @@ export default function CreateOrganisationForm() {
             />
 
             {isLoading ? (
-              <LoadingButton />
+              <LoadingButton className="w-full"/>
             ) : (
               <Button type="submit" className="w-full">
                 Create Organisation
