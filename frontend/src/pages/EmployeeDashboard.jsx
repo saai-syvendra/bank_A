@@ -42,7 +42,7 @@ import Employee_Summary from "../tabs/employee_tabs/Employee_Summary";
 
 const EmployeeDashboard = ({ role }) => {
   const loading = useAuthorization(["manager", "employee"]);
-  const [activeTab, setActiveTab] = useState("create-account");
+  const [activeTab, setActiveTab] = useState("create-ind-account");
 
   const isEmployee = role === "employee";
 
