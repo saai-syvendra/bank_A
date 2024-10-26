@@ -236,7 +236,7 @@ const UpdateDetailForm = ({
             )}
 
             {isLoading ? (
-              <LoadingButton />
+              <LoadingButton className="w-full"/>
             ) : (
               <Button type="submit" className="w-full">
                 Update Details

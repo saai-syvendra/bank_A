@@ -160,7 +160,7 @@ export default function CreateAccountForm({ triggerFetchCustomers = false, indiv
             />
 
             {isLoading ? (
-              <LoadingButton />
+              <LoadingButton className="w-full"/>
             ) : (
               <Button type="submit" className="w-full">
                 Create Account

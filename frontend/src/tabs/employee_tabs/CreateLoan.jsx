@@ -278,7 +278,7 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
               </div>
 
               {isLoading || isVerifying ? (
-                <LoadingButton />
+                <LoadingButton className="w-full" />
               ) : (
                 <Button type="submit" className="w-full">
                   Submit Loan Request

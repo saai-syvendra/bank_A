@@ -152,9 +152,13 @@ export default function LoginOtp() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? <LoadingButton /> : "Login"}
-                </Button>
+                {isLoading ? (
+                  <LoadingButton className="w-full" />
+                ) : (
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    Update Details
+                  </Button>
+                )}
               </form>
             </Form>
           </CardContent>
