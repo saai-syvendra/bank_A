@@ -1131,9 +1131,11 @@ END $$
 
 CREATE PROCEDURE ResetWithdrawalCount()
 BEGIN
+  SET SQL_SAFE_UPDATES = 0;
   -- Reset withdrawal count to 0 for all accounts
   UPDATE saving_account
   SET withdrawal_count = 0;
+  SET SQL_SAFE_UPDATES = 1;
 END $$
 
 -- DROP PROCEDURE IF EXISTS GetLoanReport;
