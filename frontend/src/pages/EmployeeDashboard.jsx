@@ -5,8 +5,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../components/ui/tabs";
-import ViewBranchTransactions from "../tabs/employee_tabs/ViewBranchTransactions";
-import Transactions from "../tabs/manager_tabs/Transactions"
+import ViewBranchTransactions from "../tabs/manager_tabs/ViewBranchTransactions";
 import CreateAccount from "../tabs/employee_tabs/CreateAccount";
 import LogoutButton from "../components/LogoutButton";
 import useAuthorization from "../auth/useAuthorization";
@@ -90,7 +89,7 @@ const EmployeeDashboard = ({ role }) => {
                 <LateLoanInstallments />
               </TabsContent>
               <TabsContent value="transactions">
-                <Transactions/>
+                <ViewBranchTransactions/>
               </TabsContent>
             </>
           )}
