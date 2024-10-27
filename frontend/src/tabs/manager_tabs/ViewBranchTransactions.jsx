@@ -108,6 +108,7 @@ export default function ViewBranchTransactions() {
 
   const applyFilters = () => {
     setFilters(tempFilters);
+    setSortConfig({ key: null, direction: 'original' });
   };
 
   const cancelFilters = () => {

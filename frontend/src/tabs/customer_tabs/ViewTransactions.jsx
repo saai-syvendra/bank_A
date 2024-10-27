@@ -103,12 +103,13 @@ export default function ViewTransactions() {
 
   const applyFilters = () => {
     setFilters(tempFilters);
+    setSortConfig({ key: null, direction: 'original' });
   };
 
   const cancelFilters = () => {
     setFilters(defaultFilters);
     setTempFilters(defaultFilters);
-    setSortConfig({ key: null, direction: 'original' })
+    setSortConfig({ key: null, direction: 'original' });
   };
 
   const sortData = (key) => {
