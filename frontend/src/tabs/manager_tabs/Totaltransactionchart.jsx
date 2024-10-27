@@ -154,8 +154,19 @@ export default function TotalTransactionAmountChart() {
               <XAxis dataKey="date" />
               <YAxis tickFormatter={formatYAxis} />
               <Tooltip 
-                formatter={(value, name) => [formatCurrency(Number(value)), name]}
-                labelFormatter={(label) => `Date: ${label}`}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const { date, total_transaction_amount, transaction_count } = payload[0].payload;
+                      return (
+                        <div className="custom-tooltip bg-white border border-gray-300 p-2 rounded shadow-lg">
+                          <p className="label" style={{ color: 'red' }}>{`Date: ${date}`}</p>
+                          <p className="desc">{`Total Transaction Amount: ${formatCurrency(total_transaction_amount)}`}</p>
+                          <p className="desc">{`No.of transactions: ${transaction_count}`}</p>
+                        </div>
+                      );
+                    }
+                    return null; // If not active, return null
+                  }}
               />
               <Legend />
               <Bar dataKey="total_transaction_amount" fill="hsl(var(--primary))" name="Total Transaction Amount" />
