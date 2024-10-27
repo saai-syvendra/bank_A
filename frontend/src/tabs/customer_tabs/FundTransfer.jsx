@@ -92,7 +92,7 @@ const FundTransfer = ({ triggerToRefetch }) => {
       //   ...data,
       //   fromAccountNumber: selectedAccount.account_number,
       // };
-      console.log(data);
+      // console.log(data);
       await callMakeOnlineTransfer(data);
       toast.success("Online transfer successful");
       fetchAccounts();

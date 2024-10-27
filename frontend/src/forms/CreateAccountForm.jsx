@@ -57,7 +57,6 @@ export default function CreateAccountForm({ triggerFetchCustomers = false, indiv
 
   const onSave = async (data) => {
     setIsLoading(true);
-    console.log(data);
     try {
       await callCreateAccount(data);
       toast.success("Account created successfully");

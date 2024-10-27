@@ -136,7 +136,7 @@ const rejectLoan = async (loan_id) => {
     await connection.query(
       `
         UPDATE Branch_Loan
-        SET state = "disapproved"
+        SET state = 'disapproved'
         WHERE loan_id = ?;
       `,
       [loan_id]

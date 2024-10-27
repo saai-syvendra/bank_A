@@ -20,7 +20,6 @@ const employeeDepositForCustomerController = async (req, res) => {
 };
 
 const makeOnlineTransfer = async (req, res) => {
-  //console.log(req.body);
   const { fromAccountId, toAccountNo, amount, reason,fromAccountNo } = req.body;
   try {
     if (fromAccountNo === toAccountNo) {

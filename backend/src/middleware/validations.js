@@ -75,13 +75,13 @@ const validateOrganisation = [
     body("customerDetails.brc")
         .isLength({ min: 6, max: 6 })
         .withMessage("BRC must be 6 characters long"),
-    body("customerDetails.orgName")
+    body("customerDetails.name")
         .notEmpty()
         .withMessage("Organization name is required"),
     body("customerDetails.address")
         .isString()
         .withMessage("Address must be a string"),
-    body("customerDetails.telephone")
+    body("customerDetails.mobile")
         .isLength({ min: 10, max: 10 })
         .withMessage("Telephone must be 10 digits long"),
     body("customerDetails.email")

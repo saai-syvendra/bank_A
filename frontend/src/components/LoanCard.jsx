@@ -122,7 +122,7 @@ export default function LoanCard({ loan, onStatusChange }) {
             className="bg-blue-900 hover:bg-teal-950"
             disabled={isLoading}
           >
-            {isLoading ? "Approving..." : "Approve"}
+            Approve
           </Button>
           <Button
             onClick={() => {

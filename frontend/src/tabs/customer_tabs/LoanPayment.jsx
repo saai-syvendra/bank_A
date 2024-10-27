@@ -45,7 +45,7 @@ const LoanPayment = () => {
   const fetchUpcomingInstallments = async () => {
     try {
       const fetchedInstallments = await callGetUpcomingInstallments();
-      console.log("Upcoming Installments", fetchedInstallments);
+      // console.log("Upcoming Installments", fetchedInstallments);
       setUpcomingInstallments(fetchedInstallments);
     } catch (error) {
       toast.error("Failed to fetch upcoming installments");
@@ -55,7 +55,7 @@ const LoanPayment = () => {
   const fetchAccounts = async () => {
     try {
       const fetchedAccounts = await callGetThisCustomerAccounts();
-      console.log("Accounts", fetchedAccounts);
+      // console.log("Accounts", fetchedAccounts);
       setAccounts(fetchedAccounts);
     } catch (error) {
       toast.error("Failed to fetch customer accounts");

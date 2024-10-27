@@ -14,9 +14,14 @@ import { pool } from "../middleware/constants.js";
 const GetLoanReport = async (start_date, end_date, min_amount, max_amount, state, branch, plan_id, is_late_loan) => {
     const query = `CALL GetLoanReport(?, ?, ?, ?, ?, ?, ?, ?)`;
     const params = [start_date, end_date, min_amount, max_amount, state, branch, plan_id, is_late_loan];
-    const [result] = await pool.query(query, params);
-    console.log(result[0]);
-    return result[0];
+    try {
+        const [result] = await pool.query(query, params);
+        // console.log(result[0]);
+        return result[0];
+    } catch (error) {
+        console.error("Error executing GetLoanReport:", error.message);
+        throw error;
+    }
 };
 
 // CREATE PROCEDURE GetOverallLoanReport(
@@ -30,9 +35,15 @@ const GetLoanReport = async (start_date, end_date, min_amount, max_amount, state
 const GetOverallLoanReport = async (start_date, end_date, state, branch_code, report_frequency) => {
     const query = `CALL GetOverallLoanReport(?, ?, ?, ?, ?)`;
     const params = [start_date, end_date, state, branch_code, report_frequency];
-    const [result] = await pool.query(query, params);
-    console.log(result[0]);
-    return result[0];
+
+    try {
+        const [result] = await pool.query(query, params);
+        // console.log(result[0]);
+        return result[0];
+    } catch (error) {
+        console.error("Error executing GetOverallLoanReport:", error.message);
+        throw error;
+    }
 };
 
 // CREATE PROCEDURE GetOverallLateLoanReport(
@@ -44,10 +55,17 @@ const GetOverallLoanReport = async (start_date, end_date, state, branch_code, re
 const GetOverallLateLoanReport = async (end_date, branch_code, report_frequency) => {
     const query = `CALL GetOverallLateLoanReport(?, ?, ?)`;
     const params = [end_date, branch_code, report_frequency];
-    const [result] = await pool.query(query, params);
-    console.log(result[0]);
-    return result[0];
+
+    try {
+        const [result] = await pool.query(query, params);
+        // console.log(result[0]);
+        return result[0]; 
+    } catch (error) {
+        console.error("Error executing GetOverallLateLoanReport:", error.message);
+        throw error;
+    }
 };
+
 
 // CREATE PROCEDURE GetTransactionReport(
 //     IN start_date TIMESTAMP,
@@ -62,9 +80,14 @@ const GetOverallLateLoanReport = async (end_date, branch_code, report_frequency)
 const GetTransactionReport = async (start_date, end_date, max_amount, min_amount, transaction_type, transaction_method, branch_code) => {
     const query = `CALL GetTransactionReport(?, ?, ?, ?, ?, ?, ?)`;
     const params = [start_date, end_date, max_amount, min_amount, transaction_type, transaction_method, branch_code];
-    const [result] = await pool.query(query, params);
-    console.log(result[0]);
-    return result[0];
+    try {
+        const [result] = await pool.query(query, params);
+        // console.log(result[0]);
+        return result[0];
+    } catch (error) {
+        console.error("Error executing GetTransactionReport:", error.message);
+        throw error;
+    }
 };
 
 // CREATE PROCEDURE GetTransactionOverallReport(
@@ -79,9 +102,14 @@ const GetTransactionReport = async (start_date, end_date, max_amount, min_amount
 const GetTransactionOverallReport = async (start_date, end_date, transaction_type, transaction_method, branch_code, report_period) => {
     const query = `CALL GetTransactionOverallReport(?, ?, ?, ?, ?, ?)`;
     const params = [start_date, end_date, transaction_type, transaction_method, branch_code, report_period];
-    const [result] = await pool.query(query, params);
-    console.log(result[0]);
-    return result[0];
+    try {
+        const [result] = await pool.query(query, params);
+        // console.log(result[0]);
+        return result[0];
+    } catch (error) {
+        console.error("Error executing GetTransactionOverallReport:", error.message);
+        throw error;
+    }
 };
 
 export default {

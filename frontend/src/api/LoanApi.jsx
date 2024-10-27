@@ -223,7 +223,6 @@ export const callGetLoansByAccountId = async (accountId) => {
     });
 
     const data = await response.json();
-    console.log(`API response for accountId: ${accountId}:`, data);
 
     if (!response.ok) {
       throw new Error(data.message);
@@ -270,7 +269,6 @@ export const callGetFilteredLoans = async ({
     });
 
     const data = await response.json();
-    console.log('API response:', data);
 
     if (!response.ok) {
       throw new Error(data.message || 'Failed to fetch loans');

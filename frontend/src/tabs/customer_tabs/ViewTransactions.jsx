@@ -67,7 +67,7 @@ export default function ViewTransactions() {
       const sortedTransactions = fetchedTransactions.sort((a, b) => {
         return new Date(b.trans_timestamp) - new Date(a.trans_timestamp);
       });
-      console.log("Fetched Transactions", sortedTransactions);
+      // console.log("Fetched Transactions", sortedTransactions);
       setTransactions(sortedTransactions);
       setOriginalTransactions(sortedTransactions);
     } catch (error) {
@@ -83,7 +83,7 @@ export default function ViewTransactions() {
     try {
       const accounts = await callGetThisCustomerAccounts();
       setAccounts(accounts);
-      console.log("Fetched Accounts", accounts);
+      // console.log("Fetched Accounts", accounts);
     } catch (error) {
       toast.error(error.message || "Failed to fetch accounts");
     }
@@ -155,8 +155,8 @@ export default function ViewTransactions() {
 
   return (
     <div className="p-6">
-      <Card className="mb-4">
-        <CardHeader>
+      <Card className="mb-4 max-h-[600px] flex flex-col">
+        <CardHeader className="shadow-md">
           <h2 className="text-2xl font-bold text-blue-900">Account Transactions</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
           <div>
@@ -297,7 +297,7 @@ export default function ViewTransactions() {
             <Button onClick={applyFilters} className="bg-blue-900 hover:bg-teal-950">Apply Filters</Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-auto flex-grow">
           <Table>
             <TableHeader>
               <TableRow>

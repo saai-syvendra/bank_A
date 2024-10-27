@@ -75,7 +75,6 @@ const UpdateDetailForm = ({
   const onSubmit = async (data) => {
     setIsLoading(true);
     data.dob = new Date(data.dob).toISOString().split("T")[0];
-    console.log(data);
     try {
       await updateFunction(data);
       toast.success("Details updated successfully");

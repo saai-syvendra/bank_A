@@ -13,7 +13,7 @@ export default function LoanApprovalList() {
     try {
       const data = await callGetApprovalPendingLoans();
       setLoans(data);
-      console.log(data);
+      // console.log(data);
       setError(null);
     } catch (error) {
       setError(error.message);
@@ -30,24 +30,24 @@ export default function LoanApprovalList() {
     fetchLoans();
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   if (error) {
     return <div>Error: {error}</div>;
   }
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-blue-900">Loans Pending Approval</CardTitle>
-          <p className="text-teal-600 text-sm text-secondary-foreground">
-            Approve or reject pending branch loans
-          </p>
-        </CardHeader>
-        <CardContent className="grid grid-cols-2">
-        {loans.length === 0 ? (
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-blue-900">
+          Loans Pending Approval
+        </CardTitle>
+        <p className="text-teal-600 text-sm text-secondary-foreground">
+          Approve or reject pending branch loans
+        </p>
+      </CardHeader>
+      <CardContent className="grid grid-cols-2">
+        {isLoading ? (
+          <p>Loading loans...</p>
+        ) : loans.length === 0 ? (
           <p>No loans pending approval.</p>
         ) : (
           loans.map((loan) => (
@@ -58,7 +58,7 @@ export default function LoanApprovalList() {
             />
           ))
         )}
-        </CardContent>
-      </Card>
+      </CardContent>
+    </Card>
   );
 }

@@ -31,7 +31,7 @@ export default function BranchOverview() {
   const fetchLoans = async () => {
     try {
       const data = await callGetBranchLoanSummary();
-      console.log("Loan", data);
+      // console.log("Loan", data);
       setLoans(data);
     } catch (error) {
       toast.error(error.message || "Failed to fetch loans");
@@ -59,7 +59,7 @@ export default function BranchOverview() {
   const fetchCustomers = async () => {
     try {
       const data = await callGetthisBranchCustomers();
-      console.log("Customer", data);
+      // console.log("Customer", data);
       setcustomers(data);
     } catch (error) {
       toast.error(error.message || "Failed to fetch customers");
