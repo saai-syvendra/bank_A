@@ -102,13 +102,20 @@ export default function CDM() {
     }
   };
 
+  const handleBackClick = () => {
+    setAccountInfo(null);
+    accountForm.reset();
+    depositForm.reset();
+    setStep(1);
+  };
+
   return (
     <Card className="w-full max-w-lg mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">
+        <CardTitle className="text-2xl font-bold text-blue-900">
           Cash Deposit Machine
         </CardTitle>
-        <CardDescription className="text-gray-400 text-sm text-secondary-foreground">
+        <CardDescription className="text-teal-600 text-sm">
           Deposit cash to your account
         </CardDescription>
       </CardHeader>
@@ -136,7 +143,7 @@ export default function CDM() {
                   </FormItem>
                 )}
               />
-              <Button className="w-full" type="submit" disabled={isLoading}>
+              <Button className="w-full bg-blue-900 hover:bg-teal-950" type="submit" disabled={isLoading}>
                 {isLoading ? "Verifying..." : "Verify Account"}
               </Button>
             </form>
@@ -190,9 +197,19 @@ export default function CDM() {
                   </FormItem>
                 )}
               />
-              <Button className="w-full" type="submit" disabled={isLoading}>
-                {isLoading ? "Processing..." : "Make Deposit"}
-              </Button>
+              <div className="flex justify-between space-x-2">
+                <Button
+                  className="w-1/2 bg-blue-900 hover:bg-teal-950"
+                  type="button"
+                  onClick={handleBackClick}
+                  disabled={isLoading}
+                >
+                  Back
+                </Button>
+                <Button type="submit" disabled={isLoading} className="w-1/2 bg-blue-900 hover:bg-teal-950">
+                  {isLoading ? "Processing..." : "Make Deposit"}
+                </Button>
+              </div>
             </form>
           </Form>
         )}
