@@ -65,7 +65,7 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
       const fetchedPlans = await callGetLoanPlans();
       setPlans(fetchedPlans);
     } catch (error) {
-      toast.error("Failed to fetch loan plans");
+      toast.error(error.message || "Failed to fetch loan plans");
     }
   };
 
@@ -74,7 +74,7 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
       const fetchedCustomers = await callGetCustomerNames();
       setCustomers(fetchedCustomers);
     } catch (error) {
-      toast.error("Failed to fetch customers");
+      toast.error(error.message || "Failed to fetch customers");
     }
   };
 
@@ -83,7 +83,7 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
       const fetchedAccounts = await callGetCustomerAccounts(customerId);
       setAccounts(fetchedAccounts);
     } catch (error) {
-      toast.error("Failed to fetch customer accounts");
+      toast.error(error.message || "Failed to fetch customer accounts");
     }
   };
 

@@ -35,7 +35,7 @@ export default function LoanCard({ loan, onStatusChange }) {
       onStatusChange();
     } catch (error) {
       console.error("Error approving loan:", error);
-      toast.error("Error approving loan");
+      toast.error(error.message || "Error approving loan");
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +49,7 @@ export default function LoanCard({ loan, onStatusChange }) {
       onStatusChange();
     } catch (error) {
       console.error("Error rejecting loan:", error);
-      toast.error("Error rejecting loan");
+      toast.error(error.message || "Error rejecting loan");
     } finally {
       setIsLoading(false);
     }
