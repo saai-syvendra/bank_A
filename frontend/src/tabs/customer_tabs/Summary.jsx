@@ -112,7 +112,7 @@ export default function Summary() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 bg-muted rounded-md bg-blue-200">
+              <CollapsibleTrigger className="bg-blue-100 flex items-center justify-between w-full p-2 bg-muted rounded-md">
                 <span className="font-semibold">Loans</span>
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>
@@ -165,7 +165,7 @@ export default function Summary() {
             </Collapsible>
 
             <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 bg-muted rounded-md bg-blue-200">
+              <CollapsibleTrigger className="bg-blue-100 flex items-center justify-between w-full p-2 bg-muted rounded-md">
                 <span className="font-semibold">Fixed Deposits</span>
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>
