@@ -109,7 +109,7 @@ export default function LateLoanInstallments() {
   return (
     <div className="p-6">
       <Card className="mb-4 max-h-[600px] flex flex-col">
-        <CardHeader className="space-y-4">
+        <CardHeader className="space-y-4 shadow-md">
           <h2 className="text-2xl font-bold text-blue-900">
             Late Loan Installments
           </h2>
