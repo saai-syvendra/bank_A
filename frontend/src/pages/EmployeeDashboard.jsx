@@ -24,7 +24,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import ViewBranchTransactions from "../tabs/manager_tabs/ViewBranchTransactions";
-import CreateAccountForm from "../forms/createAccountForm";
+import CreateAccountForm from "../forms/CreateAccountForm";
 import LogoutButton from "../components/LogoutButton";
 import useAuthorization from "../auth/useAuthorization";
 import UpdateDetailForm from "../forms/UpdateDetailForm";
