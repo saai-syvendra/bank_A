@@ -20,7 +20,6 @@ const GoToMachinesButton = () => {
 
   const handleGoToMachines = () => {
     navigate("/machines");
-    toast.success("Redirecting to Machines!");
   };
 
   return (
