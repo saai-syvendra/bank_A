@@ -15,7 +15,7 @@ export default function Machines() {
 
   return (
     <div className="relative flex justify-center items-center min-h-screen bg-gradient-to-b from-cyan-100 to-blue-200">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 left-4">
         <Button
           onClick={handleGoToDashboard}
           className="bg-blue-900 text-white hover:bg-teal-950 flex items-center"
