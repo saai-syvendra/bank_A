@@ -106,10 +106,6 @@ export default function LateLoanInstallments() {
     setTempFilters(defaultFilters);
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="p-6">
       <Card className="mb-4 max-h-[600px] flex flex-col">
@@ -240,7 +236,7 @@ export default function LateLoanInstallments() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {installments.map((installment) => (
+              {!isLoading ? installments.map((installment) => (
                 <TableRow
                   key={`${installment.loan_id}-${installment.installment_no}`}
                 >
@@ -273,7 +269,7 @@ export default function LateLoanInstallments() {
                       : "Not Paid"}
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : <div>Loading...</div>}
             </TableBody>
           </Table>
         </CardContent>
