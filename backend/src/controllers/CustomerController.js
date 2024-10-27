@@ -62,7 +62,7 @@ const getCustomerNames = async (req, res) => {
 };
 
 const createCustomer = async (req, res) => {
-  const { cType, data } = req.body;
+  const { cType, customerDetails: data } = req.body;
   const customerDetails = {
     email: data.email || null,
     address: data.address || null,

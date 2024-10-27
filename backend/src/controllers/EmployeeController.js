@@ -10,13 +10,12 @@ const getEmployeeDetail = async (req, res) => {
       lastName: employee["last_name"],
       mobile: employee["mobile"],
       address: employee["address"],
-      position: employee["position"],
+      position: employee["emp_position"],
       experience: employee["experience"],
       email: employee["email"],
       dob: employee["dob"],
       nic: employee["nic"],
     };
-    console.log(employeeDetail);
     res.status(200).json(employeeDetail);
   } catch (error) {
     res.status(400).json({ message: error.message });

@@ -21,9 +21,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const formSchema = z.object({
   brc: z.string().length(6, "BRC must be 6 digits"),
-  orgName: z.string().min(1, "Organisation name is required"),
+  name: z.string().min(1, "Organisation name is required"),
   address: z.string().min(1, "Address is required"),
-  telephone: z.string().length(10, "Telephone number must be 10 digits"),
+  mobile: z.string().length(10, "Telephone number must be 10 digits"),
   email: z.string().email("Invalid email"),
 });
 
@@ -34,9 +34,9 @@ export default function CreateOrganisationForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       brc: "",
-      orgName: "",
+      name: "",
       address: "",
-      telephone: "",
+      mobile: "",
       email: "",
     },
   });
@@ -71,7 +71,7 @@ export default function CreateOrganisationForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="orgName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Organisation Name</FormLabel>
@@ -101,7 +101,7 @@ export default function CreateOrganisationForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="telephone"
+                name="mobile"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Telephone</FormLabel>
