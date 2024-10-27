@@ -61,7 +61,7 @@ const EmployeeCashDepositForm = () => {
       const accountID = await callGetAccountIDfromAccountNo(accountNo);
       form.setValue("accountID", accountID);
     } catch (error) {
-      toast.error("Failed to fetch customer details or account ID");
+      toast.error(error.message || "Failed to fetch customer details or account ID");
     } finally {
       setIsCustomerLoading(false);
     }
@@ -105,7 +105,7 @@ const EmployeeCashDepositForm = () => {
       form.reset();
     } catch (error) {
       console.log(error);
-      toast.error("Deposit failed");
+      toast.error(error.message || "Deposit failed");
     } finally {
       setIsLoading(false);
     }

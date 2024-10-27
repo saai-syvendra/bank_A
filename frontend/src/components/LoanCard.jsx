@@ -35,7 +35,7 @@ export default function LoanCard({ loan, onStatusChange }) {
       onStatusChange();
     } catch (error) {
       console.error("Error approving loan:", error);
-      toast.error("Error approving loan");
+      toast.error(error.message || "Error approving loan");
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +49,7 @@ export default function LoanCard({ loan, onStatusChange }) {
       onStatusChange();
     } catch (error) {
       console.error("Error rejecting loan:", error);
-      toast.error("Error rejecting loan");
+      toast.error(error.message || "Error rejecting loan");
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +73,11 @@ export default function LoanCard({ loan, onStatusChange }) {
       <Card className="w-full max-w-sm mb-5">
         <CardHeader>
           <CardTitle className="text-lg">
-            Loan Amount: Rs. {loan.loan_amount}
+            Loan Amount: Rs.{" "}
+            {Number(loan.loan_amount).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -82,7 +86,11 @@ export default function LoanCard({ loan, onStatusChange }) {
               <strong>Customer:</strong> {loan.customer_name}
             </p>
             <p>
-              <strong>Account Balance:</strong> Rs. {loan.account_balance}
+              <strong>Account Balance:</strong> Rs.{" "}
+              {Number(loan.account_balance).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </p>
             <p>
               <strong>Plan Name:</strong> {loan.plan_name}

@@ -47,8 +47,8 @@ export default function CreateOrganisationForm() {
       await callCreateCustomer("organisation", data);
       toast.success("Organisation created successfully");
       form.reset();
-    } catch (errors) {
-      toast.error("Organisation creation failed");
+    } catch (error) {
+      toast.error(error.message || "Organisation creation failed");
     } finally {
       setIsLoading(false);
     }

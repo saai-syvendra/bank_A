@@ -86,7 +86,7 @@ export default function LoanDetailsChart() {
 
   if (isLoading) {
     return (
-      <Card className="w-full">
+      <Card className="w-full mb-4">
         <CardContent className="pt-6">
           <div className="flex justify-center items-center h-[300px]">
             <p className="text-muted-foreground">Loading loan data...</p>
@@ -98,7 +98,7 @@ export default function LoanDetailsChart() {
 
   if (error) {
     return (
-      <Card className="w-full">
+      <Card className="w-full mb-4">
         <CardContent className="pt-6">
           <div className="flex justify-center items-center h-[300px]">
             <p className="text-destructive">{error}</p>

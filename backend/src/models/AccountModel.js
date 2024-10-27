@@ -85,7 +85,7 @@ const getCustomerAccounts = async (customerId, accountType) => {
       );
     }
     if (rows.length === 0)
-      throw new Error("No accounts found for this customer");
+      throw new Error(`No${accountType? " "+accountType : ""} accounts found for this customer`);
 
     await connection.commit();
     return rows;

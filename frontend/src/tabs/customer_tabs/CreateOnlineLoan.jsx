@@ -61,7 +61,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
       setPlans(fetchedPlans);
       console.log("Plans", fetchedPlans);
     } catch (error) {
-      toast.error("Failed to fetch loan plans");
+      toast.error(error.message || "Failed to fetch loan plans");
     }
   };
 
@@ -81,7 +81,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
       console.log("Accounts", fetchedAccounts);
       setAccounts(fetchedAccounts);
     } catch (error) {
-      toast.error("Failed to fetch customer accounts");
+      toast.error(error.message || "Failed to fetch customer accounts");
     }
   };
 
@@ -165,7 +165,10 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
                                 plan.interest
                               }% , Max Amount: Rs. ${parseFloat(
                                 plan.max_amount
-                              ).toLocaleString()}`}
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}`}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -195,7 +198,10 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
                             <SelectItem key={fd.id} value={fd.id.toString()}>
                               {`FD #${fd.id} - Amount: Rs. ${parseFloat(
                                 fd.amount
-                              ).toLocaleString()}`}
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}`}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -254,7 +260,10 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
               {isLoading ? (
                 <LoadingButton className="w-full" />
               ) : (
-                <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950">
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-900 hover:bg-teal-950"
+                >
                   Create Online Loan
                 </Button>
               )}

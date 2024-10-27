@@ -65,7 +65,7 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
       const fetchedPlans = await callGetLoanPlans();
       setPlans(fetchedPlans);
     } catch (error) {
-      toast.error("Failed to fetch loan plans");
+      toast.error(error.message || "Failed to fetch loan plans");
     }
   };
 
@@ -74,7 +74,7 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
       const fetchedCustomers = await callGetCustomerNames();
       setCustomers(fetchedCustomers);
     } catch (error) {
-      toast.error("Failed to fetch customers");
+      toast.error(error.message || "Failed to fetch customers");
     }
   };
 
@@ -83,7 +83,7 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
       const fetchedAccounts = await callGetCustomerAccounts(customerId);
       setAccounts(fetchedAccounts);
     } catch (error) {
-      toast.error("Failed to fetch customer accounts");
+      toast.error(error.message || "Failed to fetch customer accounts");
     }
   };
 
@@ -205,9 +205,12 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
                             >
                               {`${plan.name} - ${
                                 plan.interest
-                              }% , Max Amount: Rs. ${parseFloat(
+                              }% , Max Amount: Rs.${parseFloat(
                                 plan.max_amount
-                              ).toLocaleString()}`}
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}`}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -280,7 +283,10 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
               {isLoading || isVerifying ? (
                 <LoadingButton className="w-full" />
               ) : (
-                <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950">
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-900 hover:bg-teal-950"
+                >
                   Submit Loan Request
                 </Button>
               )}

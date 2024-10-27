@@ -80,7 +80,7 @@ const getFixedDepositsByAccountId = async (accountId) => {
 
     const [rows] = await connection.query(
       `
-        SELECT FD.*,FD_Plan.interest
+        SELECT FD.*,FD_Plan.interest,FD_Plan.name
         FROM FD
         JOIN Customer_Account ca USING(account_id)
         JOIN FD_Plan ON FD.plan_id=FD_Plan.id

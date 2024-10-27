@@ -103,12 +103,13 @@ export default function ViewTransactions() {
 
   const applyFilters = () => {
     setFilters(tempFilters);
+    setSortConfig({ key: null, direction: 'original' });
   };
 
   const cancelFilters = () => {
     setFilters(defaultFilters);
     setTempFilters(defaultFilters);
-    setSortConfig({ key: null, direction: 'original' })
+    setSortConfig({ key: null, direction: 'original' });
   };
 
   const sortData = (key) => {
@@ -150,10 +151,6 @@ export default function ViewTransactions() {
       if (sortConfig.direction === 'descending') return <ChevronDown className="inline-block ml-1 size-4" />
     }
     return <ChevronsUpDown className="inline-block ml-1 size-4" />
-  }
-
-  if (isLoading) {
-    return <div>Loading...</div>;
   }
 
   return (
@@ -317,7 +314,7 @@ export default function ViewTransactions() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions.map((transaction) => (
+              {!isLoading ? transactions.map((transaction) => (
                 <TableRow key={transaction.transaction_id+transaction.transactionType}>
                   <TableCell>{transaction.account_number}</TableCell>
                   <TableCell
@@ -327,8 +324,12 @@ export default function ViewTransactions() {
                         : "text-green-600"
                     }`}
                   >
-                    {transaction.trans_type === "debit" ? "-" : ""} Rs.{" "}
-                    {parseFloat(transaction.amount).toFixed(2)}
+                    {transaction.trans_type === "debit" ? "-" : ""}
+                    Rs.{" "}
+                    {Number(transaction.amount).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </TableCell>
                   <TableCell>
                     {format(new Date(transaction.trans_timestamp), "PP")}
@@ -353,7 +354,7 @@ export default function ViewTransactions() {
                     </Badge>
                   </TableCell>
                 </TableRow>
-              ))}
+              )): <div>Loading...</div>}
             </TableBody>
           </Table>
         </CardContent>

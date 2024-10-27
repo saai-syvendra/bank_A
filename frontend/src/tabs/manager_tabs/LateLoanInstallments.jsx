@@ -24,10 +24,10 @@ import {
 import { DatePicker } from "@/components/ui/custom-date-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Loancharts from "./Loancharts"
-import LateLoanchart from "./LateLoanchart"
-import Loanchartfortotal from "./Lonchartfortotal"
-import Lateloantotalchart from "./Lateloantotalchart"
+import Loancharts from "./Loancharts";
+import LateLoanchart from "./LateLoanchart";
+import Loanchartfortotal from "./Lonchartfortotal";
+import Lateloantotalchart from "./Lateloantotalchart";
 
 export default function LateLoanInstallments() {
   const [installments, setInstallments] = useState([]);
@@ -73,7 +73,6 @@ export default function LateLoanInstallments() {
     } finally {
       setIsLoading(false);
     }
-
   }, [filters]);
 
   const fetchCustomers = useCallback(async () => {
@@ -107,15 +106,13 @@ export default function LateLoanInstallments() {
     setTempFilters(defaultFilters);
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  
   return (
     <div className="p-6">
-      <Card className="mb-4">
-        <CardHeader>
-          <h2 className="text-2xl font-bold text-blue-900">Late Loan Installments</h2>
+      <Card className="mb-4 max-h-[600px] flex flex-col">
+        <CardHeader className="space-y-4">
+          <h2 className="text-2xl font-bold text-blue-900">
+            Late Loan Installments
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-4">
             <div>
               <Select
@@ -218,10 +215,15 @@ export default function LateLoanInstallments() {
             <Button variant="outline" onClick={cancelFilters}>
               Reset Filters
             </Button>
-            <Button onClick={applyFilters} className=" bg-blue-900 hover:bg-teal-950">Apply Filters</Button>
+            <Button
+              onClick={applyFilters}
+              className=" bg-blue-900 hover:bg-teal-950"
+            >
+              Apply Filters
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-auto flex-grow">
           <Table>
             <TableHeader>
               <TableRow>
@@ -234,7 +236,7 @@ export default function LateLoanInstallments() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {installments.map((installment) => (
+              {!isLoading ? installments.map((installment) => (
                 <TableRow
                   key={`${installment.loan_id}-${installment.installment_no}`}
                 >
@@ -249,7 +251,14 @@ export default function LateLoanInstallments() {
                     {format(new Date(installment.due_date), "PP")}
                   </TableCell>
                   <TableCell>
-                    Rs. {parseFloat(installment.installment_amount).toFixed(2)}
+                    Rs.{" "}
+                    {Number(installment.installment_amount).toLocaleString(
+                      "en-US",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
                   </TableCell>
                   <TableCell>
                     {installment.paid_date
@@ -260,15 +269,15 @@ export default function LateLoanInstallments() {
                       : "Not Paid"}
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : <div>Loading...</div>}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-      <Loancharts/>
-      <Loanchartfortotal/>
-      <LateLoanchart/>
-      <Lateloantotalchart/>
+      <Loancharts />
+      <Loanchartfortotal />
+      <LateLoanchart />
+      <Lateloantotalchart />
     </div>
   );
 }

@@ -729,8 +729,8 @@ BEGIN
     WHERE account_id = p_connected_account;
     
     -- If all checks pass, insert the loan application
-    INSERT INTO Loan (plan_id, connected_account, loan_type, loan_amount, start_date)
-    VALUES (p_loan_plan_id, p_connected_account, 'branch', p_req_loan_amount, CURDATE());
+    INSERT INTO Loan (plan_id, connected_account, loan_type, loan_amount)
+    VALUES (p_loan_plan_id, p_connected_account, 'branch', p_req_loan_amount);
     
     SET v_new_loan_id = LAST_INSERT_ID();
     
