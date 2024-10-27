@@ -11,7 +11,7 @@ import {
   SidebarMenuSubButton,
   SidebarProvider,
   SidebarRail,
-  SidebarFooter
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import {
   Users,
@@ -42,7 +42,7 @@ import Employee_Summary from "../tabs/employee_tabs/Employee_Summary";
 
 const EmployeeDashboard = ({ role }) => {
   const loading = useAuthorization(["manager", "employee"]);
-  const [activeTab, setActiveTab] = useState("create-ind-account");
+  const [activeTab, setActiveTab] = useState("summary");
 
   const isEmployee = role === "employee";
 
@@ -89,8 +89,8 @@ const EmployeeDashboard = ({ role }) => {
         return <LateLoanInstallments />;
       case "transactions":
         return <ViewBranchTransactions />;
-        case "summary":
-          return <Employee_Summary/>;
+      case "summary":
+        return <Employee_Summary />;
       default:
         return null;
     }
@@ -107,10 +107,15 @@ const EmployeeDashboard = ({ role }) => {
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
-                <SidebarMenuButton onClick={() => setActiveTab("summary")}>
-                  <CreditCard className="mr-2" />
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={() => setActiveTab("summary")}
+                  className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                >
+                  <CreditCard className="mr-2 text-teal-600" />
                   Summary
                 </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton className="cursor-text">
                   <Users className="mr-2 text-teal-600" />
