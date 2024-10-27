@@ -146,8 +146,19 @@ export default function TotalLateLoanAmountChart() {
               <XAxis dataKey="due_date" />
               <YAxis tickFormatter={formatYAxis} />
               <Tooltip 
-                formatter={(value, name) => [formatCurrency(Number(value)), name]}
-                labelFormatter={(label) => `Due on: ${label}`}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const { due_date, total_late_loan_amount, late_loan_count } = payload[0].payload; // Access the data from the payload
+                      return (
+                        <div className="custom-tooltip bg-white border border-gray-300 p-2 rounded shadow-lg">
+                          <p className="label" style={{ color: 'red' }}>{`Due on: ${due_date}`}</p>
+                          <p className="desc">{`Total Late Loan Amount: ${formatCurrency(total_late_loan_amount)}`}</p>
+                          <p className="desc">{`No.of Installments: ${late_loan_count}`}</p>
+                        </div>
+                      );
+                    }
+                    return null; // If not active, return null
+                  }}
               />
               <Legend />
               <Bar dataKey="total_late_loan_amount" fill="hsl(var(--destructive))" name="Total Late Loan Amount" />
