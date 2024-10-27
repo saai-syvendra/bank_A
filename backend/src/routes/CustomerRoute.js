@@ -4,6 +4,11 @@ import { authorizeRole } from "../middleware/auth.js";
 import { validateCreateCustomer } from "../middleware/validations.js";
 
 const router = express.Router();
+router.get(
+  "/this-customers",
+  authorizeRole("employee", "manager"),
+  CustomerController.getthisBranchCustomers
+);
 
 router.get(
   "/",

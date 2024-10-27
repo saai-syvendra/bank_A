@@ -118,6 +118,36 @@ const getCustomerIDFromAccountNo = async (accountNo) => {
 
   return customerId;
 };
+const getthisBranchCustomers = async (branch_code) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [rows] = await connection.query(
+      `
+        SELECT * 
+        FROM customer_account 
+        LEFT JOIN individual_customer on customer_account.customer_id=individual_customer.customer_id
+        LEFT JOIN organisation_customer on customer_account.customer_id=organisation_customer.customer_id
+        LEFT JOIN customer on customer_account.customer_id=customer.customer_id
+        WHERE branch_code = ?
+      `,
+      [branch_code]
+    );
+
+    if (rows.length === 0) throw new Error("No customers found for this branch");
+
+    await connection.commit();
+    return rows;
+  } catch (error) {
+    if (connection) await connection.rollback();
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
 
 export default {
   getCustomer,
@@ -125,4 +155,5 @@ export default {
   createCustomer,
   updateCustomer,
   getCustomerIDFromAccountNo,
+  getthisBranchCustomers,
 };

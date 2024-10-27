@@ -273,12 +273,13 @@ const getBranchCustomers = async (branch_code) => {
 
     const [rows] = await connection.query(
       `
-        SELECT *
-        FROM Customer_Account 
-        WHERE=?
+      SELECT *
+      FROM Customer_Account 
+      WHERE branch_code = ?  --
       `,
       [branch_code]
     );
+
     if (rows.length === 0) throw new Error("No accounts found for this branch");
 
     await connection.commit();
@@ -289,7 +290,7 @@ const getBranchCustomers = async (branch_code) => {
   } finally {
     if (connection) connection.release();
   }
-};
+}
 export default {
   getAccountByAccountNo,
   getAccountById,

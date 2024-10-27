@@ -205,12 +205,14 @@ const getATMinformation = async (req, res) => {
   }
 };
 const getbranchCustomers = async (req, res) => {
-  const { id: employeeId } = req.user;
-  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId);
+  console.log("Invoking getbranchCustomers...");
+  const { id: employeeId } = req.user; 
+  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId); 
   console.log("Branch Code:", branchCode);
+  
   try {
-    const summary = await AccountModel.getBranchAccounts(branchCode);
-    res.status(200).send(summary);
+    const summary = await AccountModel.getBranchCustomers(branchCode); 
+    res.status(200).send(summary); 
   } catch (error) {
     res.status(500).send({ message: error.message });
   }

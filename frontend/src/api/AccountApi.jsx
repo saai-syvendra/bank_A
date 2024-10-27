@@ -262,10 +262,10 @@ export const callGetBranchCustomers = async () => {
 
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.message);
+      throw new Error(data.message || "Failed to fetch customers");
     }
 
-    return data.plans;
+    return data; 
   } catch (error) {
     throw new Error(error.message);
   }

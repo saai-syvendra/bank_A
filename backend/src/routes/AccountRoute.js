@@ -49,6 +49,12 @@ router.get(
 );
 
 router.get(
+  "/branch-customers", 
+  authorizeRole("employee", "manager"),
+  AccountController.getbranchCustomers 
+);
+
+router.get(
   "/",
   authorizeRole("employee", "manager"),
   AccountController.getAccountDetails
@@ -66,9 +72,5 @@ router.post(
   AccountController.getAccountIDByAccountNo
 );
 
-router.get(
-  "/branch-customers",
-  authorizeRole("employee", "manager"),
-  AccountController.getbranchCustomers
-);
+
 export default router;
