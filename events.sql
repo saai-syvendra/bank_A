@@ -1,16 +1,22 @@
 -- Event to reset the withdrawal count to 0 at the start of each month for all accounts.
 
+-- SELECT * FROM saving_account;
+-- DROP EVENT ResetWithdrawalCountMonthly;
+
+-- SELECT * FROM Daily_Account_Balance;
+
 CREATE EVENT ResetWithdrawalCountMonthly
 ON SCHEDULE EVERY 1 MONTH
 STARTS '2024-10-01 00:00:00'
 DO
   CALL ResetWithdrawalCount();
 
+
 DELIMITER $$
 
 CREATE EVENT InsertDailyAccountBalance
 ON SCHEDULE EVERY 1 DAY
-STARTS '2024-09-28 23:59:59'
+STARTS '2024-10-01 11:59:59'
 DO
 BEGIN
     -- Insert account balances for all 'saving' accounts into Daily_Account_Balance table
@@ -25,11 +31,11 @@ BEGIN
         ca.account_type = 'saving';
 END $$
 
--- DROP EVENT CalculateMonthlyInterest;
+DROP EVENT CalculateMonthlyInterest;
 
 CREATE EVENT CalculateMonthlyInterest
 ON SCHEDULE EVERY 1 MONTH
-STARTS '2024-01-01 00:00:00'
+STARTS '2024-09-30 00:00:00'
 DO
 BEGIN
     DECLARE avg_balance DECIMAL(12,2);

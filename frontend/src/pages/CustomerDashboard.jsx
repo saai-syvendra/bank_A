@@ -32,6 +32,7 @@ import LoanPayment from "../tabs/customer_tabs/LoanPayment";
 import CreateFd from "../tabs/customer_tabs/CreateFd";
 import FundTransfer from "../tabs/customer_tabs/FundTransfer";
 import Summary from "../tabs/customer_tabs/Summary";
+import GoToMachinesButton from "../components/GoToMachines";
 
 const CustomerDashboard = () => {
   const loading = useAuthorization(["customer"]);
@@ -146,6 +147,7 @@ const CustomerDashboard = () => {
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
+            <GoToMachinesButton/>
             <LogoutButton />
           </SidebarFooter>
           <SidebarRail />
