@@ -32,47 +32,49 @@ export default function TotalTransactionAmountChart() {
         // Process and format the data
         const formattedData = data.map(item => {
           let formattedDate;
+          let sortValue;
 
-          if (timeRange === "quarterly") {
+          if (timeRange === "quarterly" && item.transaction_quarter) {
             const [year, quarter] = item.transaction_quarter.split("-Q");
             formattedDate = `Q${quarter} ${year}`;
-          } else if (timeRange === "half_year") {
+            sortValue = parseInt(year) * 10 + parseInt(quarter);
+          } else if (timeRange === "half_year" && item.transaction_half_year) {
             const [year, half] = item.transaction_half_year.split("-H");
             formattedDate = half === "1" ? `First Half ${year}` : `Second Half ${year}`;
-          } else if (timeRange === "monthly") {
+            sortValue = parseInt(year) * 10 + parseInt(half);
+          } else if (timeRange === "monthly" && item.transaction_month) {
             const [year, month] = item.transaction_month.split("-");
             const date = new Date(year, month - 1); // month is 0-indexed in JS
             formattedDate = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long" }).format(date);
-          } else if (timeRange === "annual") {
+            sortValue = new Date(item.transaction_month + "-01").getTime();
+          } else if (timeRange === "annual" && item.transaction_year) {
             formattedDate = item.transaction_year;
+            sortValue = parseInt(item.transaction_year);
+          } else {
+            // If we don't have the expected data, use a default value
+            formattedDate = "Unknown";
+            sortValue = 0;
           }
 
           return {
             date: formattedDate,
             total_transaction_amount: Number(item.total_amount) || 0,
-            transaction_count: Number(item.transaction_count) || 0
+            transaction_count: Number(item.transaction_count) || 0,
+            sort_value: sortValue
           }
         });
 
-        // Sorting logic for different time ranges
-        formattedData.sort((a, b) => {
-          if (timeRange === "quarterly") {
-            const [yearA, quarterA] = a.date.match(/\d+/g);
-            const [yearB, quarterB] = b.date.match(/\d+/g);
-            return yearA - yearB || quarterA - quarterB;
-          } else if (timeRange === "half_year") {
-            const [yearA, halfA] = a.date.match(/\d+/g);
-            const [yearB, halfB] = b.date.match(/\d+/g);
-            return yearA - yearB || halfA - halfB;
-          } else if (timeRange === "monthly") {
-            return new Date(a.date) - new Date(b.date);
-          } else if (timeRange === "annual") {
-            return a.date - b.date;
+        // Sort data by sort_value
+        const sortedData = formattedData.sort((a, b) => {
+          if (Math.floor(a.sort_value / 10) === Math.floor(b.sort_value / 10)) {
+            // Same year, sort by quarter or half
+            return a.sort_value % 10 - b.sort_value % 10;
           }
-          return 0;
+          // Different years, sort by year
+          return a.sort_value - b.sort_value;
         });
 
-        setTransactionData(formattedData);
+        setTransactionData(sortedData);
         setIsLoading(false)
       } catch (error) {
         console.error("Error fetching transaction data:", error)

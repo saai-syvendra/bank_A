@@ -1,8 +1,10 @@
+"use client"
+
 import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from "recharts"
-import { callGetLateLoanreports } from "../../api/LoanApi" 
+import { callGetLateLoanreports} from "../../api/LoanApi"
 
 export default function LoanDetailsChart() {
   const [timeRange, setTimeRange] = useState("monthly")
@@ -31,19 +33,28 @@ export default function LoanDetailsChart() {
         // Process and format the data
         const formattedData = data.map(item => {
           let formattedDate;
+          let sortValue;
 
-          if (timeRange === "quarterly") {
+          if (timeRange === "quarterly" && item.due_quarter) {
             const [year, quarter] = item.due_quarter.split("-Q")
             formattedDate = `Q${quarter} ${year}`
-          } else if (timeRange === "half_year") {
+            sortValue = parseInt(year) * 10 + parseInt(quarter)
+          } else if (timeRange === "half_year" && item.due_half_year) {
             const [year, half] = item.due_half_year.split("-H")
             formattedDate = half === "1" ? `First Half ${year}` : `Second Half ${year}`
-          } else if (timeRange === "monthly") {
+            sortValue = parseInt(year) * 10 + parseInt(half)
+          } else if (timeRange === "monthly" && item.due_month) {
             const [year, month] = item.due_month.split("-")
             const date = new Date(year, month - 1) // month is 0-indexed in JS
             formattedDate = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long" }).format(date)
-          } else if (timeRange === "annual") {
+            sortValue = new Date(item.due_month + "-01").getTime()
+          } else if (timeRange === "annual" && item.due_year) {
             formattedDate = item.due_year
+            sortValue = parseInt(item.due_year)
+          } else {
+            // If we don't have the expected data, use a default value
+            formattedDate = "Unknown"
+            sortValue = 0
           }
 
           return {
@@ -53,14 +64,19 @@ export default function LoanDetailsChart() {
             min_loan_amount: Number(item.min_installment_amount) || 0,
             total_loan_amount: Number(item.total_installment_amount) || 0,
             loan_count: Number(item.installment_count) || 0,
-            sort_date: timeRange === "quarterly" || timeRange === "half_year" 
-              ? parseInt(item.due_quarter || item.due_half_year) 
-              : new Date(item.due_month || item.due_year + "-01").getTime()
+            sort_value: sortValue
           }
         })
 
-        // Sort data by the `sort_date`
-        const sortedData = formattedData.sort((a, b) => a.sort_date - b.sort_date)
+        // Sort data by sort_value
+        const sortedData = formattedData.sort((a, b) => {
+          if (Math.floor(a.sort_value / 10) === Math.floor(b.sort_value / 10)) {
+            // Same year, sort by quarter or half
+            return a.sort_value % 10 - b.sort_value % 10;
+          }
+          // Different years, sort by year
+          return a.sort_value - b.sort_value;
+        });
 
         setLoanData(sortedData)
         setIsLoading(false)
@@ -84,7 +100,7 @@ export default function LoanDetailsChart() {
 
   if (isLoading) {
     return (
-      <Card className="w-full">
+      <Card className="w-full mb-4">
         <CardContent className="pt-6">
           <div className="flex justify-center items-center h-[300px]">
             <p className="text-muted-foreground">Loading loan data...</p>
@@ -96,7 +112,7 @@ export default function LoanDetailsChart() {
 
   if (error) {
     return (
-      <Card className="w-full">
+      <Card className="w-full mb-4">
         <CardContent className="pt-6">
           <div className="flex justify-center items-center h-[300px]">
             <p className="text-destructive">{error}</p>
@@ -109,7 +125,7 @@ export default function LoanDetailsChart() {
   return (
     <Card className="w-full mb-4">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-blue-900">Late Loan Chart</CardTitle>
+        <CardTitle className="text-2xl font-bold text-blue-900">Loan Details Chart</CardTitle>
         <CardDescription className="text-teal-600">View average, minimum, and maximum loan amounts</CardDescription>
       </CardHeader>
       <CardContent>
@@ -133,7 +149,7 @@ export default function LoanDetailsChart() {
               <YAxis tickFormatter={formatYAxis} />
               <Tooltip 
                 formatter={(value, name) => [formatCurrency(Number(value)), name]}
-                labelFormatter={(label) => `Due on: ${label}`}
+                labelFormatter={(label) => `Approved: ${label}`}
               />
               <Legend />
               <Line type="monotone" dataKey="avg_loan_amount" stroke="hsl(var(--primary))" name="Avg Loan Amount" />

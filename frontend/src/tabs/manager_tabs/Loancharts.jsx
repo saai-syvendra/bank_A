@@ -33,19 +33,24 @@ export default function LoanDetailsChart() {
         // Process and format the data
         const formattedData = data.map(item => {
           let formattedDate;
+          let sortValue;
 
           if (timeRange === "quarterly") {
             const [year, quarter] = item.approved_quarter.split("-Q")
             formattedDate = `Q${quarter} ${year}`
+            sortValue = parseInt(year) * 10 + parseInt(quarter)
           } else if (timeRange === "half_year") {
             const [year, half] = item.approved_half_year.split("-H")
             formattedDate = half === "1" ? `First Half ${year}` : `Second Half ${year}`
+            sortValue = parseInt(year) * 10 + parseInt(half)
           } else if (timeRange === "monthly") {
             const [year, month] = item.approved_month.split("-")
             const date = new Date(year, month - 1) // month is 0-indexed in JS
             formattedDate = new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long" }).format(date)
+            sortValue = new Date(item.approved_month + "-01").getTime()
           } else if (timeRange === "annual") {
             formattedDate = item.approved_year
+            sortValue = parseInt(item.approved_year)
           }
 
           return {
@@ -55,14 +60,19 @@ export default function LoanDetailsChart() {
             min_loan_amount: Number(item.min_loan_amount) || 0,
             total_loan_amount: Number(item.total_loan_amount) || 0,
             loan_count: Number(item.loan_count) || 0,
-            sort_date: timeRange === "quarterly" || timeRange === "half_year" 
-              ? parseInt(item.approved_quarter || item.approved_half_year) 
-              : new Date(item.approved_month || item.approved_year + "-01").getTime()
+            sort_value: sortValue
           }
         })
 
-        // Sort data by `sort_date`
-        const sortedData = formattedData.sort((a, b) => a.sort_date - b.sort_date)
+        // Sort data by sort_value
+        const sortedData = formattedData.sort((a, b) => {
+          if (Math.floor(a.sort_value / 10) === Math.floor(b.sort_value / 10)) {
+            // Same year, sort by quarter or half
+            return a.sort_value % 10 - b.sort_value % 10;
+          }
+          // Different years, sort by year
+          return a.sort_value - b.sort_value;
+        });
 
         setLoanData(sortedData)
         setIsLoading(false)
