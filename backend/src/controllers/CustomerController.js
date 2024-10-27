@@ -1,5 +1,5 @@
 import CustomerModel from "../models/CustomerModel.js";
-
+import EmployeeModel from "../models/EmployeeModel.js";
 const getCustomer = async (req, res) => {
   const { customerId } = req.body;
   try {
@@ -133,7 +133,18 @@ const getCustomerDetailsFromAccountNo = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
+const getthisBranchCustomers = async (req, res) => {
+  const { id: employeeId } = req.user; 
+  const branchCode = await EmployeeModel.getEmployeeBranch(employeeId); 
+  console.log("Branch Code:", branchCode);
+  
+  try {
+    const summary = await CustomerModel.getthisBranchCustomers(branchCode); 
+    res.status(200).send(summary); 
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+}
 export default {
   getCustomer,
   getCustomerNames,
@@ -141,4 +152,5 @@ export default {
   getCustomerDetail,
   updateCustomerDetail,
   getCustomerDetailsFromAccountNo,
+  getthisBranchCustomers,
 };

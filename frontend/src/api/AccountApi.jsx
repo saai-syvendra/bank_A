@@ -253,4 +253,20 @@ export const callGetATMInformation = async (accountNo) => {
   }
 };
 
+export const callGetBranchCustomers = async () => {
+  try {
+    const response = await fetch(`${ACCOUNT_API_URL}/branch-customers`, {
+      method: "GET",
+      credentials: "include",
+    });
 
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch customers");
+    }
+
+    return data; 
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};

@@ -60,7 +60,7 @@ router.get(
 
 router.get(
   "/branch-loans",
-  authorizeRole("emplopyee", "manager"),
+  authorizeRole("employee", "manager"),
   LoanController.getBranchLoanSummary
 );
 

@@ -125,3 +125,21 @@ export const callGetCustomerDetailsFromAccountNo = async (accountNo) => {
     throw new Error(error.message);
   }
 };
+
+export const callGetthisBranchCustomers = async () => {
+  try {
+    const response = await fetch(`${CUSTOMER_API_URL}/this-customers`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch customers");
+    }
+
+    return data; 
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
