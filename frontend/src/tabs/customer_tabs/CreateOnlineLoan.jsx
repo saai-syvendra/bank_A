@@ -61,7 +61,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
       setPlans(fetchedPlans);
       console.log("Plans", fetchedPlans);
     } catch (error) {
-      toast.error("Failed to fetch loan plans");
+      toast.error(error.message || "Failed to fetch loan plans");
     }
   };
 
@@ -81,7 +81,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
       console.log("Accounts", fetchedAccounts);
       setAccounts(fetchedAccounts);
     } catch (error) {
-      toast.error("Failed to fetch customer accounts");
+      toast.error(error.message || "Failed to fetch customer accounts");
     }
   };
 

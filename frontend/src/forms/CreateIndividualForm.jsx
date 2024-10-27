@@ -57,8 +57,8 @@ export default function CreateIndividualForm() {
       });
       toast.success("Customer created successfully");
       form.reset();
-    } catch (errors) {
-      toast.error("Customer creation failed");
+    } catch (error) {
+      toast.error(error.message || "Customer creation failed");
     } finally {
       setIsLoading(false);
     }

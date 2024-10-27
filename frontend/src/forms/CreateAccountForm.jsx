@@ -51,7 +51,7 @@ export default function CreateAccountForm({ triggerFetchCustomers = false, indiv
       const fetchedCustomers = await callGetCustomerNames(customerType);
       setCustomers(fetchedCustomers);
     } catch (error) {
-      toast.error("Failed to fetch customers");
+      toast.error(error.message || "Failed to fetch customers");
     }
   };
 

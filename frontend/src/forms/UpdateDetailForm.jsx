@@ -62,7 +62,7 @@ const UpdateDetailForm = ({
         new Date(data.dob).toDateString().split(" ").slice(1).join(" ")
       );
     } catch (error) {
-      toast.error("Failed to fetch employee detail");
+      toast.error(error.message || "Failed to fetch employee detail");
     }
   };
 
@@ -79,8 +79,8 @@ const UpdateDetailForm = ({
     try {
       await updateFunction(data);
       toast.success("Details updated successfully");
-    } catch (errors) {
-      toast.error("Update failed");
+    } catch (error) {
+      toast.error(error.message || "Update failed");
     } finally {
       setIsLoading(false);
     }

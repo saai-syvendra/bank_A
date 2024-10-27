@@ -56,7 +56,7 @@ const CreateFd = ({ triggerToRefetch }) => {
       setPlans(fetchedPlans);
       console.log("Plans", fetchedPlans);
     } catch (error) {
-      toast.error("Failed to fetch FD plans");
+      toast.error(error.message || "Failed to fetch FD plans");
     }
   };
 
@@ -66,7 +66,7 @@ const CreateFd = ({ triggerToRefetch }) => {
       console.log("Accounts", fetchedAccounts);
       setAccounts(fetchedAccounts);
     } catch (error) {
-      toast.error("Failed to fetch customer accounts");
+      toast.error(error.message || "Failed to fetch customer accounts");
     }
   };
 
@@ -75,7 +75,7 @@ const CreateFd = ({ triggerToRefetch }) => {
     try {
       await sendOtp();
     } catch (error) {
-      toast.error("Failed to initiate OTP verification");
+      toast.error(error.message || "Failed to initiate OTP verification");
     } finally {
       setIsLoading(false);
     }
