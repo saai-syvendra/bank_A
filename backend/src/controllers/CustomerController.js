@@ -136,11 +136,21 @@ const getCustomerDetailsFromAccountNo = async (req, res) => {
 const getthisBranchCustomers = async (req, res) => {
   const { id: employeeId } = req.user; 
   const branchCode = await EmployeeModel.getEmployeeBranch(employeeId); 
-  console.log("Branch Code:", branchCode);
   
   try {
     const summary = await CustomerModel.getthisBranchCustomers(branchCode); 
-    res.status(200).send(summary); 
+    const modifiedData = summary.map(customer => {
+      if (customer.c_type === 'individual') {
+        customer.name = `${customer.first_name} ${customer.last_name}`;
+      }
+      // Remove unnecessary fields
+      delete customer.nic;
+      delete customer.first_name;
+      delete customer.last_name;
+      
+      return customer;
+    });
+    res.status(200).send(modifiedData); 
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
