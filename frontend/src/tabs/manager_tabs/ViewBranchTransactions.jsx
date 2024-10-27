@@ -113,6 +113,7 @@ export default function ViewBranchTransactions() {
   const cancelFilters = () => {
     setFilters(defaultFilters);
     setTempFilters(defaultFilters);
+    setSortConfig({key: null, direction: "ascending"});
   };
 
   const sortData = (key) => {
@@ -164,11 +165,11 @@ export default function ViewBranchTransactions() {
 
   return (
     <div className="p-6">
-      <Transactioncharts/>
-      <TotalTransactionAmountChart/>
-      <Card className="mb-4">
-        <CardHeader>
-          <h2 className="text-2xl font-bold text-blue-900">Branch Transactions</h2>
+      <Card className="mb-4 max-h-[600px] flex flex-col">
+        <CardHeader className="space-y-4">
+          <h2 className="text-2xl font-bold text-blue-900">
+            Branch Transactions
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
             <div>
               <Select
@@ -302,15 +303,24 @@ export default function ViewBranchTransactions() {
             </div>
           </div>
           <div className="flex justify-start space-x-2 mt-4 pt-3">
-            <Button variant="outline" onClick={cancelFilters} className="hover:bg-blue-50 hover:border-blue-900">
+            <Button
+              variant="outline"
+              onClick={cancelFilters}
+              className="hover:bg-blue-50 hover:border-blue-900"
+            >
               Reset Filters
             </Button>
-            <Button onClick={applyFilters} className=" bg-blue-900 hover:bg-teal-950">Apply Filters</Button>
+            <Button
+              onClick={applyFilters}
+              className=" bg-blue-900 hover:bg-teal-950"
+            >
+              Apply Filters
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-auto flex-grow relative">
           <Table>
-            <TableHeader>
+          <TableHeader>
               <TableRow>
                 <TableHead>Account No</TableHead>
                 <TableHead
@@ -330,9 +340,11 @@ export default function ViewBranchTransactions() {
                 <TableHead>Method</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="max-h-[400px] overflow-y-auto">
               {transactions.map((transaction) => (
-                <TableRow key={transaction.transaction_id+transaction.transactionType}>
+                <TableRow
+                  key={transaction.transaction_id + transaction.transactionType}
+                >
                   <TableCell>{transaction.account_number}</TableCell>
                   <TableCell
                     className={`text-gray-800 font-semibold ${
@@ -342,7 +354,10 @@ export default function ViewBranchTransactions() {
                     }`}
                   >
                     {transaction.trans_type === "debit" ? "-" : ""} Rs.{" "}
-                    {parseFloat(transaction.amount).toFixed(2)}
+                    {Number(transaction.amount).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </TableCell>
                   <TableCell>
                     {format(new Date(transaction.trans_timestamp), "PP")}
@@ -372,6 +387,9 @@ export default function ViewBranchTransactions() {
           </Table>
         </CardContent>
       </Card>
+
+      <Transactioncharts />
+      <TotalTransactionAmountChart />
     </div>
   );
 }
