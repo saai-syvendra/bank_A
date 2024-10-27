@@ -82,22 +82,37 @@ export default function Summary() {
     <div className="container mx-auto max-w-4xl p-4 space-y-6">
       {customerData.accounts.map((account) => (
         <Card key={account.id} className="w-full">
-          <CardHeader>
-            <CardTitle>
-              {account.account_type.charAt(0).toUpperCase() +
-                account.account_type.slice(1)}{" "}
-              Account - {account.account_number}
-            </CardTitle>
-            <CardDescription>
-              Current Balance: Rs.{" "}
-              {!isNaN(account.balance)
-                ? parseFloat(account.balance).toFixed(2)
-                : "0.00"}
-            </CardDescription>
+          <CardHeader className="space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-xl font-semibold">
+                  {account.account_type.charAt(0).toUpperCase() +
+                    account.account_type.slice(1)}{" "}
+                  Account
+                </CardTitle>
+                <CardDescription className="text-sm mt-1">
+                  Account Number: {account.account_number}
+                </CardDescription>
+              </div>
+              <div className="text-right">
+                <CardDescription className="text-sm font-medium text-teal-600">
+                  Current Balance
+                </CardDescription>
+                <CardTitle className="text-3xl font-bold text-primary text-blue-900">
+                  Rs.
+                  {!isNaN(account.balance)
+                    ? Number(account.balance).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    : "0.00"}
+                </CardTitle>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 bg-muted rounded-md">
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 bg-muted rounded-md bg-blue-200">
                 <span className="font-semibold">Loans</span>
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>
@@ -108,6 +123,7 @@ export default function Summary() {
                       <TableRow>
                         <TableHead>Loan ID</TableHead>
                         <TableHead>Plan Name</TableHead>
+                        <TableHead>Loan Type</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Interest Rate</TableHead>
                         <TableHead>Approved Date</TableHead>
@@ -119,7 +135,18 @@ export default function Summary() {
                           <TableCell>{loan.id}</TableCell>
                           <TableCell>{loan.name}</TableCell>
                           <TableCell>
-                            Rs. {parseFloat(loan.loan_amount).toFixed(2)}
+                            {loan.loan_type.charAt(0).toUpperCase() +
+                              loan.loan_type.slice(1)}{" "}
+                            {loan.loan_type === "online"
+                              ? ` (FD ID: ${loan.fd_id})`
+                              : ""}
+                          </TableCell>
+                          <TableCell>
+                            Rs.{" "}
+                            {Number(loan.loan_amount).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </TableCell>
                           <TableCell>{loan.interest}%</TableCell>
                           <TableCell>
@@ -138,7 +165,7 @@ export default function Summary() {
             </Collapsible>
 
             <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 bg-muted rounded-md">
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 bg-muted rounded-md bg-blue-200">
                 <span className="font-semibold">Fixed Deposits</span>
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>
@@ -148,6 +175,7 @@ export default function Summary() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>FD ID</TableHead>
+                        <TableHead>Plan Name</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Interest Rate</TableHead>
                         <TableHead>Maturity Date</TableHead>
@@ -157,8 +185,13 @@ export default function Summary() {
                       {account.fixedDeposits.map((fd) => (
                         <TableRow key={fd.id}>
                           <TableCell>{fd.id}</TableCell>
+                          <TableCell>{fd.name}</TableCell>
                           <TableCell>
-                            Rs. {parseFloat(fd.amount).toFixed(2)}
+                            Rs.{" "}
+                            {Number(fd.amount).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </TableCell>
                           <TableCell>{fd.interest}%</TableCell>
                           <TableCell>

@@ -205,9 +205,12 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
                             >
                               {`${plan.name} - ${
                                 plan.interest
-                              }% , Max Amount: Rs. ${parseFloat(
+                              }% , Max Amount: Rs.${parseFloat(
                                 plan.max_amount
-                              ).toLocaleString()}`}
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}`}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -280,7 +283,10 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
               {isLoading || isVerifying ? (
                 <LoadingButton className="w-full" />
               ) : (
-                <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950">
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-900 hover:bg-teal-950"
+                >
                   Submit Loan Request
                 </Button>
               )}

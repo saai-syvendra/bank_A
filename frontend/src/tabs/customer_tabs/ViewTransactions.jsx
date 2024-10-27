@@ -327,8 +327,12 @@ export default function ViewTransactions() {
                         : "text-green-600"
                     }`}
                   >
-                    {transaction.trans_type === "debit" ? "-" : ""} Rs.{" "}
-                    {parseFloat(transaction.amount).toFixed(2)}
+                    {transaction.trans_type === "debit" ? "-" : ""}
+                    Rs.{" "}
+                    {Number(transaction.amount).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </TableCell>
                   <TableCell>
                     {format(new Date(transaction.trans_timestamp), "PP")}

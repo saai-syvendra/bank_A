@@ -61,7 +61,7 @@ const getApprovalPendingLoans = async (req, res) => {
         if (customer["c_type"] === "individual") {
           customer_name = customer["first_name"] + " " + customer["last_name"];
         } else if (customer["c_type"] === "organisation") {
-          customer_name = customer["org_name"];
+          customer_name = customer["name"];
         }
         loanData.push({
           ...loan,

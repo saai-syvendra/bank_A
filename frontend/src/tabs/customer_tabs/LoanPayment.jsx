@@ -84,12 +84,11 @@ const LoanPayment = () => {
       );
     } catch (error) {
       toast.error(error.message || "Failed to process payment");
-    } finally{
+    } finally {
       setIsPaymentModalOpen(false);
       fetchUpcomingInstallments();
       fetchAccounts();
     }
-    
   };
 
   useEffect(() => {
@@ -101,7 +100,9 @@ const LoanPayment = () => {
     <div className="container mx-auto p-4">
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-blue-900">Loan Payment</CardTitle>
+          <CardTitle className="text-2xl font-bold text-blue-900">
+            Loan Payment
+          </CardTitle>
           <p className="text-teal-600 text-sm text-secondary-foreground">
             Select and pay relevant laon installment
           </p>
@@ -124,7 +125,13 @@ const LoanPayment = () => {
                   <TableCell>
                     {loan.installment_no}/{loan.months}
                   </TableCell>
-                  <TableCell>Rs. {loan.installment_amount}</TableCell>
+                  <TableCell>
+                    Rs.{" "}
+                    {Number(loan.installment_amount).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </TableCell>
                   <TableCell>{format(new Date(loan.due_date), "PP")}</TableCell>
                   <TableCell>
                     <Button
@@ -147,8 +154,12 @@ const LoanPayment = () => {
           <DialogHeader>
             <DialogTitle>Make Payment</DialogTitle>
             <DialogDescription>
-              Are you sure you want to make a payment of Rs. {paymentAmount} for
-              installment {selectedInstallment?.installment_no} of{" "}
+              Are you sure you want to make a payment of Rs.{" "}
+              {Number(paymentAmount).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              for installment {selectedInstallment?.installment_no} of{" "}
               {selectedInstallment?.id}?
             </DialogDescription>
           </DialogHeader>

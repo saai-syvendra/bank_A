@@ -279,10 +279,11 @@ const getLoansByAccountId = async (accountId) => {
 
     const [rows] = await connection.query(
       `
-        SELECT Loan.*, Loan_Plan.interest, Loan_Plan.name
+        SELECT Loan.*, Loan_Plan.interest, Loan_Plan.name, Online_Loan.fd_id
         FROM Loan 
         JOIN Loan_Plan ON Loan.plan_id = Loan_Plan.id
-        WHERE Loan.connected_account = ?;
+        LEFT JOIN Online_Loan ON Loan.id = Online_Loan.loan_id
+        WHERE Loan.start_date IS NOT NULL AND Loan.connected_account = ?;
       `,
       [accountId] // Use accountId as a parameter
     );

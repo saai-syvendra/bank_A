@@ -227,18 +227,19 @@ INSERT INTO Online_Transfer (transaction_id, to_account_id) VALUES
 
 -- Online Transfers for 2023
 INSERT INTO Online_Transfer (transaction_id, to_account_id) VALUES
-(54,4), -- Online Purchase for account 3
-(68,6), -- Subscription Fee for account 7
-(93, 9); -- Shopping for account 3
+(35,4), -- Online Purchase for account 3
+(43,6), -- Subscription Fee for account 7
+(55, 9); -- Shopping for account 3
 
 -- SELECT * FROM account_transaction ORDER BY account_transaction.trans_timestamp DESC;
 -- SELECT * FROM online_transfer;
 -- Online Transfers for 2024
 INSERT INTO Online_Transfer (transaction_id, to_account_id) VALUES
-(102, 2); -- Transfer Fee for account 2
--- (100, 3), -- Invoice Payment for account 3
--- (105, 5), -- Online Shopping for account 5
--- (111, 6); -- Salary Adjustment for account 6
+(67, 4), -- Transfer Fee for account 2
+(69, 7), -- Invoice Payment for account 3
+(73, 1), -- Online Shopping for account 5
+(83, 6),
+(102,1); -- Salary Adjustment for account 6
 -- Add Dummy Data To FDs, Loans and Loan installments
 
 INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
