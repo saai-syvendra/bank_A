@@ -124,7 +124,6 @@ export const callGetCustomerAccountTransactions = async ({
   params.set("maxAmount", maxAmount);
   params.set("method", method);
   params.set("accountId", accountId);
-  console.log(params.toString());
   try {
     const response = await fetch(
       `${ACCOUNT_API_URL}/my-transactions?${params.toString()}`,
@@ -163,7 +162,6 @@ export const callGetBranchAccountTransactions = async ({
   params.set("maxAmount", maxAmount);
   params.set("method", method);
   params.set("accountId", accountId);
-  console.log(params.toString());
   try {
     const response = await fetch(
       `${ACCOUNT_API_URL}/branch-transactions?${params.toString()}`,

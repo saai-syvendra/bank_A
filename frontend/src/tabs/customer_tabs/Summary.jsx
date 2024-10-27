@@ -44,8 +44,8 @@ export default function Summary() {
 
         const loansData = await Promise.all(loanPromises);
         const fdsData = await Promise.all(fdPromises);
-        console.log(loansData);
-        console.log(fdsData);
+        // console.log(loansData);
+        // console.log(fdsData);
 
         // Combine loans and fixed deposits with respective accounts
         const combinedAccounts = accounts.map((account, index) => ({
@@ -54,7 +54,7 @@ export default function Summary() {
           fixedDeposits: fdsData[index] || [],
         }));
 
-        console.log(combinedAccounts);
+        // console.log(combinedAccounts);
 
         setCustomerData({
           accounts: combinedAccounts,

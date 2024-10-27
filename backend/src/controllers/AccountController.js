@@ -181,7 +181,6 @@ const getAccountIDByAccountNo = async (req, res) => {
 
 const getATMinformation = async (req, res) => {
   const { accountNo } = req.query;
-  console.log(accountNo);
   try {
     const account = await AccountModel.getAccountByAccountNo(accountNo);
     const customer = await CustomerModel.getCustomer(account.customer_id);
@@ -205,10 +204,8 @@ const getATMinformation = async (req, res) => {
   }
 };
 const getbranchCustomers = async (req, res) => {
-  console.log("Invoking getbranchCustomers...");
   const { id: employeeId } = req.user; 
   const branchCode = await EmployeeModel.getEmployeeBranch(employeeId); 
-  console.log("Branch Code:", branchCode);
   
   try {
     const summary = await AccountModel.getBranchCustomers(branchCode); 

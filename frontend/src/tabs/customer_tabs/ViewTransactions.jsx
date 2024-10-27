@@ -67,7 +67,7 @@ export default function ViewTransactions() {
       const sortedTransactions = fetchedTransactions.sort((a, b) => {
         return new Date(b.trans_timestamp) - new Date(a.trans_timestamp);
       });
-      console.log("Fetched Transactions", sortedTransactions);
+      // console.log("Fetched Transactions", sortedTransactions);
       setTransactions(sortedTransactions);
       setOriginalTransactions(sortedTransactions);
     } catch (error) {
@@ -83,7 +83,7 @@ export default function ViewTransactions() {
     try {
       const accounts = await callGetThisCustomerAccounts();
       setAccounts(accounts);
-      console.log("Fetched Accounts", accounts);
+      // console.log("Fetched Accounts", accounts);
     } catch (error) {
       toast.error(error.message || "Failed to fetch accounts");
     }

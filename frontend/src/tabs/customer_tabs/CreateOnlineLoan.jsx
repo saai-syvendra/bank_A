@@ -59,7 +59,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
     try {
       const fetchedPlans = await callGetLoanPlans();
       setPlans(fetchedPlans);
-      console.log("Plans", fetchedPlans);
+      // console.log("Plans", fetchedPlans);
     } catch (error) {
       toast.error(error.message || "Failed to fetch loan plans");
     }
@@ -69,7 +69,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
     try {
       const fetchedFds = await callGetCustomerFds();
       setFds(fetchedFds);
-      console.log("Fds", fetchedFds);
+      // console.log("Fds", fetchedFds);
     } catch (error) {
       toast.error(error.message || "Failed to fetch customer fixed deposits");
     }
@@ -78,7 +78,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
   const fetchAccounts = async () => {
     try {
       const fetchedAccounts = await callGetThisCustomerAccounts();
-      console.log("Accounts", fetchedAccounts);
+      // console.log("Accounts", fetchedAccounts);
       setAccounts(fetchedAccounts);
     } catch (error) {
       toast.error(error.message || "Failed to fetch customer accounts");

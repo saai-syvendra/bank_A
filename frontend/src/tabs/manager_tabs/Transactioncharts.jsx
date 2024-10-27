@@ -28,7 +28,7 @@ export default function TransactionDetailsChart() {
         }
 
         const data = await callGetTransactionReports(filters)
-        console.log(data);
+        // console.log(data);
         
         // Process and format the data
         const formattedData = data.map(item => {

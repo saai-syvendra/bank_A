@@ -54,7 +54,7 @@ const CreateFd = ({ triggerToRefetch }) => {
     try {
       const fetchedPlans = await callGetFdPlans();
       setPlans(fetchedPlans);
-      console.log("Plans", fetchedPlans);
+      // console.log("Plans", fetchedPlans);
     } catch (error) {
       toast.error(error.message || "Failed to fetch FD plans");
     }
@@ -63,7 +63,7 @@ const CreateFd = ({ triggerToRefetch }) => {
   const fetchAccounts = async () => {
     try {
       const fetchedAccounts = await callGetThisCustomerAccounts("saving");
-      console.log("Accounts", fetchedAccounts);
+      // console.log("Accounts", fetchedAccounts);
       setAccounts(fetchedAccounts);
     } catch (error) {
       toast.error(error.message || "Failed to fetch customer accounts");

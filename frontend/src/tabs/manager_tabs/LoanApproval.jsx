@@ -13,7 +13,7 @@ export default function LoanApprovalList() {
     try {
       const data = await callGetApprovalPendingLoans();
       setLoans(data);
-      console.log(data);
+      // console.log(data);
       setError(null);
     } catch (error) {
       setError(error.message);
