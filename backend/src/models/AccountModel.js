@@ -275,7 +275,7 @@ const getBranchCustomers = async (branch_code) => {
       `
       SELECT *
       FROM Customer_Account 
-      WHERE branch_code = ?  --
+      WHERE branch_code = ?;
       `,
       [branch_code]
     );

@@ -323,7 +323,7 @@ const getBranchLoanSummary = async (branch_code) => {
             Customer_Account ca ON ca.account_id = l.connected_account
         LEFT JOIN 
             Loan_Installment li ON li.loan_id = l.id
-        WHERE ca.branch_code = ?
+        WHERE start_date IS NOT NULL AND ca.branch_code = ?
         GROUP BY 
             l.id, ca.account_number, ca.customer_id, l.loan_amount
         HAVING 

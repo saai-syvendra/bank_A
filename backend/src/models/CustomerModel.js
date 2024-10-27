@@ -126,12 +126,12 @@ const getthisBranchCustomers = async (branch_code) => {
 
     const [rows] = await connection.query(
       `
-        SELECT * 
-        FROM customer_account 
-        LEFT JOIN individual_customer on customer_account.customer_id=individual_customer.customer_id
-        LEFT JOIN organisation_customer on customer_account.customer_id=organisation_customer.customer_id
-        LEFT JOIN customer on customer_account.customer_id=customer.customer_id
-        WHERE branch_code = ?
+        SELECT DISTINCT c.customer_id, c.c_type, ic.nic, ic.first_name, ic.last_name, oc.name 
+          FROM Customer c 
+          LEFT JOIN Individual_Customer ic USING(customer_id) 
+          LEFT JOIN Organisation_Customer oc USING(customer_id) 
+          RIGHT JOIN Customer_Account USING(customer_id)
+          WHERE branch_code = ?;
       `,
       [branch_code]
     );
