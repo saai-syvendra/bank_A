@@ -160,10 +160,6 @@ export default function ViewBranchTransactions() {
     return <ChevronsUpDown className="inline-block ml-1 size-4" />;
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="p-6">
       <Card className="mb-4 max-h-[600px] flex flex-col">
@@ -342,7 +338,7 @@ export default function ViewBranchTransactions() {
               </TableRow>
             </TableHeader>
             <TableBody className="max-h-[400px] overflow-y-auto">
-              {transactions.map((transaction) => (
+              {!isLoading ? transactions.map((transaction) => (
                 <TableRow
                   key={transaction.transaction_id + transaction.transactionType}
                 >
@@ -383,7 +379,8 @@ export default function ViewBranchTransactions() {
                     </Badge>
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : 
+              <div>Loading...</div>}
             </TableBody>
           </Table>
         </CardContent>

@@ -153,10 +153,6 @@ export default function ViewTransactions() {
     return <ChevronsUpDown className="inline-block ml-1 size-4" />
   }
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="p-6">
       <Card className="mb-4">
@@ -318,7 +314,7 @@ export default function ViewTransactions() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions.map((transaction) => (
+              {!isLoading ? transactions.map((transaction) => (
                 <TableRow key={transaction.transaction_id+transaction.transactionType}>
                   <TableCell>{transaction.account_number}</TableCell>
                   <TableCell
@@ -358,7 +354,7 @@ export default function ViewTransactions() {
                     </Badge>
                   </TableCell>
                 </TableRow>
-              ))}
+              )): <div>Loading...</div>}
             </TableBody>
           </Table>
         </CardContent>
