@@ -88,7 +88,7 @@ const CreateOnlineLoan = ({ triggerToRefetch }) => {
   const onSave = async () => {
     setIsLoading(true);
     try {
-      await sendOtp();
+      await sendOtp("Online Loan creation");
     } catch (error) {
       toast.error("Failed to initiate OTP verification");
     } finally {

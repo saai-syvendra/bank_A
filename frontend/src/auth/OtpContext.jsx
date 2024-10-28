@@ -17,11 +17,11 @@ export const OTPProvider = ({ children }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [showOtpDialog, setShowOtpDialog] = useState(false);
 
-  const sendOtp = useCallback(async () => {
+  const sendOtp = useCallback(async (reason) => {
     setIsVerifying(true);
     try {
       // Replace this with your actual OTP sending API call
-      await callSendOtp("login");
+      await callSendOtp(reason);
       setIsOtpSent(true);
       setShowOtpDialog(true);
       toast.success("OTP sent successfully");

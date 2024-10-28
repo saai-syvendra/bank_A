@@ -73,7 +73,7 @@ const CreateFd = ({ triggerToRefetch }) => {
   const onSave = async () => {
     setIsLoading(true);
     try {
-      await sendOtp();
+      await sendOtp("FD creation");
     } catch (error) {
       toast.error(error.message || "Failed to initiate OTP verification");
     } finally {
