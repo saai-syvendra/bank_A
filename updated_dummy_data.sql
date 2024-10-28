@@ -243,24 +243,24 @@ INSERT INTO Online_Transfer (transaction_id, to_account_id) VALUES
 -- Add Dummy Data To FDs, Loans and Loan installments
 
 INSERT INTO FD (plan_id, account_id, starting_date, amount) VALUES
-(1, 1, '2024-05-01', 10000),
-(2, 3, '2024-06-01', 25000),
-(1, 6, '2024-06-03', 10000),
-(2, 1, '2024-07-01', 25000),
-(1, 3, '2024-07-11', 10000),
+(1, 1, '2024-05-01', 250000),
+(2, 3, '2024-06-01', 250000),
+(1, 6, '2024-06-03', 320000),
+(2, 1, '2024-07-01', 250000),
+(1, 3, '2024-07-11', 250000),
 (2, 6, '2024-10-01', 25000);
 
 -- Insert Loans for various plans, accounts, and types
 INSERT INTO Loan (plan_id, connected_account, loan_type, loan_amount, start_date) VALUES
 (1, 1, 'online', 150000.00, '2024-01-10'),
 (1, 2, 'branch', 100000.00, '2024-02-15'),
-(2, 3, 'online', 250000.00, '2024-03-05'),
+(2, 3, 'online', 150000.00, '2024-03-05'),
 (1, 4, 'branch', 120000.00, '2024-04-10'),
-(2, 5, 'branch', 300000.00,  NULL),
+(2, 5, 'branch', 200000.00,  NULL),
 (1, 6, 'online', 180000.00, '2024-06-15'),
-(2, 1, 'online', 350000.00, '2024-07-25'),
+(2, 1, 'online', 150000.00, '2024-07-25'),
 (1, 3, 'online', 90000.00, '2024-08-05'),
-(2, 4, 'branch', 270000.00, '2024-09-15'),
+(2, 4, 'branch', 170000.00, '2024-09-15'),
 (1, 5, 'branch', 200000.00, '2024-10-01'),
 (1, 4, 'branch', 120000.00, '2024-06-19');
 
@@ -343,7 +343,7 @@ INSERT INTO Loan_Installment (loan_id, installment_no, installment_amount, due_d
 (10, 6, 33333.33, '2024-04-01', 'pending', NULL);
 
 CALL CreateBranchLoan(10004,2,70500,2,"Home renovations");
-CALL CreateOnlineLoan(10005,1,2,9500,3);
+CALL CreateOnlineLoan(10005,1,5,9500,3);
 
 CALL CreateCustomer('mary.poppins@abc.def', '123, Rand Street, That Place', 0718945625, 'individual', 198845678945, 'Mary', 'Poppins', '1992-05-17', null, null);
 
