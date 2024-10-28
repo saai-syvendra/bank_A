@@ -76,7 +76,7 @@ const FundTransfer = ({ triggerToRefetch }) => {
   const onSave = async () => {
     setIsLoading(true);
     try {
-      await sendOtp();
+      await sendOtp("Fund transfer");
     } catch (error) {
       toast.error("Failed to initiate OTP verification");
     } finally {

@@ -90,7 +90,7 @@ const CreateLoan = ({ triggerFetchCustomers }) => {
   const onSave = async (data) => {
     setIsLoading(true);
     try {
-      await sendOtp();
+      await sendOtp("Customer Loan Request");
     } catch (error) {
       toast.error("Failed to initiate OTP verification");
     } finally {
