@@ -251,7 +251,8 @@ CREATE PROCEDURE TransferMoney (
 BEGIN
     DECLARE v_from_balance NUMERIC(12,2);
     DECLARE v_safe_to_deduct BOOLEAN;
-
+	DECLARE v_to_account_no	CHAR(12);
+    
     -- Start a transaction
     START TRANSACTION;
 
@@ -296,11 +297,15 @@ BEGIN
     UPDATE Customer_Account
     SET balance = v_from_balance - p_transfer_amount
     WHERE account_id = p_from_account_id;
-
+    
+    SELECT account_number INTO v_to_account_no
+	FROM Customer_Account 
+    WHERE account_id = p_to_account_id;
+    
     -- Insert the transaction into the Account_Transaction table (only for the from account)
     INSERT INTO Account_Transaction (account_id, amount, trans_timestamp, reason, trans_type, trans_method)
     VALUES (p_from_account_id, p_transfer_amount, CURRENT_TIMESTAMP,
-            CONCAT('Transfer to account ', p_to_account_id, ': ', p_reason), 'debit', 'online-transfer');
+            CONCAT('To ', v_to_account_no, ': ', p_reason), 'debit', 'online-transfer');
 
     -- Capture the last inserted transaction_id
     SET p_transaction_id = LAST_INSERT_ID();
@@ -600,6 +605,7 @@ CREATE PROCEDURE CreateOnlineLoan (
 )
 BEGIN
     DECLARE v_fd_amount NUMERIC(10,2);
+    DECLARE v_existing_loan_amount NUMERIC(10, 2);
     DECLARE v_max_allowed_loan NUMERIC(10, 2);
     DECLARE v_plan_max_amount NUMERIC(10, 2);
     DECLARE v_new_loan_id INT;
@@ -633,14 +639,19 @@ BEGIN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'FD not found for the given customer.';
     END IF;
+	
+    SELECT IFNULL(SUM(l.loan_amount), 0) INTO v_existing_loan_amount
+    FROM Loan l 
+    WHERE l.id 
+		IN (SELECT ol.loan_id FROM Online_Loan ol WHERE ol.fd_id = p_fd_id);
 
     -- Calculate the maximum allowable loan amount (60% of the FD amount, capped at 500,000)
-    SET v_max_allowed_loan = LEAST(v_fd_amount * 0.60, 500000);
+    SET v_max_allowed_loan = LEAST(v_fd_amount * 0.60 - v_existing_loan_amount, 500000);
 
     -- Check if the requested loan amount exceeds the allowable loan limit
     IF p_req_loan_amount > v_max_allowed_loan THEN
         -- Rollback the transaction if requested loan exceeds limits
-        SET v_error_msg = CONCAT('Requested loan amount exceeds the allowable loan limit of ', v_max_allowed_loan ,' based on FD.');
+        SET v_error_msg = CONCAT('Loan amount exceeds the loan limit of 500,000 or 60% of FD. Current loans agains this FD: ', v_existing_loan_amount);
         ROLLBACK;
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = v_error_msg;
@@ -1091,7 +1102,7 @@ BEGIN
             ca_to.account_number,
             at.amount,
             at.trans_timestamp,
-            CONCAT('Transfer from account ', at.account_id, ': ', SUBSTRING_INDEX(at.reason, ':', -1)) AS reason,
+            CONCAT('From', ca_from.account_number, ': ', SUBSTRING_INDEX(at.reason, ':', -1)) AS reason,
             'credit' AS trans_type,
             'online-transfer' AS trans_method
         FROM 
@@ -1100,6 +1111,8 @@ BEGIN
             Online_Transfer ot ON at.transaction_id = ot.transaction_id
         JOIN 
             Customer_Account ca_to ON ot.to_account_id = ca_to.account_id
+		JOIN 
+            Customer_Account ca_from ON at.account_id = ca_from.account_id
         WHERE 
             ot.to_account_id = acc_id
         -- Apply the same filters for Online_Transfer transactions

@@ -31,7 +31,7 @@ BEGIN
         ca.account_type = 'saving';
 END $$
 
-DROP EVENT CalculateMonthlyInterest;
+-- DROP EVENT CalculateMonthlyInterest;
 
 CREATE EVENT CalculateMonthlyInterest
 ON SCHEDULE EVERY 1 MONTH
