@@ -298,6 +298,11 @@ BEGIN
     SET balance = v_from_balance - p_transfer_amount
     WHERE account_id = p_from_account_id;
     
+    -- Add money to receiver
+	UPDATE Customer_Account
+    SET balance = balance + p_transfer_amount
+    WHERE account_id = p_to_account_id;
+    
     SELECT account_number INTO v_to_account_no
 	FROM Customer_Account 
     WHERE account_id = p_to_account_id;
@@ -1102,7 +1107,7 @@ BEGIN
             ca_to.account_number,
             at.amount,
             at.trans_timestamp,
-            CONCAT('From', ca_from.account_number, ': ', SUBSTRING_INDEX(at.reason, ':', -1)) AS reason,
+            CONCAT('From ', ca_from.account_number, ': ', SUBSTRING_INDEX(at.reason, ':', -1)) AS reason,
             'credit' AS trans_type,
             'online-transfer' AS trans_method
         FROM 
