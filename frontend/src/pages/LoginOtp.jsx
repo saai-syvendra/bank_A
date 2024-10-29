@@ -109,7 +109,10 @@ export default function LoginOtp() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-cyan-100 to-blue-200">
+    <div
+      className="flex justify-center items-center min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: "url('pedro-lastra-Nyvq2juw4_o-unsplash.jpg')" }}
+    >
       {otpSent ? (
         <OtpForm onSubmit={handleOtpSubmit} isLoading={isLoading} />
       ) : (
@@ -155,7 +158,11 @@ export default function LoginOtp() {
                 {isLoading ? (
                   <LoadingButton className="w-full" />
                 ) : (
-                  <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-900 hover:bg-teal-950"
+                    disabled={isLoading}
+                  >
                     Submit
                   </Button>
                 )}
