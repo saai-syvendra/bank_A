@@ -83,7 +83,7 @@ const CustomerDashboard = () => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  className={`p-5 cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "summary" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                   onClick={() => setActiveTab("summary")}
                 >
                   <LayoutDashboard className="mr-2 text-teal-600" />
@@ -92,7 +92,7 @@ const CustomerDashboard = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  className={`p-5 cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "view-transactions" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                   onClick={() => setActiveTab("view-transactions")}
                 >
                   <FileText className="mr-2 text-teal-600" />
@@ -101,7 +101,7 @@ const CustomerDashboard = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  className={`p-5 cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "create-loan" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                   onClick={() => setActiveTab("create-loan")}
                 >
                   <CreditCard className="mr-2 text-teal-600" />
@@ -110,7 +110,7 @@ const CustomerDashboard = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  className={`p-5 cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "create-fd" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                   onClick={() => setActiveTab("create-fd")}
                 >
                   <Banknote className="mr-2 text-teal-600" />
@@ -119,7 +119,7 @@ const CustomerDashboard = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  className={`p-5 cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "fund-transfer" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                   onClick={() => setActiveTab("fund-transfer")}
                 >
                   <ArrowLeftRight className="mr-2 text-teal-600" />
@@ -128,7 +128,7 @@ const CustomerDashboard = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  className={`p-5 cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "loan-payment" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                   onClick={() => setActiveTab("loan-payment")}
                 >
                   <DollarSign className="mr-2 text-teal-600" />
@@ -137,7 +137,7 @@ const CustomerDashboard = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  className="p-5 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-10 rounded-lg"
+                  className={`p-5 cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "update-details" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                   onClick={() => setActiveTab("update-details")}
                 >
                   <UserCog className="mr-2 text-teal-600" />
