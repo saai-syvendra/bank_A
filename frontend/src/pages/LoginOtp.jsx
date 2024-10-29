@@ -112,7 +112,9 @@ export default function LoginOtp() {
     <div
       className="flex justify-center items-center min-h-screen bg-cover bg-center"
       style={{ backgroundImage: "url('pedro-lastra-Nyvq2juw4_o-unsplash.jpg')" }}
-    >
+    > 
+    <div className="absolute inset-0 bg-black opacity-50"></div>
+    <div className="relative w-full max-w-md">
       {otpSent ? (
         <OtpForm onSubmit={handleOtpSubmit} isLoading={isLoading} />
       ) : (
@@ -171,6 +173,7 @@ export default function LoginOtp() {
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 }

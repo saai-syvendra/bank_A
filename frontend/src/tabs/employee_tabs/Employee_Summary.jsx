@@ -263,7 +263,7 @@ export default function BranchOverview() {
                   <TableCell>{formatCurrency(loan.loan_amount)}</TableCell>
                   <TableCell>{formatDate(loan.start_date)}</TableCell>
                   <TableCell>{loan.name}</TableCell>
-                  <TableCell>{loan.paid_installments}</TableCell>
+                  <TableCell>{loan.paid_installments}/{loan.total_installments}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

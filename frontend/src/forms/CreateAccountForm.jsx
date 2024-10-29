@@ -76,7 +76,7 @@ export default function CreateAccountForm({ triggerFetchCustomers = false, indiv
     if (triggerFetchCustomers) {
       fetchCustomers();
     }
-  }, [triggerFetchCustomers]);
+  }, [triggerFetchCustomers, individualCustomer]);
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
