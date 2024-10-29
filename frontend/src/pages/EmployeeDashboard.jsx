@@ -110,7 +110,7 @@ const EmployeeDashboard = ({ role }) => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => setActiveTab("summary")}
-                  className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                  className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "summary" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                 >
                   <CreditCard className="mr-2 text-teal-600" />
                   Summary
@@ -125,7 +125,7 @@ const EmployeeDashboard = ({ role }) => {
                   <SidebarMenuSubItem>
                     <SidebarMenuSubButton
                       onClick={() => setActiveTab("create-ind-account")}
-                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-8 rounded-lg"
+                      className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "create-ind-account" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                     >
                       Create Individual Account
                     </SidebarMenuSubButton>
@@ -133,7 +133,7 @@ const EmployeeDashboard = ({ role }) => {
                   <SidebarMenuSubItem>
                     <SidebarMenuSubButton
                       onClick={() => setActiveTab("create-org-account")}
-                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-8 rounded-lg"
+                      className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "create-org-account" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                     >
                       Create Organisation Account
                     </SidebarMenuSubButton>
@@ -149,7 +149,7 @@ const EmployeeDashboard = ({ role }) => {
                   <SidebarMenuSubItem>
                     <SidebarMenuSubButton
                       onClick={() => setActiveTab("create-ind-customer")}
-                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-8 rounded-lg"
+                      className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "create-ind-customer" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                     >
                       Create Individual Customer
                     </SidebarMenuSubButton>
@@ -157,7 +157,7 @@ const EmployeeDashboard = ({ role }) => {
                   <SidebarMenuSubItem>
                     <SidebarMenuSubButton
                       onClick={() => setActiveTab("create-org-customer")}
-                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-8 rounded-lg"
+                      className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "create-org-customer" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                     >
                       Create Organisation Customer
                     </SidebarMenuSubButton>
@@ -167,7 +167,7 @@ const EmployeeDashboard = ({ role }) => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => setActiveTab("create-loan")}
-                  className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                  className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "create-loan" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                 >
                   <CreditCard className="mr-2 text-teal-600" />
                   Create Loan
@@ -176,7 +176,7 @@ const EmployeeDashboard = ({ role }) => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => setActiveTab("cash-deposit")}
-                  className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                  className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "cash-deposit" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                 >
                   <PiggyBank className="mr-2  text-teal-600" />
                   Cash Deposit
@@ -185,7 +185,7 @@ const EmployeeDashboard = ({ role }) => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => setActiveTab("update-details")}
-                  className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                  className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "update-details" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                 >
                   <UserCog className="mr-2  text-teal-600" />
                   Update Details
@@ -196,7 +196,7 @@ const EmployeeDashboard = ({ role }) => {
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       onClick={() => setActiveTab("approve-loan")}
-                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                      className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "approve-loan" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                     >
                       <CheckSquare className="mr-2  text-teal-600" />
                       Approve Loan
@@ -205,7 +205,7 @@ const EmployeeDashboard = ({ role }) => {
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       onClick={() => setActiveTab("late-loan")}
-                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                      className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "late-loan" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                     >
                       <AlertCircle className="mr-2  text-teal-600" />
                       Late Loan Installments
@@ -214,7 +214,7 @@ const EmployeeDashboard = ({ role }) => {
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       onClick={() => setActiveTab("transactions")}
-                      className="cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg"
+                      className={`cursor-pointer transition-all duration-200 ease-in-out ${activeTab === "transactions" ? "bg-blue-100 text-blue-700 pl-6" : ""} hover:bg-blue-100 hover:text-blue-700 hover:pl-6 rounded-lg`}
                     >
                       <BarChart3 className="mr-2  text-teal-600" />
                       Transactions
