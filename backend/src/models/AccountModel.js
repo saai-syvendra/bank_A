@@ -78,7 +78,8 @@ const getCustomerAccounts = async (customerId, accountType) => {
         `
           SELECT * 
           FROM Customer_Account 
-          LEFT JOIN Saving_Account USING(account_id)
+          LEFT JOIN Saving_Account sa USING(account_id)
+          LEFT JOIN Saving_Plan sp ON sa.plan_id = sp.id
           WHERE customer_id = ?;
         `,
         [customerId]

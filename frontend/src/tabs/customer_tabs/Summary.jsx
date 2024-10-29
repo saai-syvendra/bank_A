@@ -33,7 +33,7 @@ export default function Summary() {
       try {
         // Fetch customer accounts
         const accounts = await callGetThisCustomerAccounts();
-
+        console.log("ACC", accounts);
         // Fetch loans and fixed deposits for each account
         const loanPromises = accounts.map((account) =>
           callGetLoansByAccountId(account.account_id)
@@ -92,6 +92,16 @@ export default function Summary() {
                 </CardTitle>
                 <CardDescription className="text-sm mt-1">
                   Account Number: {account.account_number}
+                  {account.account_type === "saving" ? (
+                    <>
+                      <br />
+                      Plan Name:{" "}
+                      {account.name.charAt(0).toUpperCase() +
+                        account.name.slice(1)}{" "}
+                      | Interest Rate: {account.interest}% <br />
+                      Withdrawal Count: {account.withdrawal_count}
+                    </>
+                  ) : null}
                 </CardDescription>
               </div>
               <div className="text-right">
@@ -107,6 +117,17 @@ export default function Summary() {
                       })
                     : "0.00"}
                 </CardTitle>
+                <CardDescription className="text-sm mt-1">
+                  {account.account_type === "saving" ? (
+                    <>
+                      Minimum Balance: Rs.{" "}
+                      {Number(account.minimum_balance).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </>
+                  ) : null}
+                </CardDescription>
               </div>
             </div>
           </CardHeader>
