@@ -120,7 +120,10 @@ BEGIN
     CLOSE account_cursor;
 END $$
 
-CREATE PROCEDURE DepositFDMonthlyInterest()
+CREATE EVENT DailyFDInterestAndPrincipalEvent
+ON SCHEDULE EVERY 1 DAY
+STARTS '2024-10-30 23:00:00'
+DO
 BEGIN
     -- Declare variables
     DECLARE v_account_id INT;
@@ -193,14 +196,6 @@ BEGIN
     -- Close cursor
     CLOSE fd_cursor;
 END $$
-
-CREATE EVENT DailyFDInterestAndPrincipalEvent
-ON SCHEDULE EVERY 1 DAY
-STARTS '2024-10-30 23:00:00' DO
-BEGIN
-    -- Call the procedure to deposit monthly FD interest
-    CALL DepositMonthlyFDInterest();
-END$$
 
 
 DELIMITER ;
