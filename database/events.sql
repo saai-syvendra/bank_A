@@ -162,7 +162,7 @@ BEGIN
         END IF;
 
         -- Calculate the expected interest deposit date (exactly 1 month from opening date)
-        SET v_expected_date = DATE_ADD(v_starting_date, INTERVAL TIMESTAMPDIFF(MONTH, v_starting_date, v_current_date) MONTH);
+        SET v_expected_date = DATE_ADD(v_starting_date, INTERVAL TIMESTAMPDIFF(MONTH, v_starting_date, v_current_date)*30 DAY);
 
         -- Check if the current date matches the expected date for interest deposit
         IF v_current_date = v_expected_date AND v_current_date != v_starting_date THEN
