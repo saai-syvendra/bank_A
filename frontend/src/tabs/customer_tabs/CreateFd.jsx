@@ -125,7 +125,7 @@ const CreateFd = ({ triggerToRefetch }) => {
                   name="planId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Loan Plan</FormLabel>
+                      <FormLabel>FD Plan</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
