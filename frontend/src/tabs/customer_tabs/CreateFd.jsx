@@ -32,7 +32,7 @@ import { formatAccountDetails } from "../../helper/stringFormatting";
 const formSchema = z.object({
   planId: z.coerce.number().min(1, "Please select a plan"),
   connectedAccount: z.coerce.number().min(1, "Please select an account"),
-  fdAmount: z.coerce.number().min(0, "Loan amount must be greater than 0"),
+  fdAmount: z.coerce.number().min(1, "Loan amount must be greater than 0"),
 });
 
 const CreateFd = ({ triggerToRefetch }) => {

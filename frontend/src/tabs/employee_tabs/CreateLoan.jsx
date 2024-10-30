@@ -35,7 +35,7 @@ const formSchema = z.object({
   customerId: z.coerce.number().min(10000, "Please select a customer"),
   planId: z.coerce.number().min(1, "Please select a plan"),
   connectedAccount: z.coerce.number().min(1, "Please select an account"),
-  loanAmount: z.coerce.number().min(0, "Loan amount must be greater than 0"),
+  loanAmount: z.coerce.number().min(1, "Loan amount must be greater than 0"),
   reason: z
     .string()
     .min(1, "Reason required")
