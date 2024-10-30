@@ -11,12 +11,6 @@ router.post(
   TransactionController.employeeDepositForCustomerController
 );
 
-// // ATM deposit by customer
-// router.post(
-//     "/withdraw",
-//     authorizeRole("customer"),
-//     TransactionController.withdrawFromATMController
-// );
 
 //Make online transfer
 router.post(

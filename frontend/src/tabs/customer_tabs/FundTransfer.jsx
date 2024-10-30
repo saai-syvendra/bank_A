@@ -38,7 +38,7 @@ const formSchema = z.object({
   toAccountNo: z.coerce
     .number()
     .min(100000000000, "Please select an account to transfer to"),
-  amount: z.coerce.number().min(0, "Transfer amount must be greater than 0"),
+  amount: z.coerce.number().min(1, "Transfer amount must be greater than 0"),
   reason: z.string().min(1, "Please provide a reason for the transfer"),
 }).refine(
   (data) => data.fromAccountNo !== data.toAccountNo, // Compare actual account numbers

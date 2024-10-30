@@ -237,7 +237,13 @@ CREATE TABLE Loan_Plan (
 
 INSERT INTO Loan_Plan (name, interest, type, max_amount, months, availability) VALUES
 ('Short Loan', 19.00, 'personal', 200000, 6, true),
-('Housing Loan', 17.00, 'business', 100000.00, 48, true);
+('Housing Loan', 17.00, 'personal', 100000.00, 48, true);
+INSERT INTO Loan_Plan (name, interest, type, max_amount, months, availability) VALUES
+('Small Business Administration Loan', 15.00, 'business', 500000.00, 24, true),
+('Expired Loan Plan', 20.00, 'personal', 500000.00, 12, false),
+('Vehicle Loan', 18.00, 'personal', 500000.00, 36, true),
+('Term Loan', 16.00, 'business', 500000.00, 36, true);
+
 
 CREATE TABLE Loan (
   id           		INT AUTO_INCREMENT,
