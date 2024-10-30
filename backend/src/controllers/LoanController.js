@@ -68,7 +68,7 @@ const getApprovalPendingLoans = async (req, res) => {
           customer_name: customer_name,
           account_balance: account.balance,
           account_number: account.account_number,
-          plan_name: plan.plan_name,
+          plan_name: plan.name,
           plan_interest: plan.interest,
         });
       }
