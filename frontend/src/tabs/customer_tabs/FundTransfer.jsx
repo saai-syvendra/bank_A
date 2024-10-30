@@ -30,23 +30,25 @@ import { useOTP } from "../../auth/OtpContext";
 import { OTPDialog } from "@/components/OtpDialog";
 import { formatAccountDetails } from "../../helper/stringFormatting";
 
-const formSchema = z.object({
-  fromAccountId: z.coerce
-    .number()
-    .min(1, "Please select an account to transfer from"),
-  fromAccountNo: z.coerce.number(), // Add fromAccountNumber to compare with toAccountNo
-  toAccountNo: z.coerce
-    .number()
-    .min(100000000000, "Please select an account to transfer to"),
-  amount: z.coerce.number().min(1, "Transfer amount must be greater than 0"),
-  reason: z.string().min(1, "Please provide a reason for the transfer"),
-}).refine(
-  (data) => data.fromAccountNo !== data.toAccountNo, // Compare actual account numbers
-  {
-    message: "From account and To account must be different",
-    path: ["toAccountNo"], // Shows error message under 'To Account'
-  }
-);
+const formSchema = z
+  .object({
+    fromAccountId: z.coerce
+      .number()
+      .min(1, "Please select an account to transfer from"),
+    fromAccountNo: z.coerce.number(),
+    toAccountNo: z.coerce
+      .number()
+      .min(100000000000, "Please select an account to transfer to"),
+    amount: z.coerce.number().min(1, "Transfer amount must be greater than 0"),
+    reason: z.string().min(1, "Please provide a reason for the transfer"),
+  })
+  .refine(
+    (data) => data.fromAccountNo !== data.toAccountNo, // Compare actual account numbers
+    {
+      message: "From account and To account must be different",
+      path: ["toAccountNo"], // Shows error message under 'To Account'
+    }
+  );
 
 const FundTransfer = ({ triggerToRefetch }) => {
   const [accounts, setAccounts] = useState([]);
@@ -88,11 +90,6 @@ const FundTransfer = ({ triggerToRefetch }) => {
     setIsLoading(true);
     try {
       const data = form.getValues();
-      // const transferData = {
-      //   ...data,
-      //   fromAccountNumber: selectedAccount.account_number,
-      // };
-      // console.log(data);
       await callMakeOnlineTransfer(data);
       toast.success("Online transfer successful");
       fetchAccounts();
@@ -115,7 +112,9 @@ const FundTransfer = ({ triggerToRefetch }) => {
     <>
       <Card className="w-full max-w-3xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-blue-900">Online Transfer</CardTitle>
+          <CardTitle className="text-2xl font-bold text-blue-900">
+            Online Transfer
+          </CardTitle>
           <p className="text-teal-600 text-sm text-secondary-foreground">
             Fill out the details to make a transfer
           </p>
@@ -137,8 +136,10 @@ const FundTransfer = ({ triggerToRefetch }) => {
                             (account) => account.account_id.toString() === value
                           );
                           form.setValue("fromAccountId", value);
-                          form.setValue("fromAccountNo", selectedAccount.account_number);
-            
+                          form.setValue(
+                            "fromAccountNo",
+                            selectedAccount.account_number
+                          );
                         }}
                         value={field.value}
                       >
@@ -209,7 +210,10 @@ const FundTransfer = ({ triggerToRefetch }) => {
               {isLoading || isVerifying ? (
                 <LoadingButton className="w-full" />
               ) : (
-                <Button type="submit" className="w-full bg-blue-900 hover:bg-teal-950">
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-900 hover:bg-teal-950"
+                >
                   Make Transfer
                 </Button>
               )}

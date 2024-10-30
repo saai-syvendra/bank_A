@@ -10,6 +10,7 @@ const getCustomer = async (id) => {
     `,
     [id]
   );
+  
   const customer = row[0];
   if (!customer) throw new Error("Invalid customerId");
 
@@ -112,10 +113,8 @@ const getCustomerIDFromAccountNo = async (accountNo) => {
     `,
     [accountNo]
   );
+  if (!row[0]) throw new Error("Invalid account number");
   const customerId = row[0]["customer_id"];
-
-  if (!customerId) throw new Error("Invalid account number");
-
   return customerId;
 };
 const getthisBranchCustomers = async (branch_code) => {
