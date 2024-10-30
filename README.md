@@ -59,19 +59,14 @@ To get started with the Bank Management System, follow these steps:
      ```bash
      cd ../server
      npm start
-6. **Start the backend server**:
-   ```bash
-    cd ../server
-    npm start
-
-8. **Start the frontend development server**:
+6. **Start the frontend development server**:
     ```bash
     cd ../client
     npm start
 
-8. **Open the application**:
+7. **Open the application**:
 
-Open http://localhost:3000 in your browser to access the application.
+- Open http://localhost:3000 in your browser to access the application.
 
 ## Additional Information
 - The project description, tables, and entity-relationship diagram are included in the repository.
