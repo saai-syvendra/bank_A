@@ -55,20 +55,19 @@ To get started with the Bank Management System, follow these steps:
 - Import the provided SQL schema file (`updated_model.sql`) located in the repository.
 - Configure the database connection:
    - Update the database configuration in `server/config/database.js` with your MySQL credentials.
-   - 
 5. **Start the backend server**:
-```bash
-cd ../server
-npm start```
+     ```bash
+     cd ../server
+     npm start
 6. **Start the backend server**:
-```bash
-cd ../server
-npm start
+   ```bash
+    cd ../server
+    npm start
 
-7. **Start the frontend development server**:
-```bash
-cd ../client
-npm start
+8. **Start the frontend development server**:
+    ```bash
+    cd ../client
+    npm start
 
 8. **Open the application**:
 
