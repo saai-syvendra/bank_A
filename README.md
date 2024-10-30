@@ -44,24 +44,24 @@ To get started with the Bank Management System, follow these steps:
 2. **Install backend dependencies**:
    ```bash
    Copy code
-   cd server
+   cd backend
    npm install
 3. **Install frontend dependencies**:
    ```bash
-   cd ../client
+   cd ../frontend
    npm install
 4. **Set up the database**:
 - Create a MySQL database.
 - Import the provided SQL schema file (`updated_model.sql`) located in the repository.
 - Configure the database connection:
-   - Update the database configuration in `server/config/database.js` with your MySQL credentials.
+   - Update the database configuration in `backend/config/database.js` with your MySQL credentials.
 5. **Start the backend server**:
      ```bash
-     cd ../server
+     cd ../backend
      npm start
 6. **Start the frontend development server**:
     ```bash
-    cd ../client
+    cd ../server
     npm start
 
 7. **Open the application**:
