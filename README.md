@@ -29,8 +29,8 @@ This project is a Bank Management System (BMS) that enables users to manage thei
 
 ## Tech Stack
 
-- **Frontend**: React, Axios
-- **Backend**: Node.js with Express, MySQL
+- **Frontend**: React, TailwindCSS, Shadcn
+- **Backend**: Node.js with Express
 - **Database**: MySQL, emphasizing ACID compliance, primary and foreign keys, and indexing.
 
 ## Getting Started
@@ -40,10 +40,9 @@ To get started with the Bank Management System, follow these steps:
 1. **Clone the repository**:
    ```bash
    git clone <repository-url>
-   cd bank-management-system
+   cd bank_A
 2. **Install backend dependencies**:
    ```bash
-   Copy code
    cd backend
    npm install
 3. **Install frontend dependencies**:
@@ -66,7 +65,7 @@ To get started with the Bank Management System, follow these steps:
 
 7. **Open the application**:
 
-- Open http://localhost:3000 in your browser to access the application.
+- Open http://localhost:5173 in your browser to access the application.
 
 ## Additional Information
 - The project description, tables, and entity-relationship diagram are included in the repository.
